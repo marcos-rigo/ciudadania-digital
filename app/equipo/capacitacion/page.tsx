@@ -31,7 +31,8 @@ const cursos = [
   {
     id: "1",
     titulo: "Fundamentos de Gestión de Datos Territoriales",
-    descripcion: "Aprende los conceptos básicos de la gestión de datos georreferenciados y su aplicación en políticas públicas.",
+    descripcion:
+      "Aprende los conceptos básicos de la gestión de datos georreferenciados y su aplicación en políticas públicas.",
     duracion: "4 horas",
     modulos: 8,
     modulosCompletados: 8,
@@ -44,10 +45,7 @@ const cursos = [
   {
     id: "2",
     titulo: "Uso del Sistema de Información Territorial",
-                  <div>
-                    <p className="text-2xl font-bold">{cursosCompletados}</p>
-                    <p className="text-sm text-muted-foreground">Cursos completados</p>
-                  </div>
+    descripcion: "Aprendé a operar el SIT y registrar acciones en territorio.",
     duracion: "6 horas",
     modulos: 12,
     modulosCompletados: 7,
@@ -57,13 +55,11 @@ const cursos = [
     certificado: true,
     imagen: "/placeholder.svg",
   },
-                  <div className="p-3 rounded-lg bg-blue-100 dark:bg-blue-900/10">
-                    <Play className="h-6 w-6 text-blue-600" />
-                  </div>
   {
     id: "3",
     titulo: "Elaboración de Informes de Impacto",
-    descripcion: "Técnicas para elaborar informes efectivos que comuniquen el impacto de las acciones ciudadanas.",
+    descripcion:
+      "Técnicas para elaborar informes efectivos que comuniquen el impacto de las acciones ciudadanas.",
     duracion: "3 horas",
     modulos: 6,
     modulosCompletados: 0,
@@ -73,13 +69,11 @@ const cursos = [
     certificado: true,
     imagen: "/placeholder.svg",
   },
-                  <div className="p-3 rounded-lg bg-purple-100 dark:bg-purple-900/10">
-                    <Award className="h-6 w-6 text-purple-600" />
-                  </div>
   {
     id: "4",
     titulo: "Asistente IA para Análisis de Datos",
-    descripcion: "Aprende a utilizar el asistente de IA para generar análisis y reportes automatizados.",
+    descripcion:
+      "Aprende a utilizar el asistente de IA para generar análisis y reportes automatizados.",
     duracion: "2 horas",
     modulos: 4,
     modulosCompletados: 0,
@@ -89,13 +83,11 @@ const cursos = [
     certificado: true,
     imagen: "/placeholder.svg",
   },
-                  <div className="p-3 rounded-lg bg-amber-100 dark:bg-amber-900/10">
-                    <TrendingUp className="h-6 w-6 text-amber-600" />
-                  </div>
   {
     id: "5",
     titulo: "Coordinación de Operativos en Territorio",
-    descripcion: "Metodologías para planificar y coordinar operativos de participación ciudadana en el territorio.",
+    descripcion:
+      "Metodologías para planificar y coordinar operativos de participación ciudadana en el territorio.",
     duracion: "5 horas",
     modulos: 10,
     modulosCompletados: 0,
@@ -106,6 +98,7 @@ const cursos = [
     imagen: "/placeholder.svg",
   },
 ];
+
 
 const recursos = [
   { id: "1", titulo: "Manual de Usuario - SIT v2.0", tipo: "PDF", tamaño: "2.4 MB", fecha: "2025-01-15" },
