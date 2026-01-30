@@ -23,28 +23,64 @@ import {
 } from "lucide-react";
 import { mockEstadisticas } from "@/lib/mock/ciudadania-data";
 import {
-  BarChart,
-  Bar,
+  LineChart,
+  Line,
   XAxis,
   YAxis,
   CartesianGrid,
   ResponsiveContainer,
   Tooltip,
-  LineChart,
-              {
-              {
-              {
-              {
-            ].map((stat) => (
+  PieChart,
+  Pie,
+  Cell,
+} from "recharts";
 
 const COLORS = ["#3b82f6", "#22c55e", "#8b5cf6", "#f59e0b"];
 
 const monthlyData = [
-                    className={`h-10 w-10 rounded-lg ${stat.color} flex items-center justify-center`}
   { mes: "Oct", usuarios: 78, completados: 23 },
   { mes: "Nov", usuarios: 112, completados: 38 },
   { mes: "Dic", usuarios: 156, completados: 54 },
-                  <Badge className="bg-green-100 text-green-700 hover:bg-green-100 dark:bg-green-900/10 dark:text-green-300 dark:hover:bg-green-900/10">
+  { mes: "Ene", usuarios: 190, completados: 72 },
+];
+
+const reportTemplates = [
+  {
+    title: "Informe de Formación Digital",
+    description: "Resumen de usuarios formados, trayectos completados y certificados emitidos.",
+    icon: Users,
+    color: "text-blue-600 bg-blue-100 dark:bg-blue-900/10 dark:text-blue-300",
+  },
+  {
+    title: "Alcance Ciudadano",
+    description: "Métricas de alcance geográfico y demográfico de la plataforma.",
+    icon: TrendingUp,
+    color: "text-green-600 bg-green-100 dark:bg-green-900/10 dark:text-green-300",
+  },
+  {
+    title: "Impacto de Contenidos",
+    description: "Análisis de visualizaciones, engagement y feedback de contenidos.",
+    icon: BarChart3,
+    color: "text-purple-600 bg-purple-100 dark:bg-purple-900/10 dark:text-purple-300",
+  },
+  {
+    title: "Participación Ciudadana",
+    description: "Resumen de encuestas respondidas y devoluciones ciudadanas.",
+    icon: FileText,
+    color: "text-amber-600 bg-amber-100 dark:bg-amber-900/10 dark:text-amber-300",
+  },
+  {
+    title: "Informe Mensual",
+    description: "Consolidado mensual de todas las métricas de la plataforma.",
+    icon: Calendar,
+    color: "text-red-600 bg-red-100 dark:bg-red-900/10 dark:text-red-300",
+  },
+  {
+    title: "Informe de Gestión",
+    description: "Documento ejecutivo para presentación institucional.",
+    icon: Award,
+    color: "text-sky-600 bg-sky-100 dark:bg-sky-900/10 dark:text-sky-300",
+  },
 ];
 
 export default function GestionReportesPage() {
@@ -55,9 +91,7 @@ export default function GestionReportesPage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold text-foreground">Reportes</h1>
-            <p className="text-muted-foreground">
-              Informes de impacto y gestión
-            </p>
+            <p className="text-muted-foreground">Informes de impacto y gestión</p>
           </div>
           <div className="flex gap-3">
             <Select defaultValue="2025">
@@ -102,29 +136,23 @@ export default function GestionReportesPage() {
             },
             {
               label: "Contenidos producidos",
-              value:
-                mockEstadisticas.videosDisponibles +
-                mockEstadisticas.podcastsDisponibles,
+              value: mockEstadisticas.videosDisponibles + (mockEstadisticas.podcastsDisponibles || 0),
               icon: FileText,
               color: "text-amber-600 bg-amber-100 dark:bg-amber-900/10 dark:text-amber-300",
               change: "+45%",
             },
           ].map((stat) => (
-            <Card key={stat.label} className="border-none shadow-sm transition-smooth animate-fade-up reveal">
+            <Card key={stat.label} className="border-none shadow-sm">
               <CardContent className="p-4">
                 <div className="flex items-start justify-between mb-2">
-                  <div
-                    className={`h-10 w-10 rounded-lg ${stat.color} flex items-center justify-center`}
-                  >
+                  <div className={`h-10 w-10 rounded-lg ${stat.color} flex items-center justify-center`}>
                     <stat.icon className="h-5 w-5" />
                   </div>
-                  <Badge className="bg-green-100 text-green-700 hover:bg-green-100">
+                  <Badge className="bg-green-100 text-green-700 hover:bg-green-100 dark:bg-green-900/10 dark:text-green-300">
                     {stat.change}
                   </Badge>
                 </div>
-                <p className="text-2xl font-bold text-foreground">
-                  {stat.value}
-                </p>
+                <p className="text-2xl font-bold text-foreground">{stat.value}</p>
                 <p className="text-xs text-muted-foreground">{stat.label}</p>
               </CardContent>
             </Card>
@@ -133,48 +161,32 @@ export default function GestionReportesPage() {
 
         {/* Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Growth chart */}
-          <Card className="border-none shadow-sm transition-smooth animate-fade-up reveal">
+          <Card className="border-none shadow-sm">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-blue-600" />
-                Crecimiento mensual
+                <TrendingUp className="h-5 w-5 text-blue-600" /> Crecimiento mensual
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="h-[300px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={monthlyData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
                     <XAxis dataKey="mes" fontSize={12} />
                     <YAxis fontSize={12} />
                     <Tooltip />
-                    <Line
-                      type="monotone"
-                      dataKey="usuarios"
-                      stroke="#3b82f6"
-                      strokeWidth={2}
-                      name="Usuarios"
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="completados"
-                      stroke="#22c55e"
-                      strokeWidth={2}
-                      name="Completados"
-                    />
+                    <Line type="monotone" dataKey="usuarios" stroke="#3b82f6" strokeWidth={2} />
+                    <Line type="monotone" dataKey="completados" stroke="#22c55e" strokeWidth={2} />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
             </CardContent>
           </Card>
 
-          {/* Distribution chart */}
-          <Card className="border-none shadow-sm transition-smooth animate-fade-up reveal">
+          <Card className="border-none shadow-sm">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
-                <BarChart3 className="h-5 w-5 text-purple-600" />
-                Distribución por nivel
+                <BarChart3 className="h-5 w-5 text-purple-600" /> Distribución por nivel
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -185,20 +197,13 @@ export default function GestionReportesPage() {
                       data={mockEstadisticas.distribucionNivel}
                       cx="50%"
                       cy="50%"
-                      labelLine={false}
-                      label={({ nivel, percent }) =>
-                        `${nivel} ${(percent * 100).toFixed(0)}%`
-                      }
-                      outerRadius={100}
-                      fill="#8884d8"
+                      outerRadius={80}
                       dataKey="cantidad"
                       nameKey="nivel"
+                      label={({ nivel, percent }) => `${nivel} ${(percent * 100).toFixed(0)}%`}
                     >
-                      {mockEstadisticas.distribucionNivel.map((entry, index) => (
-                        <Cell
-                          key={`cell-${index}`}
-                          fill={COLORS[index % COLORS.length]}
-                        />
+                      {mockEstadisticas.distribucionNivel.map((_, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>
                     <Tooltip />
@@ -210,81 +215,30 @@ export default function GestionReportesPage() {
         </div>
 
         {/* Report templates */}
-        <Card className="border-none shadow-sm transition-smooth animate-fade-up reveal">
+        <Card className="border-none shadow-sm">
           <CardHeader>
             <CardTitle className="text-lg">Reportes disponibles</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {[
-                {
-                  title: "Informe de Formación Digital",
-                  description:
-                    "Resumen de usuarios formados, trayectos completados y certificados emitidos.",
-                  icon: Users,
-                  color: "text-blue-600 bg-blue-100",
-                },
-                {
-                  title: "Alcance Ciudadano",
-                  description:
-                    "Métricas de alcance geográfico y demográfico de la plataforma.",
-                  icon: TrendingUp,
-                  color: "text-green-600 bg-green-100",
-                },
-                {
-                  title: "Impacto de Contenidos",
-                  description:
-                    "Análisis de visualizaciones, engagement y feedback de contenidos.",
-                  icon: BarChart3,
-                  color: "text-purple-600 bg-purple-100",
-                },
-                {
-                  title: "Participación Ciudadana",
-                  description:
-                    "Resumen de encuestas respondidas y devoluciones ciudadanas.",
-                  icon: FileText,
-                  color: "text-amber-600 bg-amber-100",
-                },
-                {
-                  title: "Informe Mensual",
-                  description:
-                    "Consolidado mensual de todas las métricas de la plataforma.",
-                  icon: Calendar,
-                  color: "text-red-600 bg-red-100",
-                },
-                {
-                  title: "Informe de Gestión",
-                  description:
-                    "Documento ejecutivo para presentación institucional.",
-                  icon: Award,
-                  color: "text-sky-600 bg-sky-100",
-                },
-              ].map((report) => (
+              {reportTemplates.map((report) => (
                 <div
                   key={report.title}
-                  className="p-4 rounded-lg border border-muted hover:border-primary/30 hover:bg-muted/50 dark:border-muted/20 dark:hover:bg-muted/40 transition-colors"
+                  className="p-4 rounded-lg border border-muted hover:border-primary/30 hover:bg-muted/50 transition-colors"
                 >
                   <div className="flex items-start gap-4">
-                    <div
-                      className={`h-10 w-10 rounded-lg ${report.color} flex items-center justify-center flex-shrink-0`}
-                    >
+                    <div className={`h-10 w-10 rounded-lg ${report.color} flex items-center justify-center flex-shrink-0`}>
                       <report.icon className="h-5 w-5" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-medium text-foreground mb-1">
-                        {report.title}
-                      </h3>
-                      <p className="text-sm text-muted-foreground mb-3">
-                        {report.description}
-                      </p>
+                      <h3 className="font-medium text-foreground mb-1 text-sm">{report.title}</h3>
+                      <p className="text-xs text-muted-foreground mb-3 line-clamp-2">{report.description}</p>
                       <div className="flex gap-2">
-                        <Button size="sm" variant="outline" className="gap-1 bg-transparent">
-                          <Download className="h-3 w-3" />
-                          PDF
+                        <Button size="sm" variant="outline" className="h-7 text-xs gap-1">
+                          <Download className="h-3 w-3" /> PDF
                         </Button>
-                        <Button size="sm" variant="outline" className="gap-1 bg-transparent">
-                          <Download className="h-3 w-3" />
-                          Excel
+                        <Button size="sm" variant="outline" className="h-7 text-xs gap-1">
+                          <Download className="h-3 w-3" /> Excel
                         </Button>
                       </div>
                     </div>
@@ -292,45 +246,9 @@ export default function GestionReportesPage() {
                 </div>
               ))}
             </div>
-                {
-                  title: "Informe de Formación Digital",
-                  description:
-                    "Resumen de usuarios formados, trayectos completados y certificados emitidos.",
-                  icon: Users,
-                  color: "text-blue-600 bg-blue-100 dark:bg-blue-900/10 dark:text-blue-300",
-                },
-                {
-                  title: "Alcance Ciudadano",
-                  description:
-                    "Métricas de alcance geográfico y demográfico de la plataforma.",
-                  icon: TrendingUp,
-                  color: "text-green-600 bg-green-100 dark:bg-green-900/10 dark:text-green-300",
-                },
-                {
-                  title: "Impacto de Contenidos",
-                  description:
-                    "Análisis de visualizaciones, engagement y feedback de contenidos.",
-                  icon: BarChart3,
-                  color: "text-purple-600 bg-purple-100 dark:bg-purple-900/10 dark:text-purple-300",
-                },
-                {
-                  title: "Participación Ciudadana",
-                  description:
-                    "Resumen de encuestas respondidas y devoluciones ciudadanas.",
-                  icon: FileText,
-                  color: "text-amber-600 bg-amber-100 dark:bg-amber-900/10 dark:text-amber-300",
-                },
-                {
-                  title: "Informe Mensual",
-                  description:
-                    "Consolidado mensual de todas las métricas de la plataforma.",
-                  icon: Calendar,
-                  color: "text-red-600 bg-red-100 dark:bg-red-900/10 dark:text-red-300",
-                },
-                {
-                  title: "Informe de Gestión",
-                  description:
-                    "Documento ejecutivo para presentación institucional.",
-                  icon: Award,
-                  color: "text-sky-600 bg-sky-100 dark:bg-sky-900/10 dark:text-sky-300",
-                },
+          </CardContent>
+        </Card>
+      </div>
+    </GestionLayout>
+  );
+}

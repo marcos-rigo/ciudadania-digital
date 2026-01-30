@@ -15,11 +15,8 @@ import {
 import {
   mockEstadisticas,
   mockUsers,
-  mockVideos,
 } from "@/lib/mock/ciudadania-data";
 import {
-  BarChart,
-  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -86,42 +83,29 @@ export default function GestionDashboardPage() {
               bgColor: "bg-purple-100 dark:bg-purple-900/10",
             },
           ].map((kpi) => (
-            <Card key={kpi.title} className="border-none shadow-sm transition-smooth animate-fade-up reveal">
+            <Card key={kpi.title} className="border-none shadow-sm">
               <CardContent className="p-6">
                 <div className="flex items-start justify-between">
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1">
-                      {kpi.title}
-                    </p>
-                    <p className="text-3xl font-bold text-foreground">
-                      {kpi.value}
-                    </p>
-                    <p
-                      className={`text-sm flex items-center gap-1 mt-1 ${kpi.changeType === "positive" ? "text-green-600" : "text-red-600"}`}
-                    >
-                      {kpi.changeType === "positive" ? (
-                        <ArrowUpRight className="h-4 w-4" />
-                      ) : (
-                        <ArrowDownRight className="h-4 w-4" />
-                      )}
-                      {kpi.change} vs mes anterior
+                    <p className="text-sm text-muted-foreground mb-1">{kpi.title}</p>
+                    <p className="text-3xl font-bold text-foreground">{kpi.value}</p>
+                    <p className={`text-sm flex items-center gap-1 mt-1 ${kpi.changeType === "positive" ? "text-green-600" : "text-red-600"}`}>
+                      {kpi.changeType === "positive" ? <ArrowUpRight className="h-4 w-4" /> : <ArrowDownRight className="h-4 w-4" />}
+                      {kpi.change}
                     </p>
                   </div>
-                  <div
-                    className={`h-12 w-12 rounded-xl ${kpi.bgColor} ${kpi.color} flex items-center justify-center`}
-                  >
+                  <div className={`h-12 w-12 rounded-xl ${kpi.bgColor} ${kpi.color} flex items-center justify-center`}>
                     <kpi.icon className="h-6 w-6" />
                   </div>
                 </div>
               </CardContent>
             </Card>
-              {
-              {
-              {
-              {
-              {
-              {
-            ].map((kpi) => (
+          ))}
+        </div>
+
+        {/* Charts Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card className="border-none shadow-sm">
             <CardHeader>
               <CardTitle className="text-lg">Progreso semanal</CardTitle>
             </CardHeader>
@@ -129,36 +113,21 @@ export default function GestionDashboardPage() {
               <div className="h-[300px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={mockEstadisticas.progresoSemanal}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
                     <XAxis dataKey="semana" fontSize={12} />
                     <YAxis fontSize={12} />
                     <Tooltip />
-                    <Line
-                      type="monotone"
-                      dataKey="usuarios"
-                      stroke="#3b82f6"
-                      strokeWidth={2}
-                      name="Nuevos usuarios"
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="completados"
-                      stroke="#22c55e"
-                      strokeWidth={2}
-                      name="Trayectos completados"
-                    />
+                    <Line type="monotone" dataKey="usuarios" stroke="#3b82f6" strokeWidth={2} name="Nuevos usuarios" />
+                    <Line type="monotone" dataKey="completados" stroke="#22c55e" strokeWidth={2} name="Completados" />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
             </CardContent>
           </Card>
 
-          {/* Distribution by level */}
-          <Card className="border-none shadow-sm transition-smooth animate-fade-up reveal">
+          <Card className="border-none shadow-sm">
             <CardHeader>
-              <CardTitle className="text-lg">
-                Distribución por nivel
-              </CardTitle>
+              <CardTitle className="text-lg">Distribución por nivel</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="h-[300px]">
@@ -168,20 +137,13 @@ export default function GestionDashboardPage() {
                       data={mockEstadisticas.distribucionNivel}
                       cx="50%"
                       cy="50%"
-                      labelLine={false}
-                      label={({ name, percent }) =>
-                        `${name} ${(percent * 100).toFixed(0)}%`
-                      }
-                      outerRadius={100}
-                      fill="#8884d8"
+                      outerRadius={80}
                       dataKey="cantidad"
                       nameKey="nivel"
+                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                     >
-                      {mockEstadisticas.distribucionNivel.map((entry, index) => (
-                        <Cell
-                          key={`cell-${index}`}
-                          fill={COLORS[index % COLORS.length]}
-                        />
+                      {mockEstadisticas.distribucionNivel.map((_, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>
                     <Tooltip />
@@ -192,119 +154,58 @@ export default function GestionDashboardPage() {
           </Card>
         </div>
 
-        {/* Bottom row */}
+        {/* Bottom row: Videos & Users */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Most watched videos */}
-          <Card className="border-none shadow-sm transition-smooth animate-fade-up reveal">
+          <Card className="border-none shadow-sm">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
-                <PlayCircle className="h-5 w-5 text-red-600" />
-                Videos más vistos
+                <PlayCircle className="h-5 w-5 text-red-600" /> Videos más vistos
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 {mockEstadisticas.videosMasVistos.map((video, index) => (
-                  <div
-                    key={video.titulo}
-                    className="flex items-center justify-between"
-                  >
+                  <div key={index} className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <span className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-sm font-medium dark:bg-muted/20">
+                      <span className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-sm font-medium">
                         {index + 1}
                       </span>
-                      <span className="text-sm text-foreground line-clamp-1">
-                        {video.titulo}
-                      </span>
+                      <span className="text-sm font-medium line-clamp-1">{video.titulo}</span>
                     </div>
-                    <span className="text-sm text-muted-foreground">
-                      {video.vistas} vistas
-                    </span>
+                    <span className="text-sm text-muted-foreground">{video.vistas} vistas</span>
                   </div>
                 ))}
               </div>
             </CardContent>
           </Card>
 
-          {/* Recent users */}
-          <Card className="border-none shadow-sm transition-smooth animate-fade-up reveal">
+          <Card className="border-none shadow-sm">
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
-                <Users className="h-5 w-5 text-blue-600" />
-                Usuarios recientes
+                <Users className="h-5 w-5 text-blue-600" /> Usuarios recientes
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 {mockUsers.slice(0, 5).map((user) => (
-                  <div
-                    key={user.id}
-                    className="flex items-center justify-between"
-                  >
+                  <div key={user.id} className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="h-8 w-8 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center text-sm font-medium dark:bg-sky-900/10 dark:text-sky-300">
-                        {user.nombre
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")}
+                      <div className="h-8 w-8 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center text-xs font-bold">
+                        {user.nombre.split(" ").map(n => n[0]).join("")}
                       </div>
-                      <div
-                        className={`h-12 w-12 rounded-xl ${kpi.bgColor} ${kpi.color} flex items-center justify-center`}
-                          {user.nombre}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {user.email}
-                        </p>
+                      <div>
+                        <p className="text-sm font-medium leading-none">{user.nombre}</p>
+                        <p className="text-xs text-muted-foreground">{user.email}</p>
                       </div>
                     </div>
                     <span className="text-xs text-muted-foreground">
-                      {new Date(user.fechaRegistro).toLocaleDateString("es-AR")}
+                      {new Date(user.fechaRegistro).toLocaleDateString()}
                     </span>
                   </div>
                 ))}
               </div>
             </CardContent>
           </Card>
-        </div>
-
-        {/* Additional stats */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {[
-            {
-              label: "Trayectos activos",
-              value: mockEstadisticas.trayectosActivos,
-              icon: BookOpen,
-            },
-            {
-              label: "Videos disponibles",
-              value: mockEstadisticas.videosDisponibles,
-              icon: PlayCircle,
-            },
-            {
-              label: "Evaluaciones completadas",
-              value: mockEstadisticas.evaluacionesCompletadas,
-              icon: TrendingUp,
-            },
-            {
-              label: "Encuestas respondidas",
-              value: mockEstadisticas.encuestasRespondidas,
-              icon: FileQuestion,
-            },
-          ].map((stat) => (
-            <Card key={stat.label} className="border-none shadow-sm transition-smooth animate-fade-up reveal">
-              <CardContent className="p-4 flex items-center gap-4">
-                <div className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center dark:bg-muted/20">
-                  <stat.icon className="h-5 w-5 text-muted-foreground" />
-                </div>
-                <div>
-                  <p className="text-2xl font-bold text-foreground">
-                    {stat.value}
-                  </p>
-                  <p className="text-xs text-muted-foreground">{stat.label}</p>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
         </div>
       </div>
     </GestionLayout>
