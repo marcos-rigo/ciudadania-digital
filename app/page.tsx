@@ -1,18 +1,22 @@
-import { PublicLayout } from "@/components/layouts/public-layout"
-import { HeroSection } from "@/components/home/hero-section"
-import { ChallengeSection } from "@/components/home/challenge-section"
-import { EcosystemSection } from "@/components/home/ecosystem-section"
-import { BenefitsSection } from "@/components/home/benefits-section"
-import { ScalabilitySection } from "@/components/home/scalability-section"
+import { redirect } from 'next/navigation'
+import { cookies } from 'next/headers'
 
-export default function HomePage() {
-  return (
-    <PublicLayout>
-      <HeroSection />
-      <ChallengeSection />
-      <EcosystemSection />
-      <BenefitsSection />
-      <ScalabilitySection />
-    </PublicLayout>
-  )
+export default async function HomePage() {
+  const cookieStore = await cookies()
+  const session = cookieStore.get('gestion_session')
+
+  if (!session) {
+    redirect('/login')
+  }
+
+  try {
+    const data = JSON.parse(session.value)
+    if (data.rol === 'admin') {
+      redirect('/dashboard/admin')
+    } else {
+      redirect('/dashboard/estadisticas')
+    }
+  } catch {
+    redirect('/login')
+  }
 }

@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <title>Informe de Gestión 2026 · José Farhat</title>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <meta name="robots" content="noindex, nofollow"/>
+  <link href="img/logoJF.ico" rel="icon"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500&family=Roboto:wght@500;700;900&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet"/>
+  <link href="lib/animate/animate.min.css" rel="stylesheet"/>
+  <link href="css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="css/style.css" rel="stylesheet"/>
+  <style>
+    *{box-sizing:border-box;}
+    /* ── AUTH SCREENS ── */
+    .auth-screen{display:none;min-height:100vh;background:linear-gradient(135deg,#1A2A36 0%,#2d4a6e 60%,#4272bb 100%);align-items:center;justify-content:center;padding:1.5rem;position:fixed;inset:0;z-index:9999;overflow-y:auto;}
+    .auth-screen.active{display:flex;}
+    .auth-box{background:#fff;border-radius:20px;padding:2.5rem;width:100%;max-width:440px;box-shadow:0 24px 60px rgba(0,0,0,.35);animation:fadeUp .4s ease;margin:auto;}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+    .auth-logo{text-align:center;margin-bottom:1.75rem;}
+    .auth-logo .escudo{width:56px;height:56px;background:#4272bb;border-radius:14px;display:inline-flex;align-items:center;justify-content:center;margin-bottom:.75rem;}
+    .auth-logo .escudo i{color:#fff;font-size:1.5rem;}
+    .auth-logo h2{font-family:'Roboto',sans-serif;font-weight:900;font-size:1.2rem;color:#1A2A36;margin:0 0 .2rem;}
+    .auth-logo p{font-size:.78rem;color:#64748b;margin:0;}
+    .field-group{margin-bottom:1rem;}
+    .field-group label{display:block;font-size:.82rem;font-weight:600;color:#374151;margin-bottom:.35rem;}
+    .input-wrap{position:relative;}
+    .input-wrap i.ico-left{position:absolute;left:.9rem;top:50%;transform:translateY(-50%);color:#94a3b8;font-size:.85rem;pointer-events:none;}
+    .input-wrap input{width:100%;padding:.72rem 2.8rem .72rem 2.5rem;border:1.5px solid #e2e8f0;border-radius:10px;font-family:'Open Sans',sans-serif;font-size:.92rem;color:#1A2A36;transition:border-color .2s,box-shadow .2s;outline:none;}
+    .input-wrap input:focus{border-color:#4272bb;box-shadow:0 0 0 3px rgba(66,114,187,.15);}
+    .toggle-pass{position:absolute;right:.9rem;top:50%;transform:translateY(-50%);background:none;border:none;padding:0;color:#94a3b8;cursor:pointer;font-size:.85rem;}
+    .toggle-pass:hover{color:#4272bb;}
+    .btn-auth{width:100%;background:#4272bb;color:#fff;border:none;border-radius:10px;padding:.82rem;font-family:'Roboto',sans-serif;font-weight:700;font-size:1rem;cursor:pointer;margin-top:.5rem;transition:background .2s,transform .15s,box-shadow .2s;box-shadow:0 4px 14px rgba(66,114,187,.3);display:flex;align-items:center;justify-content:center;gap:.5rem;}
+    .btn-auth:hover{background:#2d5a9e;transform:translateY(-1px);}
+    .btn-auth:disabled{background:#94a3b8;cursor:not-allowed;transform:none;}
+    .btn-auth .spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none;}
+    .btn-auth.loading .spinner{display:block;}
+    .btn-auth.loading .btn-text{display:none;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+    .msg{border-radius:8px;padding:.65rem 1rem;font-size:.83rem;margin-top:.85rem;text-align:center;display:none;}
+    .msg.show{display:block;animation:fadeUp .25s ease;}
+    .msg.error{background:#fef2f2;border:1px solid #fca5a5;color:#b91c1c;}
+    .msg.success{background:#f0fdf4;border:1px solid #86efac;color:#166534;}
+    .msg.info{background:#eff6ff;border:1px solid #93c5fd;color:#1d4ed8;}
+    .auth-links{text-align:center;margin-top:1.25rem;font-size:.82rem;color:#64748b;}
+    .auth-links a{color:#4272bb;font-weight:600;text-decoration:none;cursor:pointer;}
+    .auth-links a:hover{text-decoration:underline;}
+    .codigo-inputs{display:flex;gap:.5rem;justify-content:center;margin:1rem 0;}
+    .codigo-inputs input{width:46px;height:54px;text-align:center;font-size:1.4rem;font-weight:700;font-family:'Roboto',sans-serif;border:2px solid #e2e8f0;border-radius:10px;color:#1A2A36;outline:none;transition:border-color .2s,box-shadow .2s;}
+    .codigo-inputs input:focus{border-color:#4272bb;box-shadow:0 0 0 3px rgba(66,114,187,.15);}
+    .badge-pendiente{display:inline-block;background:#fef9c3;color:#854d0e;border:1px solid #fde68a;font-size:.75rem;font-weight:600;padding:.3rem .8rem;border-radius:20px;margin-top:.75rem;}
+    .reenviar-wrap{text-align:center;margin-top:.75rem;font-size:.8rem;color:#64748b;}
+    .reenviar-wrap a{color:#4272bb;font-weight:600;cursor:pointer;text-decoration:none;}
+    .reenviar-wrap a:hover{text-decoration:underline;}
+    .reenviar-wrap a.disabled{color:#94a3b8;cursor:not-allowed;pointer-events:none;}
+    /* ── MAIN CONTENT ── */
+    #main-content{display:none;}
+    .page-hero{background:linear-gradient(135deg,#1A2A36 0%,#2d4a6e 60%,#4272bb 100%);padding:5rem 1.5rem 4rem;text-align:center;position:relative;overflow:hidden;}
+    .page-hero::before{content:'';position:absolute;top:-80px;right:-80px;width:320px;height:320px;border:50px solid rgba(255,255,255,.04);border-radius:50%;pointer-events:none;}
+    .page-hero .badge-interno{display:inline-block;background:rgba(66,114,187,.25);color:#a8c4f0;border:1px solid rgba(66,114,187,.4);font-size:.75rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:.35rem 1rem;border-radius:20px;margin-bottom:1.1rem;}
+    .page-hero h1{font-family:'Roboto',sans-serif;font-weight:900;font-size:clamp(1.8rem,4.5vw,2.8rem);color:#fff;line-height:1.2;margin-bottom:.75rem;}
+    .page-hero h1 span{color:#a8c4f0;}
+    .page-hero p{color:rgba(255,255,255,.7);font-size:1rem;max-width:540px;margin:0 auto;line-height:1.65;}
+    .usuario-activo{display:inline-flex;align-items:center;gap:.5rem;background:rgba(255,255,255,.1);color:rgba(255,255,255,.85);border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:.3rem .9rem;font-size:.78rem;margin-top:1rem;cursor:pointer;transition:background .2s;}
+    .usuario-activo:hover{background:rgba(255,255,255,.18);}
+    .gestion-card{background:#fff;border-radius:16px;padding:2rem 2.25rem;box-shadow:0 2px 18px rgba(26,42,54,.07);border:1px solid #e8edf3;margin-bottom:2rem;}
+    .gestion-card .card-heading{font-family:'Roboto',sans-serif;font-weight:900;font-size:1.3rem;color:#1A2A36;margin-bottom:1.5rem;display:flex;align-items:center;gap:.6rem;}
+    .icon-box{width:32px;height:32px;background:#4272bb;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:.85rem;flex-shrink:0;}
+    .paso-item{display:flex;gap:1.1rem;align-items:flex-start;padding:1.1rem 1.25rem;border-radius:12px;background:#f6f7f8;border:1px solid #e2e8f0;transition:border-color .2s,box-shadow .2s;margin-bottom:.75rem;}
+    .paso-item:hover{border-color:#4272bb;box-shadow:0 2px 14px rgba(66,114,187,.12);}
+    .paso-num{min-width:36px;height:36px;background:#4272bb;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Roboto',sans-serif;font-weight:700;font-size:.9rem;flex-shrink:0;}
+    .paso-body h5{font-family:'Roboto',sans-serif;font-weight:700;font-size:.95rem;color:#1A2A36;margin-bottom:.25rem;}
+    .paso-body p{font-size:.85rem;color:#4a5568;line-height:1.55;margin:0;}
+    .badge-auto{display:inline-block;background:#dcfce7;color:#166534;font-size:.72rem;font-weight:600;padding:.15rem .65rem;border-radius:20px;margin-top:.4rem;}
+    .divisor-texto{display:flex;align-items:center;gap:1rem;color:#94a3b8;font-size:.78rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;margin:1.75rem 0;}
+    .divisor-texto::before,.divisor-texto::after{content:'';flex:1;height:1px;background:#e2e8f0;}
+    .btn-abrir-forms{display:inline-flex;align-items:center;gap:.6rem;background:#4272bb;color:#fff !important;font-family:'Roboto',sans-serif;font-weight:700;font-size:1rem;padding:.85rem 2.2rem;border-radius:50px;text-decoration:none;transition:background .2s,transform .15s,box-shadow .2s;box-shadow:0 4px 16px rgba(66,114,187,.3);}
+    .btn-abrir-forms:hover{background:#2d5a9e;transform:translateY(-2px);box-shadow:0 8px 22px rgba(66,114,187,.35);color:#fff !important;}
+    .form-embed-wrapper{border-radius:10px;overflow:hidden;border:1.5px solid #e2e8f0;}
+    .form-embed-wrapper iframe{display:block;width:100%;height:720px;border:none;}
+    /* ── BADGES DE ROL ── */
+    .badge-rol{display:inline-block;font-size:.7rem;font-weight:700;padding:.2rem .65rem;border-radius:20px;vertical-align:middle;margin-left:.4rem;letter-spacing:.02em;}
+    .badge-rol-admin{background:#dbeafe;color:#1d4ed8;border:1px solid #93c5fd;}
+    .badge-rol-lector{background:#f1f5f9;color:#475569;border:1px solid #cbd5e1;}
+    .badge-rol-prueba{background:#fef9c3;color:#854d0e;border:1px solid #fde68a;}
+    /* ── BANNER CUENTA DE PRUEBA ── */
+    .banner-prueba{background:#fefce8;border:1.5px solid #fde68a;color:#854d0e;border-radius:12px;padding:1rem 1.5rem;margin-bottom:1.5rem;font-size:.9rem;font-weight:600;display:flex;align-items:center;gap:.75rem;line-height:1.5;}
+    .banner-prueba i{font-size:1.1rem;flex-shrink:0;}
+    /* ── PANEL DE ESTADÍSTICAS ── */
+    .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1.25rem;margin-bottom:1.75rem;}
+    .stat-card{background:#f8fafc;border-radius:14px;padding:1.5rem 1.75rem;border:1px solid #e8edf3;text-align:center;}
+    .stat-card .stat-val{font-family:'Roboto',sans-serif;font-weight:900;font-size:2.2rem;color:#1A2A36;line-height:1;}
+    .stat-card .stat-lbl{font-size:.8rem;color:#64748b;margin-top:.4rem;}
+    .act-tabla{width:100%;border-collapse:collapse;font-size:.85rem;}
+    .act-tabla th{text-align:left;padding:.65rem .9rem;background:#f6f7f8;color:#64748b;font-weight:600;font-size:.78rem;text-transform:uppercase;letter-spacing:.05em;border-bottom:1.5px solid #e2e8f0;}
+    .act-tabla td{padding:.65rem .9rem;border-bottom:1px solid #f1f5f9;color:#1A2A36;vertical-align:middle;}
+    .act-tabla tr:last-child td{border-bottom:none;}
+    .act-tabla tr:hover td{background:#fafbfc;}
+    .act-tabla .sin-datos{text-align:center;padding:2rem;color:#94a3b8;font-style:italic;}
+    .stats-loading{text-align:center;padding:2.5rem;color:#94a3b8;}
+    .stats-error{text-align:center;padding:2rem;color:#b91c1c;}
+    @media(max-width:576px){
+      .auth-box{padding:1.75rem 1.25rem;}
+      .codigo-inputs input{width:38px;height:46px;font-size:1.2rem;}
+      .page-hero{padding:4rem 1rem 3rem;}
+      .gestion-card{padding:1.25rem;}
+      .form-embed-wrapper iframe{height:600px;}
+      .stats-grid{grid-template-columns:1fr 1fr;}
+      .act-tabla{font-size:.78rem;}
+      .act-tabla th,.act-tabla td{padding:.5rem .6rem;}
+    }
+  </style>
+</head>
+<body>
+
+<!-- SCREEN LOGIN -->
+<div id="screen-login" class="auth-screen active">
+  <div class="auth-box">
+    <div class="auth-logo">
+      <div class="escudo"><i class="fa fa-lock"></i></div>
+      <h2>Iniciá sesión</h2>
+      <p>Secretaría de Participación Ciudadana</p>
+    </div>
+    <div class="field-group">
+      <label>Correo electrónico</label>
+      <div class="input-wrap">
+        <i class="fa fa-envelope ico-left"></i>
+        <input type="text" id="login-email" placeholder="tu@correo.com" autocomplete="email"/>
+      </div>
+    </div>
+    <div class="field-group">
+      <label>Contraseña</label>
+      <div class="input-wrap">
+        <i class="fa fa-key ico-left"></i>
+        <input type="password" id="login-pwd" placeholder="••••••••••" autocomplete="current-password"/>
+        <button class="toggle-pass" type="button" onclick="toggleVer('login-pwd','eye-login')"><i class="fa fa-eye" id="eye-login"></i></button>
+      </div>
+    </div>
+    <div style="text-align:right;margin-top:-.5rem;margin-bottom:.75rem;">
+      <a style="font-size:.8rem;color:#4272bb;font-weight:600;cursor:pointer;" onclick="ir('screen-reset-solicitar')">¿Olvidaste tu contraseña?</a>
+    </div>
+    <button class="btn-auth" id="btn-login" onclick="hacerLogin()">
+      <div class="spinner"></div><span class="btn-text"><i class="fa fa-arrow-right-to-bracket me-1"></i>Ingresar</span>
+    </button>
+    <div class="msg error" id="msg-login"></div>
+    <div class="auth-links">¿No tenés cuenta? <a onclick="ir('screen-registro')">Registrate</a></div>
+  </div>
+</div>
+
+<!-- SCREEN REGISTRO -->
+<div id="screen-registro" class="auth-screen">
+  <div class="auth-box">
+    <div class="auth-logo">
+      <div class="escudo"><i class="fa fa-user-plus"></i></div>
+      <h2>Crear cuenta</h2>
+      <p>Completá tus datos para solicitar acceso</p>
+    </div>
+    <div class="field-group">
+      <label>Nombre completo</label>
+      <div class="input-wrap">
+        <i class="fa fa-user ico-left"></i>
+        <input type="text" id="reg-nombre" placeholder="Tu nombre y apellido"/>
+      </div>
+    </div>
+    <div class="field-group">
+      <label>Correo electrónico</label>
+      <div class="input-wrap">
+        <i class="fa fa-envelope ico-left"></i>
+        <input type="text" id="reg-email" placeholder="tu@correo.com"/>
+      </div>
+    </div>
+    <div class="field-group">
+      <label>Contraseña</label>
+      <div class="input-wrap">
+        <i class="fa fa-key ico-left"></i>
+        <input type="password" id="reg-pwd" placeholder="Mínimo 8 caracteres"/>
+        <button class="toggle-pass" type="button" onclick="toggleVer('reg-pwd','eye-reg')"><i class="fa fa-eye" id="eye-reg"></i></button>
+      </div>
+    </div>
+    <div class="field-group">
+      <label>Repetir contraseña</label>
+      <div class="input-wrap">
+        <i class="fa fa-key ico-left"></i>
+        <input type="password" id="reg-pwd2" placeholder="Repetí tu contraseña"/>
+        <button class="toggle-pass" type="button" onclick="toggleVer('reg-pwd2','eye-reg2')"><i class="fa fa-eye" id="eye-reg2"></i></button>
+      </div>
+    </div>
+    <button class="btn-auth" id="btn-registro" onclick="hacerRegistro()">
+      <div class="spinner"></div><span class="btn-text"><i class="fa fa-paper-plane me-1"></i>Solicitar acceso</span>
+    </button>
+    <div class="msg error" id="msg-registro"></div>
+    <div class="msg success" id="msg-registro-ok"></div>
+    <div class="auth-links">¿Ya tenés cuenta? <a onclick="ir('screen-login')">Iniciá sesión</a></div>
+  </div>
+</div>
+
+<!-- SCREEN VERIFICAR -->
+<div id="screen-verificar" class="auth-screen">
+  <div class="auth-box">
+    <div class="auth-logo">
+      <div class="escudo"><i class="fa fa-envelope-open-text"></i></div>
+      <h2>Verificá tu email</h2>
+      <p id="verificar-subtitulo">Ingresá el código de 6 dígitos que enviamos</p>
+    </div>
+    <div class="codigo-inputs">
+      <input type="text" maxlength="1" id="c0" oninput="avanzarCodigo(0)" onkeydown="retrocederCodigo(event,0)"/>
+      <input type="text" maxlength="1" id="c1" oninput="avanzarCodigo(1)" onkeydown="retrocederCodigo(event,1)"/>
+      <input type="text" maxlength="1" id="c2" oninput="avanzarCodigo(2)" onkeydown="retrocederCodigo(event,2)"/>
+      <input type="text" maxlength="1" id="c3" oninput="avanzarCodigo(3)" onkeydown="retrocederCodigo(event,3)"/>
+      <input type="text" maxlength="1" id="c4" oninput="avanzarCodigo(4)" onkeydown="retrocederCodigo(event,4)"/>
+      <input type="text" maxlength="1" id="c5" oninput="avanzarCodigo(5)" onkeydown="retrocederCodigo(event,5)"/>
+    </div>
+    <button class="btn-auth" id="btn-verificar" onclick="verificarCodigo()">
+      <div class="spinner"></div><span class="btn-text"><i class="fa fa-check me-1"></i>Verificar código</span>
+    </button>
+    <div class="msg error" id="msg-verificar"></div>
+    <div class="msg success" id="msg-verificar-ok"></div>
+    <div class="reenviar-wrap">¿No recibiste el código? <a id="btn-reenviar" onclick="reenviarCodigo()">Reenviar</a></div>
+    <div class="auth-links"><a onclick="ir('screen-login')"><i class="fa fa-arrow-left me-1"></i>Volver al login</a></div>
+  </div>
+</div>
+
+<!-- SCREEN PENDIENTE -->
+<div id="screen-pendiente" class="auth-screen">
+  <div class="auth-box" style="text-align:center;">
+    <div class="auth-logo">
+      <div class="escudo" style="background:#f59e0b;"><i class="fa fa-clock"></i></div>
+      <h2>Solicitud enviada</h2>
+      <p>Tu email fue verificado correctamente</p>
+    </div>
+    <p style="font-size:.9rem;color:#4a5568;line-height:1.65;">Tu cuenta está siendo revisada por el administrador.<br>Recibirás un email cuando tu acceso sea <strong>aprobado</strong>.</p>
+    <div class="badge-pendiente"><i class="fa fa-hourglass-half me-1"></i>Pendiente de aprobación</div>
+    <div class="auth-links" style="margin-top:1.5rem;"><a onclick="cerrarSesion()"><i class="fa fa-arrow-left me-1"></i>Volver al inicio</a></div>
+  </div>
+</div>
+
+<!-- SCREEN RESET SOLICITAR -->
+<div id="screen-reset-solicitar" class="auth-screen">
+  <div class="auth-box">
+    <div class="auth-logo">
+      <div class="escudo" style="background:#6366f1;"><i class="fa fa-key"></i></div>
+      <h2>Recuperar contraseña</h2>
+      <p>Ingresá tu email y te enviamos un código</p>
+    </div>
+    <div class="field-group">
+      <label>Correo electrónico</label>
+      <div class="input-wrap">
+        <i class="fa fa-envelope ico-left"></i>
+        <input type="text" id="reset-email" placeholder="tu@correo.com"/>
+      </div>
+    </div>
+    <button class="btn-auth" id="btn-reset-solicitar" onclick="solicitarReset()">
+      <div class="spinner"></div><span class="btn-text"><i class="fa fa-paper-plane me-1"></i>Enviar código</span>
+    </button>
+    <div class="msg error" id="msg-reset-solicitar"></div>
+    <div class="msg success" id="msg-reset-solicitar-ok"></div>
+    <div class="auth-links"><a onclick="ir('screen-login')"><i class="fa fa-arrow-left me-1"></i>Volver al login</a></div>
+  </div>
+</div>
+
+<!-- SCREEN RESET NUEVA -->
+<div id="screen-reset-nueva" class="auth-screen">
+  <div class="auth-box">
+    <div class="auth-logo">
+      <div class="escudo" style="background:#6366f1;"><i class="fa fa-lock-open"></i></div>
+      <h2>Nueva contraseña</h2>
+      <p>Ingresá el código recibido y tu nueva contraseña</p>
+    </div>
+    <div class="field-group">
+      <label>Código de verificación</label>
+      <div class="input-wrap">
+        <i class="fa fa-hashtag ico-left"></i>
+        <input type="text" id="reset-codigo" placeholder="123456" maxlength="6"/>
+      </div>
+    </div>
+    <div class="field-group">
+      <label>Nueva contraseña</label>
+      <div class="input-wrap">
+        <i class="fa fa-key ico-left"></i>
+        <input type="password" id="reset-nueva-pwd" placeholder="Mínimo 8 caracteres"/>
+        <button class="toggle-pass" type="button" onclick="toggleVer('reset-nueva-pwd','eye-reset')"><i class="fa fa-eye" id="eye-reset"></i></button>
+      </div>
+    </div>
+    <div class="field-group">
+      <label>Repetir nueva contraseña</label>
+      <div class="input-wrap">
+        <i class="fa fa-key ico-left"></i>
+        <input type="password" id="reset-nueva-pwd2" placeholder="Repetí la contraseña"/>
+        <button class="toggle-pass" type="button" onclick="toggleVer('reset-nueva-pwd2','eye-reset2')"><i class="fa fa-eye" id="eye-reset2"></i></button>
+      </div>
+    </div>
+    <button class="btn-auth" id="btn-reset-nueva" onclick="cambiarPassword()">
+      <div class="spinner"></div><span class="btn-text"><i class="fa fa-check me-1"></i>Cambiar contraseña</span>
+    </button>
+    <div class="msg error" id="msg-reset-nueva"></div>
+    <div class="msg success" id="msg-reset-nueva-ok"></div>
+    <div class="auth-links"><a onclick="ir('screen-login')"><i class="fa fa-arrow-left me-1"></i>Volver al login</a></div>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div id="main-content">
+  <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+    <svg class="pl" width="128px" height="128px" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+      <circle class="pl__ring1" cx="64" cy="64" r="60" fill="none" stroke="hsl(3,90%,55%)" stroke-width="8" transform="rotate(-90,64,64)" stroke-linecap="round" stroke-dasharray="377 377" stroke-dashoffset="-376.4"></circle>
+      <circle class="pl__ring2" cx="64" cy="64" r="52.5" fill="none" stroke="hsl(13,90%,55%)" stroke-width="7" transform="rotate(-90,64,64)" stroke-linecap="round" stroke-dasharray="329.9 329.9" stroke-dashoffset="-329.3"></circle>
+      <circle class="pl__ring3" cx="64" cy="64" r="46" fill="none" stroke="hsl(23,90%,55%)" stroke-width="6" transform="rotate(-90,64,64)" stroke-linecap="round" stroke-dasharray="289 289" stroke-dashoffset="-288.6"></circle>
+      <circle class="pl__ring4" cx="64" cy="64" r="40.5" fill="none" stroke="hsl(33,90%,55%)" stroke-width="5" transform="rotate(-90,64,64)" stroke-linecap="round" stroke-dasharray="254.5 254.5" stroke-dashoffset="-254"></circle>
+      <circle class="pl__ring5" cx="64" cy="64" r="36" fill="none" stroke="hsl(43,90%,55%)" stroke-width="4" transform="rotate(-90,64,64)" stroke-linecap="round" stroke-dasharray="226.2 226.2" stroke-dashoffset="-225.8"></circle>
+      <circle class="pl__ring6" cx="64" cy="64" r="32.5" fill="none" stroke="hsl(53,90%,55%)" stroke-width="3" transform="rotate(-90,64,64)" stroke-linecap="round" stroke-dasharray="204.2 204.2" stroke-dashoffset="-203.9"></circle>
+    </svg>
+  </div>
+  <div id="navbar-container"></div>
+  <div class="page-hero">
+    <div class="badge-interno"><i class="fa fa-lock me-2"></i>Uso interno · Equipo</div>
+    <h1>Informe de Gestión <span>2026</span></h1>
+    <p id="hero-descripcion">Cargá los datos de actividades y acciones realizadas. Cada respuesta se registra automáticamente en la planilla del equipo.</p>
+    <div class="usuario-activo" onclick="cerrarSesion()" title="Cerrar sesión">
+      <i class="fa fa-circle-user"></i>
+      <span id="nombre-usuario">Usuario</span>
+      <span id="badge-rol"></span>
+      <i class="fa fa-right-from-bracket" style="font-size:.7rem;opacity:.7;"></i>
+    </div>
+  </div>
+  <div class="container py-5">
+
+    <!-- VISTA ADMIN: formulario de carga (rol = admin) -->
+    <div id="vista-admin" style="display:none;">
+      <div class="row justify-content-center">
+        <div class="col-lg-10 col-xl-9">
+          <div class="gestion-card">
+            <div class="card-heading"><div class="icon-box"><i class="fa fa-circle-info"></i></div>¿Cómo funciona el sistema de carga?</div>
+            <p class="text-muted mb-4" style="font-size:.9rem;line-height:1.6;">Seguí estos pasos cada vez que registres una actividad de la Secretaría.</p>
+            <div class="paso-item"><div class="paso-num">1</div><div class="paso-body"><h5>Completá el formulario</h5><p>Ingresá los datos de la actividad realizada: nombre, fecha, descripción y área.</p></div></div>
+            <div class="paso-item"><div class="paso-num">2</div><div class="paso-body"><h5>Las respuestas se guardan automáticamente</h5><p>Cada envío queda registrado de inmediato en la planilla de Excel compartida del equipo.</p><span class="badge-auto"><i class="fa fa-check me-1"></i>Automático · Microsoft Forms + Excel</span></div></div>
+            <div class="paso-item"><div class="paso-num">3</div><div class="paso-body"><h5>Los datos se sincronizan con el tablero de análisis</h5><p>La planilla alimenta un tablero de Power BI para visualizar los indicadores en tiempo real.</p><span class="badge-auto"><i class="fa fa-check me-1"></i>Visualización en Power BI</span></div></div>
+            <div class="paso-item"><div class="paso-num">4</div><div class="paso-body"><h5>¿Enviaste algo con error?</h5><p>No re-envíes el formulario. Avisá al responsable para corregirlo en la planilla.</p></div></div>
+          </div>
+          <div class="text-center mb-2">
+            <a class="btn-abrir-forms" href="https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=Rpc9hHQGv0ikAqRc0G9UGkpr6Cx7gw5EiCOXAv93xnJURUJITk5OUFg3TUhQVTFFTVpRTlROTzhUSC4u" target="_blank" rel="noopener">
+              <i class="fa fa-arrow-up-right-from-square"></i>Abrir formulario en pantalla completa
+            </a>
+          </div>
+          <div class="divisor-texto">o completalo acá abajo</div>
+          <div class="gestion-card" style="padding:1.5rem;">
+            <div class="card-heading" style="margin-bottom:1.25rem;"><div class="icon-box"><i class="fa fa-pen-to-square"></i></div>Datos para Informe de Gestión 2026</div>
+            <div class="form-embed-wrapper" id="form-embed-wrapper"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VISTA LECTOR / PRUEBA: panel de estadísticas (rol = lector o prueba) -->
+    <div id="vista-lector" style="display:none;">
+      <div class="row justify-content-center">
+        <div class="col-lg-10 col-xl-9">
+          <div id="banner-prueba-box" class="banner-prueba" style="display:none;">
+            <i class="fa fa-triangle-exclamation"></i>
+            <span>Cuenta de prueba — Solo lectura. Los datos mostrados son reales.</span>
+          </div>
+          <div class="gestion-card">
+            <div class="card-heading"><div class="icon-box"><i class="fa fa-chart-bar"></i></div>Estadísticas de actividades</div>
+            <div id="stats-loading" class="stats-loading">
+              <i class="fa fa-spinner fa-spin me-2"></i>Cargando estadísticas...
+            </div>
+            <div id="stats-content" style="display:none;">
+              <div class="stats-grid">
+                <div class="stat-card">
+                  <div class="stat-val" id="stat-total">—</div>
+                  <div class="stat-lbl">Actividades registradas</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-val" id="stat-personas">—</div>
+                  <div class="stat-lbl">Personas alcanzadas</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-val" id="stat-promedio">—</div>
+                  <div class="stat-lbl">Promedio por actividad</div>
+                </div>
+              </div>
+              <div class="card-heading" style="font-size:1rem;margin-top:.5rem;margin-bottom:1rem;">
+                <div class="icon-box" style="background:#64748b;"><i class="fa fa-list"></i></div>Últimas 10 actividades
+              </div>
+              <div style="overflow-x:auto;">
+                <table class="act-tabla">
+                  <thead>
+                    <tr>
+                      <th>Fecha</th>
+                      <th>Programa</th>
+                      <th>Localidad</th>
+                      <th>Personas</th>
+                      <th>Cargado por</th>
+                    </tr>
+                  </thead>
+                  <tbody id="act-tbody">
+                    <tr><td colspan="5" class="sin-datos">Aún no hay actividades registradas</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div id="stats-error" class="stats-error" style="display:none;">
+              <i class="fa fa-circle-exclamation me-2"></i><span id="stats-error-msg">Error al cargar los datos.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div id="footer"></div>
+  <a href="#" class="btn btn-lg btn-primary btn-lg-square rounded-circle back-to-top"><i class="bi bi-arrow-up"></i></a>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="lib/wow/wow.min.js"></script>
+<script src="lib/easing/easing.min.js"></script>
+<script src="lib/waypoints/waypoints.min.js"></script>
+<script src="js/main.js"></script>
+<script src="js/navbar.js"></script>
+<script src="js/footer.js"></script>
+<script>
+const SUPABASE_URL = 'https://tllxplxsjrwyaqepuvzo.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRsbHhwbHhzanJ3eWFxZXB1dnpvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE5NDUzMjYsImV4cCI6MjA4NzUyMTMyNn0.RCBVsNb3sJ-IR6CcuVw-D7jhb50iT8QcwUrKZ86KE-Y';
+const RESEND_KEY   = 're_eeqkK5un_2dyr8MteYPNswim1WuoPLKXY';
+const EMAIL_FROM   = 'gestion@josefarhat.com';
+const EMAIL_ADMIN  = 'jf.josefarhat@gmail.com';
+let emailEnProceso = '';
+
+async function sha256(str){const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(str));return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');}
+function generarCodigo(){return String(Math.floor(100000+Math.random()*900000));}
+function expiraEn(m){return new Date(Date.now()+m*60000).toISOString();}
+function ir(p){document.querySelectorAll('.auth-screen').forEach(s=>s.classList.remove('active'));document.getElementById(p).classList.add('active');}
+function toggleVer(id,ico){const i=document.getElementById(id),c=document.getElementById(ico);i.type=i.type==='password'?(c.className='fa fa-eye-slash','text'):(c.className='fa fa-eye','password');}
+function mostrarMsg(id,txt,tipo='error'){const e=document.getElementById(id);e.className=`msg ${tipo} show`;e.innerHTML=txt;}
+function ocultarMsg(id){const e=document.getElementById(id);if(e)e.classList.remove('show');}
+function setLoading(id,v){const b=document.getElementById(id);v?(b.classList.add('loading'),b.disabled=true):(b.classList.remove('loading'),b.disabled=false);}
+
+/* ── SUPABASE: tabla usuarios ── */
+async function sbGet(f){
+  try{
+    const r=await fetch(`${SUPABASE_URL}/rest/v1/usuarios?${f}`,{headers:{'apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`}});
+    if(!r.ok)throw new Error(`sbGet error ${r.status}`);
+    return r.json();
+  }catch(e){console.error('sbGet:',e);throw e;}
+}
+async function sbInsert(d){const r=await fetch(`${SUPABASE_URL}/rest/v1/usuarios`,{method:'POST',headers:{'apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Content-Type':'application/json','Prefer':'return=representation'},body:JSON.stringify(d)});return r.json();}
+async function sbUpdate(email,d){const r=await fetch(`${SUPABASE_URL}/rest/v1/usuarios?email=eq.${encodeURIComponent(email)}`,{method:'PATCH',headers:{'apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Content-Type':'application/json'},body:JSON.stringify(d)});return r.ok;}
+
+/* ── SUPABASE: tabla actividades ── */
+async function sbGetActividades(f){
+  try{
+    const r=await fetch(`${SUPABASE_URL}/rest/v1/actividades?${f}`,{headers:{'apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`}});
+    if(!r.ok)return[];
+    return r.json();
+  }catch(e){console.warn('sbGetActividades:',e);return[];}
+}
+
+async function enviarEmail(to,subject,html){
+  try{
+    const r=await fetch('send-email.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({to,subject,html})});
+    return r.ok;
+  }catch(e){console.warn('Email no enviado:',e);return false;}
+}
+
+function tplVerificacion(nombre,codigo){return `<div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;"><div style="background:#1A2A36;padding:24px;border-radius:12px 12px 0 0;text-align:center;"><h2 style="color:#fff;margin:0;font-size:1.2rem;">Secretaría de Participación Ciudadana</h2></div><div style="background:#fff;padding:32px;border:1px solid #e2e8f0;border-top:none;border-radius:0 0 12px 12px;"><p style="color:#1A2A36;">Hola <strong>${nombre}</strong>,</p><p style="color:#4a5568;">Tu código de verificación es:</p><div style="text-align:center;margin:24px 0;"><span style="font-size:2.5rem;font-weight:900;letter-spacing:.3em;color:#4272bb;">${codigo}</span></div><p style="color:#94a3b8;font-size:.82rem;">Expira en 15 minutos.</p></div></div>`;}
+function tplReset(codigo){return `<div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;"><div style="background:#1A2A36;padding:24px;border-radius:12px 12px 0 0;text-align:center;"><h2 style="color:#fff;margin:0;">Recuperar contraseña</h2></div><div style="background:#fff;padding:32px;border:1px solid #e2e8f0;border-top:none;border-radius:0 0 12px 12px;"><p style="color:#4a5568;">Tu código para restablecer la contraseña:</p><div style="text-align:center;margin:24px 0;"><span style="font-size:2.5rem;font-weight:900;letter-spacing:.3em;color:#6366f1;">${codigo}</span></div><p style="color:#94a3b8;font-size:.82rem;">Expira en 15 minutos.</p></div></div>`;}
+function tplAprobacion(nombre){return `<div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;"><div style="background:#1A2A36;padding:24px;border-radius:12px 12px 0 0;text-align:center;"><h2 style="color:#fff;margin:0;">Acceso aprobado</h2></div><div style="background:#fff;padding:32px;border:1px solid #e2e8f0;border-top:none;border-radius:0 0 12px 12px;"><p>Hola <strong>${nombre}</strong>, tu acceso fue <strong style="color:#166534;">aprobado</strong>. Ya podés ingresar.</p><div style="text-align:center;margin:24px 0;"><a href="https://josefarhat.com/gestion-2026.html" style="background:#4272bb;color:#fff;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:700;">Ingresar ahora</a></div></div></div>`;}
+
+async function hacerRegistro(){
+  ocultarMsg('msg-registro');ocultarMsg('msg-registro-ok');
+  const nombre=document.getElementById('reg-nombre').value.trim();
+  const email=document.getElementById('reg-email').value.trim().toLowerCase();
+  const pwd=document.getElementById('reg-pwd').value;
+  const pwd2=document.getElementById('reg-pwd2').value;
+  if(!nombre||!email||!pwd||!pwd2)return mostrarMsg('msg-registro','<i class="fa fa-circle-xmark me-1"></i>Completá todos los campos.');
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))return mostrarMsg('msg-registro','<i class="fa fa-circle-xmark me-1"></i>El email no es válido.');
+  if(pwd.length<8)return mostrarMsg('msg-registro','<i class="fa fa-circle-xmark me-1"></i>La contraseña debe tener al menos 8 caracteres.');
+  if(pwd!==pwd2)return mostrarMsg('msg-registro','<i class="fa fa-circle-xmark me-1"></i>Las contraseñas no coinciden.');
+  setLoading('btn-registro',true);
+  try{
+    const ex=await sbGet(`email=eq.${encodeURIComponent(email)}&select=email`);
+    if(ex.length>0){setLoading('btn-registro',false);return mostrarMsg('msg-registro','<i class="fa fa-circle-xmark me-1"></i>Este email ya está registrado.');}
+    const hash=await sha256(pwd);
+    const codigo=generarCodigo();
+    await sbInsert({nombre,email,password_hash:hash,estado:'pendiente',email_verificado:false,codigo_verificacion:codigo,codigo_expira:expiraEn(15)});
+    await enviarEmail(email,'Verificá tu email · Gestión 2026',tplVerificacion(nombre,codigo));
+    await enviarEmail(EMAIL_ADMIN,`Nuevo usuario pendiente: ${nombre}`,`<p><strong>${nombre}</strong> (${email}) se registró y espera aprobación. Ingresá a Supabase para aprobarlo.</p>`);
+    emailEnProceso=email;
+    document.getElementById('verificar-subtitulo').textContent=`Enviamos un código a ${email}`;
+    setLoading('btn-registro',false);
+    ir('screen-verificar');
+  }catch(e){setLoading('btn-registro',false);mostrarMsg('msg-registro','<i class="fa fa-circle-xmark me-1"></i>Error al registrar. Intentá de nuevo.');}
+}
+
+function avanzarCodigo(i){const v=document.getElementById(`c${i}`).value;if(v&&i<5)document.getElementById(`c${i+1}`).focus();}
+function retrocederCodigo(e,i){if(e.key==='Backspace'&&!document.getElementById(`c${i}`).value&&i>0)document.getElementById(`c${i-1}`).focus();}
+function leerCodigo(){return[0,1,2,3,4,5].map(i=>document.getElementById(`c${i}`).value).join('');}
+function limpiarCodigo(){[0,1,2,3,4,5].forEach(i=>{document.getElementById(`c${i}`).value='';});document.getElementById('c0').focus();}
+
+async function verificarCodigo(){
+  ocultarMsg('msg-verificar');ocultarMsg('msg-verificar-ok');
+  const codigo=leerCodigo();
+  if(codigo.length<6)return mostrarMsg('msg-verificar','<i class="fa fa-circle-xmark me-1"></i>Ingresá los 6 dígitos.');
+  setLoading('btn-verificar',true);
+  const rows=await sbGet(`email=eq.${encodeURIComponent(emailEnProceso)}&select=codigo_verificacion,codigo_expira,nombre`);
+  if(!rows.length){setLoading('btn-verificar',false);return mostrarMsg('msg-verificar','<i class="fa fa-circle-xmark me-1"></i>No se encontró el usuario.');}
+  const u=rows[0];
+  if(new Date(u.codigo_expira)<new Date()){setLoading('btn-verificar',false);limpiarCodigo();return mostrarMsg('msg-verificar','<i class="fa fa-clock me-1"></i>El código expiró. Reenvialo.');}
+  if(u.codigo_verificacion!==codigo){setLoading('btn-verificar',false);limpiarCodigo();return mostrarMsg('msg-verificar','<i class="fa fa-circle-xmark me-1"></i>Código incorrecto.');}
+  await sbUpdate(emailEnProceso,{email_verificado:true,codigo_verificacion:null,codigo_expira:null});
+  setLoading('btn-verificar',false);
+  ir('screen-pendiente');
+}
+
+async function reenviarCodigo(){
+  const btn=document.getElementById('btn-reenviar');
+  btn.classList.add('disabled');limpiarCodigo();ocultarMsg('msg-verificar');
+  const rows=await sbGet(`email=eq.${encodeURIComponent(emailEnProceso)}&select=nombre`);
+  if(!rows.length)return;
+  const codigo=generarCodigo();
+  await sbUpdate(emailEnProceso,{codigo_verificacion:codigo,codigo_expira:expiraEn(15)});
+  await enviarEmail(emailEnProceso,'Nuevo código de verificación · Gestión 2026',tplVerificacion(rows[0].nombre,codigo));
+  mostrarMsg('msg-verificar','<i class="fa fa-check me-1"></i>Código reenviado. Revisá tu email.','success');
+  let seg=60;btn.textContent=`Reenviar (${seg}s)`;
+  const t=setInterval(()=>{seg--;btn.textContent=seg>0?`Reenviar (${seg}s)`:'Reenviar';if(seg<=0){clearInterval(t);btn.classList.remove('disabled');}},1000);
+}
+
+document.getElementById('login-email').addEventListener('keydown',e=>{if(e.key==='Enter')hacerLogin();});
+document.getElementById('login-pwd').addEventListener('keydown',e=>{if(e.key==='Enter')hacerLogin();});
+
+async function hacerLogin(){
+  ocultarMsg('msg-login');
+  const email=document.getElementById('login-email').value.trim().toLowerCase();
+  const pwd=document.getElementById('login-pwd').value;
+  if(!email||!pwd)return mostrarMsg('msg-login','<i class="fa fa-circle-xmark me-1"></i>Completá email y contraseña.');
+  setLoading('btn-login',true);
+  try{
+    const hash=await sha256(pwd);
+    const rows=await sbGet(`email=eq.${encodeURIComponent(email)}&select=nombre,password_hash,estado,email_verificado,rol`);
+    setLoading('btn-login',false);
+    if(!rows.length||rows[0].password_hash!==hash)return mostrarMsg('msg-login','<i class="fa fa-circle-xmark me-1"></i>Email o contraseña incorrectos.');
+    const u=rows[0];
+    if(!u.email_verificado){
+      emailEnProceso=email;
+      const r=await sbGet(`email=eq.${encodeURIComponent(email)}&select=nombre`);
+      const codigo=generarCodigo();
+      await sbUpdate(email,{codigo_verificacion:codigo,codigo_expira:expiraEn(15)});
+      await enviarEmail(email,'Verificá tu email · Gestión 2026',tplVerificacion(r[0].nombre,codigo));
+      document.getElementById('verificar-subtitulo').textContent=`Enviamos un código a ${email}`;
+      return ir('screen-verificar');
+    }
+    if(u.estado==='pendiente')return ir('screen-pendiente');
+    if(u.estado==='rechazado')return mostrarMsg('msg-login','<i class="fa fa-ban me-1"></i>Tu acceso fue rechazado. Contactá al administrador.');
+    const rol=u.rol||'admin';
+    sessionStorage.setItem('gestion_auth','1');
+    sessionStorage.setItem('gestion_nombre',u.nombre);
+    sessionStorage.setItem('gestion_rol',rol);
+    mostrarContenido(u.nombre,rol);
+  }catch(e){
+    setLoading('btn-login',false);
+    mostrarMsg('msg-login','<i class="fa fa-circle-xmark me-1"></i>Error de conexión. Intentá de nuevo.');
+  }
+}
+
+async function solicitarReset(){
+  ocultarMsg('msg-reset-solicitar');ocultarMsg('msg-reset-solicitar-ok');
+  const email=document.getElementById('reset-email').value.trim().toLowerCase();
+  if(!email)return mostrarMsg('msg-reset-solicitar','<i class="fa fa-circle-xmark me-1"></i>Ingresá tu email.');
+  setLoading('btn-reset-solicitar',true);
+  const rows=await sbGet(`email=eq.${encodeURIComponent(email)}&select=nombre`);
+  if(rows.length){const codigo=generarCodigo();await sbUpdate(email,{codigo_reset:codigo,reset_expira:expiraEn(15)});await enviarEmail(email,'Recuperar contraseña · Gestión 2026',tplReset(codigo));emailEnProceso=email;}
+  setLoading('btn-reset-solicitar',false);
+  mostrarMsg('msg-reset-solicitar-ok','<i class="fa fa-check me-1"></i>Si ese email está registrado, recibirás el código en breve.','success');
+  setTimeout(()=>ir('screen-reset-nueva'),2000);
+}
+
+async function cambiarPassword(){
+  ocultarMsg('msg-reset-nueva');ocultarMsg('msg-reset-nueva-ok');
+  const codigo=document.getElementById('reset-codigo').value.trim();
+  const pwd=document.getElementById('reset-nueva-pwd').value;
+  const pwd2=document.getElementById('reset-nueva-pwd2').value;
+  if(!codigo||!pwd||!pwd2)return mostrarMsg('msg-reset-nueva','<i class="fa fa-circle-xmark me-1"></i>Completá todos los campos.');
+  if(pwd.length<8)return mostrarMsg('msg-reset-nueva','<i class="fa fa-circle-xmark me-1"></i>Mínimo 8 caracteres.');
+  if(pwd!==pwd2)return mostrarMsg('msg-reset-nueva','<i class="fa fa-circle-xmark me-1"></i>Las contraseñas no coinciden.');
+  setLoading('btn-reset-nueva',true);
+  const rows=await sbGet(`email=eq.${encodeURIComponent(emailEnProceso)}&select=codigo_reset,reset_expira`);
+  if(!rows.length||rows[0].codigo_reset!==codigo){setLoading('btn-reset-nueva',false);return mostrarMsg('msg-reset-nueva','<i class="fa fa-circle-xmark me-1"></i>Código incorrecto.');}
+  if(new Date(rows[0].reset_expira)<new Date()){setLoading('btn-reset-nueva',false);return mostrarMsg('msg-reset-nueva','<i class="fa fa-clock me-1"></i>El código expiró. Solicitá uno nuevo.');}
+  const hash=await sha256(pwd);
+  await sbUpdate(emailEnProceso,{password_hash:hash,codigo_reset:null,reset_expira:null});
+  setLoading('btn-reset-nueva',false);
+  mostrarMsg('msg-reset-nueva-ok','<i class="fa fa-check me-1"></i>Contraseña actualizada. Ya podés iniciar sesión.','success');
+  setTimeout(()=>ir('screen-login'),2000);
+}
+
+function mostrarContenido(nombre,rol){
+  rol=rol||'admin';
+  document.querySelectorAll('.auth-screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('main-content').style.display='block';
+  document.getElementById('nombre-usuario').textContent=nombre;
+
+  const badgeMap={
+    admin:  ['badge-rol-admin','Administrador'],
+    lector: ['badge-rol-lector','Lectura'],
+    prueba: ['badge-rol-prueba','Prueba']
+  };
+  const [cls,txt]=badgeMap[rol]||badgeMap['admin'];
+  const badgeEl=document.getElementById('badge-rol');
+  badgeEl.className=`badge-rol ${cls}`;
+  badgeEl.textContent=txt;
+
+  if(rol==='admin'){
+    document.getElementById('vista-admin').style.display='block';
+    document.getElementById('vista-lector').style.display='none';
+    document.getElementById('hero-descripcion').textContent='Cargá los datos de actividades y acciones realizadas. Cada respuesta se registra automáticamente en la planilla del equipo.';
+    const w=document.getElementById('form-embed-wrapper');
+    if(!w.querySelector('iframe')){
+      const f=document.createElement('iframe');
+      f.src='https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=Rpc9hHQGv0ikAqRc0G9UGkpr6Cx7gw5EiCOXAv93xnJURUJITk5OUFg3TUhQVTFFTVpRTlROTzhUSC4u&embed=true';
+      f.style.cssText='display:block;width:100%;height:720px;border:none;';
+      f.setAttribute('allowfullscreen','');
+      w.appendChild(f);
+    }
+  }else{
+    document.getElementById('vista-admin').style.display='none';
+    document.getElementById('vista-lector').style.display='block';
+    document.getElementById('hero-descripcion').textContent='Consultá el panel de estadísticas con los datos de actividades registradas.';
+    cargarEstadisticas(rol);
+  }
+}
+
+async function cargarEstadisticas(rol){
+  const loadEl=document.getElementById('stats-loading');
+  const contentEl=document.getElementById('stats-content');
+  const errorEl=document.getElementById('stats-error');
+  const bannerEl=document.getElementById('banner-prueba-box');
+  loadEl.style.display='block';
+  contentEl.style.display='none';
+  errorEl.style.display='none';
+  bannerEl.style.display=rol==='prueba'?'flex':'none';
+  try{
+    const [ultimas,todas]=await Promise.all([
+      sbGetActividades('select=fecha,programa,localidad,cantidad_personas,usuario_nombre&order=created_at.desc&limit=10'),
+      sbGetActividades('select=cantidad_personas')
+    ]);
+    loadEl.style.display='none';
+    const total=todas.length;
+    const totalPersonas=todas.reduce((s,r)=>s+(parseInt(r.cantidad_personas)||0),0);
+    const promedio=total>0?Math.round(totalPersonas/total):0;
+    document.getElementById('stat-total').textContent=total.toLocaleString('es-AR');
+    document.getElementById('stat-personas').textContent=totalPersonas.toLocaleString('es-AR');
+    document.getElementById('stat-promedio').textContent=promedio.toLocaleString('es-AR');
+    const tbody=document.getElementById('act-tbody');
+    if(!ultimas.length){
+      tbody.innerHTML='<tr><td colspan="5" class="sin-datos">Aún no hay actividades registradas</td></tr>';
+    }else{
+      tbody.innerHTML=ultimas.map(r=>{
+        const fecha=r.fecha?new Date(r.fecha+'T00:00:00').toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'}):'-';
+        const personas=(parseInt(r.cantidad_personas)||0).toLocaleString('es-AR');
+        return `<tr><td>${fecha}</td><td>${r.programa||'-'}</td><td>${r.localidad||'-'}</td><td>${personas}</td><td>${r.usuario_nombre||'-'}</td></tr>`;
+      }).join('');
+    }
+    contentEl.style.display='block';
+  }catch(e){
+    loadEl.style.display='none';
+    document.getElementById('stats-error-msg').textContent='Error al cargar los datos. Intentá de nuevo más tarde.';
+    errorEl.style.display='block';
+    console.error('cargarEstadisticas:',e);
+  }
+}
+
+function cerrarSesion(){
+  sessionStorage.removeItem('gestion_auth');
+  sessionStorage.removeItem('gestion_nombre');
+  sessionStorage.removeItem('gestion_rol');
+  document.getElementById('main-content').style.display='none';
+  ir('screen-login');
+  document.getElementById('login-email').value='';
+  document.getElementById('login-pwd').value='';
+}
+
+window.addEventListener('DOMContentLoaded',()=>{
+  const auth=sessionStorage.getItem('gestion_auth');
+  const nombre=sessionStorage.getItem('gestion_nombre');
+  const rol=sessionStorage.getItem('gestion_rol')||'admin';
+  if(auth==='1'&&nombre)mostrarContenido(nombre,rol);
+});
+
+/* ── Solo para consola: crear usuarios iniciales en Supabase ── */
+async function crearUsuariosIniciales(){
+  const usuarios=[
+    {nombre:'Administrador',          email:'admin@participacionciudadana.gob.ar', pwd:'Admin2026!',  rol:'admin'},
+    {nombre:'Lector Estadísticas',    email:'lector@participacionciudadana.gob.ar',pwd:'Lector2026!', rol:'lector'},
+    {nombre:'Profesor Supervisor',    email:'profesor@prueba.com',                 pwd:'Prueba2026!', rol:'prueba'}
+  ];
+  console.log('Creando usuarios iniciales...');
+  for(const u of usuarios){
+    const hash=await sha256(u.pwd);
+    const res=await sbInsert({nombre:u.nombre,email:u.email,password_hash:hash,estado:'aprobado',email_verificado:true,rol:u.rol});
+    const ok=Array.isArray(res)&&res.length>0;
+    console.log(`${ok?'✓':'⚠'} ${u.email} (${u.rol})`,ok?'creado':res);
+  }
+  console.log('Listo. Verificá en Supabase que los 3 registros existen.');
+}
+</script>
+</body>
+</html>

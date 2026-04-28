@@ -293,7 +293,7 @@ export default function GestionContenidosPage() {
                           </TableCell>
                           <TableCell>
                             <span className="text-sm text-muted-foreground">
-                              {podcast.invitados.length > 0
+                              {(podcast.invitados?.length ?? 0) > 0
                                 ? podcast.invitados.join(", ")
                                 : "-"}
                             </span>
