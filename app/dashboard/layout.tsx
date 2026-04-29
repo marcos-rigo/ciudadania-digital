@@ -14,7 +14,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
   try {
     const data = JSON.parse(session.value)
     nombre = data.nombre || 'Usuario'
-    rol = data.rol || 'admin'
+    rol = data.rol || 'lector'
   } catch {
     redirect('/login')
   }

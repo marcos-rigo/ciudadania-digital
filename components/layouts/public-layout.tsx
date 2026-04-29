@@ -17,10 +17,7 @@ import {
   FolderOpen,
   Calendar,
   BarChart3,
-  FileText,
-  Mail,
   LogIn,
-  GraduationCap,
 } from "lucide-react"
 
 const navItems = [
@@ -28,9 +25,6 @@ const navItems = [
   { href: "/programas", label: "Programas", icon: FolderOpen },
   { href: "/acciones", label: "Acciones", icon: Calendar },
   { href: "/resultados", label: "Resultados", icon: BarChart3 },
-  { href: "/transparencia", label: "Transparencia", icon: FileText },
-  { href: "/ciudadania-digital", label: "Ciudadanía Digital", icon: GraduationCap },
-  { href: "/contacto", label: "Contacto", icon: Mail },
 ]
 
 export function PublicLayout({ children }: { children: React.ReactNode }) {

@@ -9,7 +9,9 @@ export default async function DashboardPage() {
 
   try {
     const data = JSON.parse(session.value)
-    redirect(data.rol === 'admin' ? '/dashboard/admin' : '/dashboard/estadisticas')
+    if (data.rol === 'superadmin') redirect('/dashboard/admin/usuarios')
+    else if (data.rol === 'empleado') redirect('/dashboard/admin')
+    else redirect('/dashboard/estadisticas')
   } catch {
     redirect('/login')
   }

@@ -24,12 +24,13 @@ Plus a **standalone HTML file** (`gestion-2026.html`) deployed separately, shari
 
 ## Routing & Layouts
 
-Four layout trees:
+Five layout trees:
 
 | Tree | Routes | Layout component |
 |---|---|---|
 | Public | `/`, `/programas`, `/acciones`, `/ciudadania-digital`, etc. | `components/layouts/public-layout.tsx` |
-| Equipo/Admin | `/equipo/**`, `/gestion/**` | `components/layouts/admin-layout.tsx` |
+| Equipo | `/equipo/**` | `components/layouts/admin-layout.tsx` |
+| Gestión (Ciudadanía Digital CMS) | `/gestion/**` | `components/layouts/gestion-layout.tsx` |
 | Ciudadanía Digital | `/ciudadania-digital`, `/trayectos`, `/contenidos` | `components/layouts/ciudadania-layout.tsx` |
 | Dashboard | `/dashboard/**` | `components/dashboard/DashboardLayout.tsx` |
 
@@ -49,7 +50,7 @@ Each page uses a component from `components/auth/` that calls the corresponding 
 3. If `estado = 'pendiente'` → return `{pendiente: true}` → redirect `/pendiente`
 4. If `estado = 'rechazado'` → error message
 5. If `estado = 'aprobado'` → set `gestion_session` cookie, return `{ok: true, rol, nombre}`
-6. Client redirects: `admin` → `/dashboard/admin`, others → `/dashboard/estadisticas`
+6. Client redirects: `superadmin` → `/dashboard/admin/usuarios`, `empleado` → `/dashboard/admin`, others → `/dashboard/estadisticas`
 
 **Session cookie:**
 ```js
@@ -59,17 +60,21 @@ gestion_session = JSON.stringify({ auth: true, nombre, rol })
 
 ### Middleware (proxy.ts)
 
-`proxy.ts` (renamed from `middleware.ts` for Next.js 16) protects `/dashboard/**` and redirects authenticated users away from `/login`.
+`proxy.ts` es el middleware de Next.js 16 (en esta versión el archivo se llama `proxy.ts` en lugar de `middleware.ts`, y la función exportada se llama `proxy`). Protege `/dashboard/**` y redirige usuarios autenticados fuera de `/login`.
 
 Matcher: `['/login', '/dashboard/:path*']`
+
+Route guards in middleware:
+- `/dashboard/admin/usuarios` — only `superadmin`; others redirected to `/dashboard/estadisticas`
+- `/dashboard/admin` — blocked for `lector`; redirected to `/dashboard/estadisticas`
 
 ### Roles
 
 | Rol | Destino tras login | Puede ver |
 |---|---|---|
-| `admin` | `/dashboard/admin` | Panel de carga (MS Forms) + gestión de usuarios |
+| `superadmin` | `/dashboard/admin/usuarios` | Gestión completa de usuarios (PATCH/DELETE) |
+| `empleado` | `/dashboard/admin` | Panel de carga (MS Forms) |
 | `lector` | `/dashboard/estadisticas` | Solo estadísticas |
-| `prueba` | `/dashboard/estadisticas` | Estadísticas + banner de cuenta de prueba |
 
 ### API routes
 
@@ -84,6 +89,8 @@ Matcher: `['/login', '/dashboard/:path*']`
 | GET | `/api/auth/seed` | Crea los 3 usuarios iniciales (solo dev) |
 | POST | `/api/admin/usuarios` | Crea usuario (requiere rol admin) |
 | GET | `/api/admin/usuarios` | Lista todos los usuarios (requiere rol admin) |
+| PATCH | `/api/admin/usuarios/[email]` | Actualiza nombre/rol/estado (requiere `superadmin`) |
+| DELETE | `/api/admin/usuarios/[email]` | Elimina usuario (requiere `superadmin`) |
 
 ### Server-side auth helpers (`lib/auth-server.ts`)
 
@@ -94,6 +101,7 @@ Matcher: `['/login', '/dashboard/:path*']`
 - `sbGetUsuarios()` — lista todos los usuarios
 - `sbInsertUsuario(data)` — inserta usuario, **lanza error si Supabase devuelve non-ok**
 - `sbUpdateUsuario(email, data)` — actualiza campos por email
+- `sbDeleteUsuario(email)` — elimina usuario por email
 - `enviarEmail(to, subject, html)` — envía via Resend API (falla silenciosa con `console.warn`)
 - `tplVerificacion(nombre, codigo)` / `tplReset(codigo)` — templates HTML de email
 
@@ -107,7 +115,7 @@ Matcher: `['/login', '/dashboard/:path*']`
 ```sql
 id uuid PK, nombre text, email text UNIQUE,
 password_hash text,       -- SHA256 hex
-rol text,                 -- 'admin' | 'lector' | 'prueba'
+rol text,                 -- 'superadmin' | 'empleado' | 'lector'
 estado text,              -- 'pendiente' | 'aprobado' | 'rechazado'
 email_verificado boolean,
 codigo_verificacion text, codigo_expira timestamptz,
@@ -121,13 +129,7 @@ Columnas usadas en el código: `fecha`, `programa`, `localidad`, `cantidad_perso
 
 ## Usuarios seed (dev)
 
-Correr `GET /api/auth/seed` para crear:
-
-| Email | Password | Rol |
-|---|---|---|
-| `admin@participacionciudadana.gob.ar` | `Admin2026!` | admin |
-| `lector@participacionciudadana.gob.ar` | `Lector2026!` | lector |
-| `dsardi@prueba.com` | `Prueba2026!` | prueba |
+Correr `GET /api/auth/seed` para crear usuarios iniciales de prueba.
 
 ## Data Layer (mock)
 
@@ -144,7 +146,7 @@ Interfaces principales en `/lib/types.ts`: `Programa`, `Accion`, `Video`, `Mater
 - `PanelAdmin` — embed de MS Forms iframe + instrucciones de carga
 - `PanelEstadisticas` — cards de estadísticas + tabla de últimas 10 actividades (fetch real a Supabase)
 - `CrearUsuarioForm` — formulario para crear usuarios (solo admin, POST `/api/admin/usuarios`)
-- `ListaUsuarios` — tabla de usuarios (solo admin, GET `/api/admin/usuarios`)
+- `ListaUsuarios` — tabla de usuarios con edición y eliminación inline (solo superadmin, usa PATCH/DELETE `/api/admin/usuarios/[email]`)
 
 ## Component Conventions
 

@@ -7,11 +7,11 @@ const headers = {
 }
 
 export async function sbGetActividades(filtros: string): Promise<Record<string, unknown>[]> {
-  try {
-    const r = await fetch(`${SB_URL}/rest/v1/actividades?${filtros}`, { headers })
-    if (!r.ok) return []
-    return r.json()
-  } catch {
-    return []
+  const url = `${SB_URL}/rest/v1/actividades?${filtros}`
+  const r = await fetch(url, { headers, cache: 'no-store' })
+  if (!r.ok) {
+    const texto = await r.text()
+    throw new Error(`Supabase ${r.status}: ${texto}`)
   }
+  return r.json()
 }
