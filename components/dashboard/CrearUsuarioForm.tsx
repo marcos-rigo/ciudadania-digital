@@ -3,10 +3,9 @@ import { useState } from 'react'
 import { Plus, Eye, EyeOff } from 'lucide-react'
 
 const ROLES = [
-  { value: 'admin', label: 'Administrador' },
+  { value: 'superadmin', label: 'Superadministrador' },
+  { value: 'empleado', label: 'Empleado' },
   { value: 'lector', label: 'Lector' },
-  { value: 'profesor', label: 'Profesor' },
-  { value: 'prueba', label: 'Prueba' },
 ]
 
 const ESTADOS = [
@@ -19,7 +18,7 @@ export function CrearUsuarioForm({ onUsuarioCreado }: { onUsuarioCreado: () => v
   const [nombre, setNombre] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [rol, setRol] = useState('lector')
+  const [rol, setRol] = useState('empleado')
   const [estado, setEstado] = useState('aprobado')
   const [showPwd, setShowPwd] = useState(false)
   const [loading, setLoading] = useState(false)

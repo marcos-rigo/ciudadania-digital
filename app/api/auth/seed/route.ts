@@ -6,7 +6,6 @@ import {
 } from '@/lib/auth-server'
 
 export async function GET() {
-  // Solo funciona en desarrollo
   if (process.env.NODE_ENV === 'production') {
     return NextResponse.json(
       { ok: false, error: 'No disponible en producción' },
@@ -17,10 +16,18 @@ export async function GET() {
   try {
     const usuariosSeeds = [
       {
-        nombre: 'Administrador',
-        email: 'admin@participacionciudadana.gob.ar',
-        password: 'Admin2026!',
-        rol: 'admin',
+        nombre: 'Superadministrador',
+        email: 'superadmin@participacionciudadana.gob.ar',
+        password: 'Superadmin2026!',
+        rol: 'superadmin',
+        estado: 'aprobado',
+        email_verificado: true,
+      },
+      {
+        nombre: 'Empleado',
+        email: 'empleado@participacionciudadana.gob.ar',
+        password: 'Empleado2026!',
+        rol: 'empleado',
         estado: 'aprobado',
         email_verificado: true,
       },
@@ -32,37 +39,22 @@ export async function GET() {
         estado: 'aprobado',
         email_verificado: true,
       },
-      {
-        nombre: 'Profesor Duilio',
-        email: 'dsardi@prueba.com',
-        password: 'Prueba2026!',
-        rol: 'prueba',
-        estado: 'aprobado',
-        email_verificado: true,
-      },
     ]
 
     const resultados = []
 
     for (const seed of usuariosSeeds) {
       try {
-        // Verificar si el usuario ya existe
         const existing = await sbGetUsuario(seed.email)
 
         if (existing.length > 0) {
-          resultados.push({
-            email: seed.email,
-            ok: false,
-            mensaje: 'Usuario ya existe',
-          })
+          resultados.push({ email: seed.email, ok: false, mensaje: 'Usuario ya existe' })
           continue
         }
 
-        // Hashear password
         const passwordHash = hashPassword(seed.password)
 
-        // Insertar usuario
-        const result = await sbInsertUsuario({
+        await sbInsertUsuario({
           nombre: seed.nombre,
           email: seed.email,
           password_hash: passwordHash,
@@ -71,11 +63,7 @@ export async function GET() {
           email_verificado: seed.email_verificado,
         })
 
-        resultados.push({
-          email: seed.email,
-          ok: true,
-          mensaje: 'Usuario creado exitosamente',
-        })
+        resultados.push({ email: seed.email, ok: true, mensaje: 'Usuario creado exitosamente' })
       } catch (err) {
         resultados.push({
           email: seed.email,
@@ -85,17 +73,11 @@ export async function GET() {
       }
     }
 
-    return NextResponse.json({
-      ok: true,
-      resultados,
-    })
+    return NextResponse.json({ ok: true, resultados })
   } catch (e) {
     console.error('seed error:', e)
     return NextResponse.json(
-      {
-        ok: false,
-        error: `Error: ${e instanceof Error ? e.message : 'desconocido'}`,
-      },
+      { ok: false, error: `Error: ${e instanceof Error ? e.message : 'desconocido'}` },
       { status: 500 }
     )
   }

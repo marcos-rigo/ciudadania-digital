@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { sbGetActividades } from '@/lib/supabase-client'
-import { BarChart2, List, AlertTriangle } from 'lucide-react'
+import { BarChart2, List } from 'lucide-react'
 
 interface Actividad {
   fecha: string
@@ -52,12 +52,6 @@ export function PanelEstadisticas({ rol }: { rol: string }) {
 
   return (
     <div>
-      {rol === 'prueba' && (
-        <div className="flex items-center gap-3 bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-xl px-5 py-4 mb-6 text-sm font-semibold">
-          <AlertTriangle className="w-5 h-5 flex-shrink-0" />
-          Cuenta de prueba — Solo lectura. Los datos mostrados son reales.
-        </div>
-      )}
 
       <div className="bg-white rounded-2xl border border-[#e8edf3] shadow-sm p-8">
         <h2 className="text-[#1A2A36] font-black text-xl flex items-center gap-2 mb-6">

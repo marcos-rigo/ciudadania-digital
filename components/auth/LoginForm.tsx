@@ -27,7 +27,9 @@ export function LoginForm() {
       if (data.pendiente) { router.push('/pendiente'); return }
       if (data.verificar) { router.push(`/verificar?email=${encodeURIComponent(email.trim().toLowerCase())}`); return }
       if (!data.ok) { setError(data.error || 'Email o contraseña incorrectos.'); return }
-      router.push(data.rol === 'admin' ? '/dashboard/admin' : '/dashboard/estadisticas')
+      if (data.rol === 'superadmin') router.push('/dashboard/admin/usuarios')
+      else if (data.rol === 'empleado') router.push('/dashboard/admin')
+      else router.push('/dashboard/estadisticas')
     } catch {
       setError('Error de conexión. Intentá de nuevo.')
     } finally {

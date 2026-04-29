@@ -67,12 +67,26 @@ export async function sbInsertUsuario(data: object) {
   return r.json()
 }
 
-export async function sbUpdateUsuario(email: string, data: object): Promise<boolean> {
+export async function sbUpdateUsuario(email: string, data: object): Promise<void> {
   const r = await fetch(
     `${SB_URL}/rest/v1/usuarios?email=eq.${encodeURIComponent(email)}`,
     { method: 'PATCH', headers: sbHeaders, body: JSON.stringify(data) }
   )
-  return r.ok
+  if (!r.ok) {
+    const texto = await r.text()
+    throw new Error(`Supabase update ${r.status}: ${texto}`)
+  }
+}
+
+export async function sbDeleteUsuario(email: string): Promise<void> {
+  const r = await fetch(
+    `${SB_URL}/rest/v1/usuarios?email=eq.${encodeURIComponent(email)}`,
+    { method: 'DELETE', headers: sbHeaders }
+  )
+  if (!r.ok) {
+    const texto = await r.text()
+    throw new Error(`Supabase delete ${r.status}: ${texto}`)
+  }
 }
 
 export async function enviarEmail(to: string, subject: string, html: string) {

@@ -6,7 +6,7 @@ export type NivelCapacitacion = 'basico' | 'intermedio' | 'avanzado'
 export type TipoMaterial = 'pdf' | 'guia' | 'presentacion' | 'documento'
 export type TipoTablero = 'power_bi' | 'looker' | 'metabase'
 export type Sentimiento = 'positivo' | 'neutral' | 'negativo'
-export type RolUsuario = 'admin' | 'editor' | 'lector'
+export type RolUsuario = 'superadmin' | 'empleado' | 'lector'
 
 export interface Programa {
   id: string

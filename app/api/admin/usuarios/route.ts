@@ -12,7 +12,7 @@ export async function POST(request: Request) {
     const cookieStore = await cookies()
     const session = cookieStore.get('gestion_session')
 
-    // Verificar que el usuario es admin
+    // Verificar que el usuario es superadmin
     if (!session) {
       return NextResponse.json(
         { ok: false, error: 'No autorizado' },
@@ -22,9 +22,9 @@ export async function POST(request: Request) {
 
     try {
       const data = JSON.parse(session.value)
-      if (data.rol !== 'admin') {
+      if (data.rol !== 'superadmin') {
         return NextResponse.json(
-          { ok: false, error: 'Solo administradores pueden crear usuarios' },
+          { ok: false, error: 'Solo superadministradores pueden crear usuarios' },
           { status: 403 }
         )
       }
@@ -90,7 +90,7 @@ export async function GET(request: Request) {
     const cookieStore = await cookies()
     const session = cookieStore.get('gestion_session')
 
-    // Verificar que el usuario es admin
+    // Verificar que el usuario es superadmin
     if (!session) {
       return NextResponse.json(
         { ok: false, error: 'No autorizado' },
@@ -100,9 +100,9 @@ export async function GET(request: Request) {
 
     try {
       const data = JSON.parse(session.value)
-      if (data.rol !== 'admin') {
+      if (data.rol !== 'superadmin') {
         return NextResponse.json(
-          { ok: false, error: 'Solo administradores pueden ver usuarios' },
+          { ok: false, error: 'Solo superadministradores pueden ver usuarios' },
           { status: 403 }
         )
       }

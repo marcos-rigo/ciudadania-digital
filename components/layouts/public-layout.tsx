@@ -24,7 +24,7 @@ import {
 } from "lucide-react"
 
 const navItems = [
-  { href: "/", label: "Inicio", icon: Home },
+  { href: "/inicio", label: "Inicio", icon: Home },
   { href: "/programas", label: "Programas", icon: FolderOpen },
   { href: "/acciones", label: "Acciones", icon: Calendar },
   { href: "/resultados", label: "Resultados", icon: BarChart3 },
@@ -43,7 +43,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
       <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="flex h-16 items-center px-4 lg:px-6">
           {/* Logo - pegado a la izquierda */}
-          <Link href="/" className="flex items-center shrink-0">
+          <Link href="/inicio" className="flex items-center shrink-0">
             <div className="relative h-14 w-48">
               <Image
                 src="/logo1.png"
@@ -80,7 +80,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
             <ThemeToggle />
             
             <Button asChild variant="default" size="sm" className="hidden sm:flex glow">
-              <Link href="/equipo/login">
+              <Link href="/login">
                 <LogIn className="h-4 w-4 mr-2" />
                 Ingresar
               </Link>
@@ -128,7 +128,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
                   </nav>
                   <div className="mt-auto pb-4">
                     <Button asChild className="w-full glow">
-                      <Link href="/equipo/login" onClick={() => setMobileMenuOpen(false)}>
+                      <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
                         <LogIn className="h-4 w-4 mr-2" />
                         Ingresar
                       </Link>

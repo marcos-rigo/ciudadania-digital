@@ -1,13 +1,22 @@
 'use client'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
-import { LogOut, CircleUser, LayoutDashboard, Globe, Users } from 'lucide-react'
+import { LogOut, CircleUser, LayoutDashboard, Globe, Users, BarChart2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const BADGE: Record<string, { cls: string; label: string }> = {
-  admin:  { cls: 'bg-blue-100 text-blue-700 border border-blue-200',      label: 'Administrador' },
-  lector: { cls: 'bg-slate-100 text-slate-600 border border-slate-200',    label: 'Lectura' },
-  prueba: { cls: 'bg-yellow-100 text-yellow-800 border border-yellow-200', label: 'Prueba' },
+  superadmin: {
+    cls: 'bg-orange-100 text-orange-800 border border-orange-300',
+    label: 'Superadmin',
+  },
+  empleado: {
+    cls: 'bg-sky-100 text-sky-700 border border-sky-200',
+    label: 'Empleado',
+  },
+  lector: {
+    cls: 'bg-slate-100 text-slate-600 border border-slate-200',
+    label: 'Lector',
+  },
 }
 
 interface Props {
@@ -19,7 +28,7 @@ interface Props {
 export function DashboardLayout({ nombre, rol, children }: Props) {
   const router = useRouter()
   const pathname = usePathname()
-  const badge = BADGE[rol] ?? BADGE.admin
+  const badge = BADGE[rol] ?? BADGE.lector
 
   async function handleLogout() {
     await fetch('/api/auth/logout', { method: 'POST' })
@@ -27,7 +36,19 @@ export function DashboardLayout({ nombre, rol, children }: Props) {
     router.refresh()
   }
 
-  const isActive = (href: string) => pathname.startsWith(href)
+  const isActive = (href: string, exact = false) =>
+    exact ? pathname === href : pathname.startsWith(href)
+
+  const linkCls = (active: boolean) =>
+    cn(
+      'flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-colors text-xs',
+      active
+        ? 'bg-white/30 border border-white/40'
+        : 'bg-white/10 hover:bg-white/20 border border-white/20'
+    )
+
+  const puedeCargar = rol === 'superadmin' || rol === 'empleado'
+  const puedeVerUsuarios = rol === 'superadmin'
 
   return (
     <div className="min-h-screen bg-[#f6f7f8]">
@@ -45,47 +66,40 @@ export function DashboardLayout({ nombre, rol, children }: Props) {
             </h1>
           </div>
 
-          <nav className="hidden sm:flex items-center gap-1 text-xs">
-            {rol === 'admin' && (
-              <>
-                <Link
-                  href="/dashboard/admin"
-                  className={cn(
-                    'flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-colors',
-                    isActive('/dashboard/admin') && !isActive('/dashboard/admin/usuarios')
-                      ? 'bg-white/30 border border-white/40'
-                      : 'bg-white/10 hover:bg-white/20 border border-white/20'
-                  )}
-                >
-                  <LayoutDashboard className="w-3.5 h-3.5" />
-                  Carga
-                </Link>
-                <Link
-                  href="/dashboard/admin/usuarios"
-                  className={cn(
-                    'flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-colors',
-                    isActive('/dashboard/admin/usuarios')
-                      ? 'bg-white/30 border border-white/40'
-                      : 'bg-white/10 hover:bg-white/20 border border-white/20'
-                  )}
-                >
-                  <Users className="w-3.5 h-3.5" />
-                  Usuarios
-                </Link>
-              </>
-            )}
-            {(rol === 'lector' || rol === 'prueba') && (
+          <nav className="hidden sm:flex items-center gap-1">
+            {puedeCargar && (
               <Link
-                href="/dashboard/estadisticas"
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 transition-colors"
+                href="/dashboard/admin"
+                className={linkCls(
+                  isActive('/dashboard/admin') && !isActive('/dashboard/admin/usuarios')
+                )}
               >
                 <LayoutDashboard className="w-3.5 h-3.5" />
-                Estadísticas
+                Carga
               </Link>
             )}
+
+            <Link
+              href="/dashboard/estadisticas"
+              className={linkCls(isActive('/dashboard/estadisticas'))}
+            >
+              <BarChart2 className="w-3.5 h-3.5" />
+              Estadísticas
+            </Link>
+
+            {puedeVerUsuarios && (
+              <Link
+                href="/dashboard/admin/usuarios"
+                className={linkCls(isActive('/dashboard/admin/usuarios'))}
+              >
+                <Users className="w-3.5 h-3.5" />
+                Usuarios
+              </Link>
+            )}
+
             <Link
               href="/inicio"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 transition-colors"
+              className={linkCls(false)}
             >
               <Globe className="w-3.5 h-3.5" />
               Sitio

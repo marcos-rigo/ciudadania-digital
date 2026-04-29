@@ -9,7 +9,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
   if (!session) redirect('/login')
 
   let nombre = 'Usuario'
-  let rol = 'admin'
+  let rol = 'lector'
 
   try {
     const data = JSON.parse(session.value)
