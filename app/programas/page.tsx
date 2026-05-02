@@ -8,7 +8,8 @@ import { FiltersBar } from "@/components/ui/filters-bar"
 import { StatusBadge } from "@/components/ui/status-badge"
 import { TagChips } from "@/components/ui/tag-chips"
 import { NoResultsState } from "@/components/ui/empty-state"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { SpotlightCard } from "@/components/ui/spotlight-card"
 import { Button } from "@/components/ui/button"
 import { programas, tematicas, publicos, territorios } from "@/lib/mock/data"
 import { ArrowRight, MapPin, Users } from "lucide-react"
@@ -113,13 +114,10 @@ export default function ProgramasPage() {
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredProgramas.map((programa) => (
-                <Card
-                  key={programa.id}
-                  className="group hover:shadow-lg transition-shadow border-border/50"
-                >
+                <SpotlightCard key={programa.id}>
                   <CardHeader>
                     <div className="flex items-start justify-between gap-2">
-                      <CardTitle className="text-lg group-hover:text-primary transition-colors">
+                      <CardTitle className="text-lg group-hover:text-primary transition-colors duration-200">
                         {programa.nombre}
                       </CardTitle>
                       <StatusBadge status={programa.estado} />
@@ -131,7 +129,7 @@ export default function ProgramasPage() {
                   <CardContent className="space-y-4">
                     <div className="space-y-2">
                       <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <MapPin className="h-4 w-4" />
+                        <MapPin className="h-4 w-4 shrink-0" />
                         <span className="truncate">
                           {programa.territorios.slice(0, 2).join(", ")}
                           {programa.territorios.length > 2 &&
@@ -139,7 +137,7 @@ export default function ProgramasPage() {
                         </span>
                       </div>
                       <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Users className="h-4 w-4" />
+                        <Users className="h-4 w-4 shrink-0" />
                         <span className="truncate">
                           {programa.publicos.slice(0, 2).join(", ")}
                           {programa.publicos.length > 2 &&
@@ -152,14 +150,18 @@ export default function ProgramasPage() {
                       variant="primary"
                       size="sm"
                     />
-                    <Button asChild variant="ghost" className="w-full mt-2">
+                    <Button
+                      asChild
+                      variant="ghost"
+                      className="w-full mt-2 group/btn border border-transparent hover:border-border/60 hover:bg-primary/5 hover:text-primary transition-all duration-300"
+                    >
                       <Link href={`/programas/${programa.slug}`}>
                         Ver detalle
-                        <ArrowRight className="ml-2 h-4 w-4" />
+                        <ArrowRight className="ml-2 h-4 w-4 transition-transform duration-200 group-hover/btn:translate-x-1" />
                       </Link>
                     </Button>
                   </CardContent>
-                </Card>
+                </SpotlightCard>
               ))}
             </div>
           )}

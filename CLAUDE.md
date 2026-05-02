@@ -15,12 +15,14 @@ No test suite is configured. Package manager: `npm` (ignore the `pnpm-lock.yaml`
 
 ## Architecture Overview
 
-**Next.js 16 App Router** project for the Secretaría de Participación Ciudadana (Tucumán, Argentina). Two distinct systems coexist:
+**Next.js 16 App Router** project (React 19) for the Secretaría de Participación Ciudadana (Tucumán, Argentina). Two distinct systems coexist:
 
 1. **Public platform** — ciudadanía digital, programas, acciones (mock data, no auth)
 2. **Internal dashboard** — activity reporting, stats, user management (real Supabase auth)
 
 Plus a **standalone HTML file** (`gestion-2026.html`) deployed separately, sharing the same Supabase project.
+
+Root page (`app/page.tsx`) redirects to `/inicio`.
 
 ## Routing & Layouts
 
@@ -29,8 +31,8 @@ Five layout trees:
 | Tree | Routes | Layout component |
 |---|---|---|
 | Public | `/`, `/programas`, `/acciones`, `/ciudadania-digital`, etc. | `components/layouts/public-layout.tsx` |
-| Equipo | `/equipo/**` | `components/layouts/admin-layout.tsx` |
-| Gestión (Ciudadanía Digital CMS) | `/gestion/**` | `components/layouts/gestion-layout.tsx` |
+| Equipo | `/equipo/**` | `components/layouts/admin-layout.tsx` | (mock, no auth) |
+| Gestión (Ciudadanía Digital CMS) | `/gestion/**` | `components/layouts/gestion-layout.tsx` | (mock, no auth) |
 | Ciudadanía Digital | `/ciudadania-digital`, `/trayectos`, `/contenidos` | `components/layouts/ciudadania-layout.tsx` |
 | Dashboard | `/dashboard/**` | `components/dashboard/DashboardLayout.tsx` |
 
@@ -61,6 +63,8 @@ gestion_session = JSON.stringify({ auth: true, nombre, rol })
 ### Middleware (proxy.ts)
 
 `proxy.ts` es el middleware de Next.js 16 (en esta versión el archivo se llama `proxy.ts` en lugar de `middleware.ts`, y la función exportada se llama `proxy`). Protege `/dashboard/**` y redirige usuarios autenticados fuera de `/login`.
+
+**Solo `/dashboard/**` está protegido por el middleware.** Las rutas `/gestion/**` y `/equipo/**` son accesibles sin autenticación — son UIs de demo con datos mock.
 
 Matcher: `['/login', '/dashboard/:path*']`
 
@@ -156,7 +160,7 @@ Interfaces principales en `/lib/types.ts`: `Programa`, `Accion`, `Video`, `Mater
 
 ## Theming
 
-CSS custom properties (OKLCH) en `app/globals.css`. Tailwind config con:
+**Tailwind v4** — configurado con `@import 'tailwindcss'` en `app/globals.css` (sin archivo JS de config separado; `tailwind.config.js` existe pero está vacío). CSS custom properties en hex (no OKLCH) en `app/globals.css`. Tailwind config con:
 - Sombras glow: `glow-sm`, `glow`, `glow-lg`, `glow-accent`
 - Animaciones: `pulse-glow`, `float`, `shimmer`
 - Fuentes: Poppins (UI), Lora (contenido serif)

@@ -41,20 +41,20 @@ export function DashboardLayout({ nombre, rol, children }: Props) {
 
   const linkCls = (active: boolean) =>
     cn(
-      'flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-colors text-xs',
+      'flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all duration-200 text-xs font-medium',
       active
-        ? 'bg-white/30 border border-white/40'
-        : 'bg-white/10 hover:bg-white/20 border border-white/20'
+        ? 'bg-[#4f8fff]/20 text-[#a8c4f0] border border-[#4f8fff]/35 shadow-[0_0_12px_rgba(79,143,255,0.2)]'
+        : 'bg-white/[0.07] text-white/60 hover:bg-white/[0.14] hover:text-white/90 border border-white/[0.12]'
     )
 
   const puedeCargar = rol === 'superadmin' || rol === 'empleado'
   const puedeVerUsuarios = rol === 'superadmin'
 
   return (
-    <div className="min-h-screen bg-[#f6f7f8]">
+    <div className="min-h-screen bg-[#f4f6f9] dark:bg-[#09090b]">
       <header
-        className="text-white shadow-lg"
-        style={{ background: 'linear-gradient(135deg, #1A2A36 0%, #2d4a6e 60%, #4272bb 100%)' }}
+        className="text-white shadow-lg border-b border-white/5"
+        style={{ background: 'linear-gradient(135deg, #09090b 0%, #0d1929 55%, #1a2d50 100%)' }}
       >
         <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
           <div>
@@ -107,9 +107,9 @@ export function DashboardLayout({ nombre, rol, children }: Props) {
           </nav>
 
           <div className="flex items-center gap-2">
-            <div className="flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-3 py-1.5 text-xs">
-              <CircleUser className="w-4 h-4 flex-shrink-0" />
-              <span className="hidden sm:inline max-w-[120px] truncate">{nombre}</span>
+            <div className="flex items-center gap-2 bg-white/[0.07] border border-white/[0.12] rounded-full px-3 py-1.5 text-xs backdrop-blur-sm">
+              <CircleUser className="w-4 h-4 flex-shrink-0 text-white/60" />
+              <span className="hidden sm:inline max-w-[120px] truncate text-white/80">{nombre}</span>
               <span className={cn('text-[11px] font-bold px-2 py-0.5 rounded-full', badge.cls)}>
                 {badge.label}
               </span>
@@ -117,7 +117,7 @@ export function DashboardLayout({ nombre, rol, children }: Props) {
             <button
               onClick={handleLogout}
               title="Cerrar sesión"
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-white/10 hover:bg-white/20 border border-white/20 rounded-full transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-white/[0.07] hover:bg-white/[0.14] border border-white/[0.12] rounded-full transition-all duration-200 text-white/60 hover:text-white/90"
             >
               <LogOut className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Salir</span>
@@ -126,7 +126,7 @@ export function DashboardLayout({ nombre, rol, children }: Props) {
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto px-4 py-8">
+      <main className="max-w-5xl mx-auto px-6 py-10 space-y-6">
         {children}
       </main>
     </div>
