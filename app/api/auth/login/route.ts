@@ -59,6 +59,15 @@ export async function POST(request: Request) {
       maxAge: 60 * 60 * 24 * 7,
     })
 
+    // Cookie legible por JS para mostrar/ocultar items de nav en el cliente
+    cookieStore.set('spc_auth', '1', {
+      httpOnly: false,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 60 * 60 * 24 * 7,
+    })
+
     return NextResponse.json({ ok: true, rol, nombre })
   } catch (e) {
     console.error('login error:', e)

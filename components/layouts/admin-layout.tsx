@@ -8,7 +8,6 @@ import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { ThemeToggle } from "@/components/ui/theme-toggle"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -168,7 +167,9 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top Bar */}
-        <header className="sticky top-0 z-40 flex h-16 items-center gap-4 border-b border-border/40 bg-background/95 backdrop-blur px-4 lg:px-6">
+        <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur shadow-sm">
+          <div className="h-0.5 w-full bg-gradient-to-r from-blue-600 via-violet-600 to-blue-600" />
+        <div className="flex h-14 items-center gap-4 px-4 lg:px-6">
           {/* Mobile menu button */}
           <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
             <SheetTrigger asChild>
@@ -192,9 +193,6 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
 
           {/* Spacer */}
           <div className="flex-1" />
-
-          {/* Theme Toggle */}
-          <ThemeToggle />
 
           {/* Notifications */}
           <Button variant="ghost" size="icon" className="relative glow">
@@ -240,6 +238,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+        </div>
         </header>
 
         {/* Page Content */}

@@ -6,11 +6,11 @@ import { cn } from '@/lib/utils'
 
 const BADGE: Record<string, { cls: string; label: string }> = {
   superadmin: {
-    cls: 'bg-orange-100 text-orange-800 border border-orange-300',
+    cls: 'bg-violet-100 text-violet-700 border border-violet-200',
     label: 'Superadmin',
   },
   empleado: {
-    cls: 'bg-sky-100 text-sky-700 border border-sky-200',
+    cls: 'bg-blue-100 text-blue-700 border border-blue-200',
     label: 'Empleado',
   },
   lector: {
@@ -43,26 +43,27 @@ export function DashboardLayout({ nombre, rol, children }: Props) {
     cn(
       'flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all duration-200 text-xs font-medium',
       active
-        ? 'bg-[#4f8fff]/20 text-[#a8c4f0] border border-[#4f8fff]/35 shadow-[0_0_12px_rgba(79,143,255,0.2)]'
-        : 'bg-white/[0.07] text-white/60 hover:bg-white/[0.14] hover:text-white/90 border border-white/[0.12]'
+        ? 'bg-blue-600 text-white shadow-sm'
+        : 'text-slate-500 hover:bg-slate-100 hover:text-slate-800 border border-slate-200'
     )
 
-  const puedeCargar = rol === 'superadmin' || rol === 'empleado'
+  const puedeCargar     = rol === 'superadmin' || rol === 'empleado'
   const puedeVerUsuarios = rol === 'superadmin'
 
   return (
-    <div className="min-h-screen bg-[#f4f6f9] dark:bg-[#09090b]">
-      <header
-        className="text-white shadow-lg border-b border-white/5"
-        style={{ background: 'linear-gradient(135deg, #09090b 0%, #0d1929 55%, #1a2d50 100%)' }}
-      >
-        <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
+    <div className="min-h-screen bg-slate-50">
+      {/* Accent bar top */}
+      <div className="h-0.5 w-full bg-gradient-to-r from-blue-600 via-violet-600 to-blue-600" />
+
+      <header className="bg-white border-b border-slate-200 shadow-sm">
+        <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
           <div>
-            <p className="text-[10px] text-white/50 uppercase tracking-widest font-semibold">
+            <p className="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">
               Uso interno · Equipo
             </p>
-            <h1 className="text-lg font-black leading-tight">
-              Informe de Gestión <span className="text-[#a8c4f0]">2026</span>
+            <h1 className="text-lg font-black leading-tight text-slate-900">
+              Informe de Gestión{' '}
+              <span className="text-blue-600">2026</span>
             </h1>
           </div>
 
@@ -97,19 +98,18 @@ export function DashboardLayout({ nombre, rol, children }: Props) {
               </Link>
             )}
 
-            <Link
-              href="/inicio"
-              className={linkCls(false)}
-            >
+            <Link href="/inicio" className={linkCls(false)}>
               <Globe className="w-3.5 h-3.5" />
               Sitio
             </Link>
           </nav>
 
           <div className="flex items-center gap-2">
-            <div className="flex items-center gap-2 bg-white/[0.07] border border-white/[0.12] rounded-full px-3 py-1.5 text-xs backdrop-blur-sm">
-              <CircleUser className="w-4 h-4 flex-shrink-0 text-white/60" />
-              <span className="hidden sm:inline max-w-[120px] truncate text-white/80">{nombre}</span>
+            <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-full px-3 py-1.5 text-xs">
+              <CircleUser className="w-4 h-4 flex-shrink-0 text-slate-400" />
+              <span className="hidden sm:inline max-w-[120px] truncate text-slate-700 font-medium">
+                {nombre}
+              </span>
               <span className={cn('text-[11px] font-bold px-2 py-0.5 rounded-full', badge.cls)}>
                 {badge.label}
               </span>
@@ -117,7 +117,7 @@ export function DashboardLayout({ nombre, rol, children }: Props) {
             <button
               onClick={handleLogout}
               title="Cerrar sesión"
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-white/[0.07] hover:bg-white/[0.14] border border-white/[0.12] rounded-full transition-all duration-200 text-white/60 hover:text-white/90"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-slate-50 hover:bg-red-50 border border-slate-200 hover:border-red-200 rounded-full transition-all duration-200 text-slate-500 hover:text-red-600"
             >
               <LogOut className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Salir</span>

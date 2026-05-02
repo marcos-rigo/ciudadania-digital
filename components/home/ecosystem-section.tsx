@@ -1,139 +1,174 @@
-import { GraduationCap, Users, Clipboard, BarChart3 } from "lucide-react"
+"use client"
+
+import { motion } from "framer-motion"
+import { UploadCloud, Activity, LayoutDashboard } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-
-
 
 const modules = [
   {
-    icon: GraduationCap,
-    title: "Ciudadanía Digital",
-    description: "Formación y trayectos",
+    icon: UploadCloud,
+    title: "Carga de Datos Operativos",
+    description: "Registro territorial",
     details:
-      "Espacio de formación abierta en ciudadanía digital. Trayectos con videos, podcast y actividades que promueven el uso responsable, crítico y participativo de las tecnologías.",
-    color: "bg-blue-500",
+      "Sistema centralizado de carga de actividades, capacitaciones y acciones territoriales. Integración directa con formularios operativos para un registro ágil y trazable.",
+    iconBg: "bg-blue-50",
+    iconColor: "text-blue-600",
+    borderHover: "hover:border-blue-300",
+    shadowHover: "hover:shadow-[0_8px_32px_rgba(37,99,235,0.12)]",
+    gradientHover: "from-blue-50/80 to-transparent",
+    accentColor: "text-blue-600",
   },
   {
-    icon: Users,
-    title: "Participación y Comunidad",
-    description: "Aprender en red",
+    icon: Activity,
+    title: "Monitoreo en Tiempo Real",
+    description: "Seguimiento continuo",
     details:
-      "Entorno digital que fomenta la participación ciudadana, el intercambio de experiencias y la reflexión colectiva sobre la convivencia y los desafíos del mundo digital.",
-    color: "bg-emerald-500",
+      "Visualización actualizada del alcance territorial, cantidad de personas impactadas y localidades activas. Indicadores en vivo para el seguimiento de la gestión diaria.",
+    iconBg: "bg-emerald-50",
+    iconColor: "text-emerald-600",
+    borderHover: "hover:border-emerald-300",
+    shadowHover: "hover:shadow-[0_8px_32px_rgba(16,185,129,0.12)]",
+    gradientHover: "from-emerald-50/80 to-transparent",
+    accentColor: "text-emerald-600",
   },
   {
-    icon: Clipboard,
-    title: "Registro y Seguimiento",
-    description: "Trazabilidad de acciones",
+    icon: LayoutDashboard,
+    title: "Tableros de Control Interno",
+    description: "Decisiones basadas en datos",
     details:
-      "Sistema interno para registrar actividades, capacitaciones y acciones territoriales. Permite el seguimiento del alcance, la planificación y la evaluación de impacto.",
-    color: "bg-amber-500",
-  },
-  {
-    icon: BarChart3,
-    title: "Análisis y Gestión",
-    description: "Datos para decidir",
-    details:
-      "Tableros e indicadores que consolidan información de participación, formación y territorio. Herramientas para mejorar la toma de decisiones y los informes de gestión.",
-    color: "bg-rose-500",
+      "Dashboards con indicadores clave de desempeño, consolidación de información por programa y territorio, y reportes automáticos para la toma de decisiones estratégicas.",
+    iconBg: "bg-violet-50",
+    iconColor: "text-violet-600",
+    borderHover: "hover:border-violet-300",
+    shadowHover: "hover:shadow-[0_8px_32px_rgba(109,40,217,0.12)]",
+    gradientHover: "from-violet-50/80 to-transparent",
+    accentColor: "text-violet-600",
   },
 ]
 
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: { staggerChildren: 0.12, delayChildren: 0.1 },
+  },
+}
+
+const cardVariant = {
+  hidden: { opacity: 0, y: 30, filter: "blur(4px)" },
+  show: {
+    opacity: 1, y: 0, filter: "blur(0px)",
+    transition: { type: "spring", stiffness: 100, damping: 15, mass: 0.8 },
+  },
+}
 
 export function EcosystemSection() {
   return (
-    <section className="py-20">
-      <div className="container mx-auto px-4">
-        {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-            Ecosistema Digital Integrado
-          </h2>
-          <p className="text-lg text-muted-foreground">
-            Módulos interconectados que trabajan juntos para potenciar 
-            la participación ciudadana.
-          </p>
-        </div>
+    <section className="py-24 md:py-32 relative overflow-hidden bg-white">
+      {/* Background */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-50 to-transparent rounded-full blur-3xl opacity-70" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-violet-50 to-transparent rounded-full blur-3xl opacity-60" />
+      </div>
 
-        {/* Ecosystem Diagram */}
-        <div className="relative max-w-5xl mx-auto">
-          {/* Connection lines (visible on lg+) */}
-          <div className="hidden lg:block absolute inset-0">
-            <svg className="w-full h-full" viewBox="0 0 800 400" fill="none">
-              {/* Horizontal line */}
-              <path
-                d="M200 200 L600 200"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeDasharray="8 4"
-                className="text-border"
-              />
-              {/* Vertical line */}
-              <path
-                d="M400 100 L400 300"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeDasharray="8 4"
-                className="text-border"
-              />
-              {/* Center circle */}
-              <circle
-                cx="400"
-                cy="200"
-                r="40"
-                fill="currentColor"
-                className="text-primary/10"
-              />
-              <text
-                x="400"
-                y="195"
-                textAnchor="middle"
-                className="fill-primary text-xs font-medium"
-              >
-                SPC
-              </text>
-              <text
-                x="400"
-                y="210"
-                textAnchor="middle"
-                className="fill-muted-foreground text-[10px]"
-              >
-                Integrado
-              </text>
-            </svg>
+      <div className="container mx-auto px-4 relative z-10">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
+          className="text-center max-w-3xl mx-auto mb-20"
+        >
+          <div className="section-divider mb-6" />
+
+          <div className="inline-block mb-4">
+            <span className="badge-accent">Sistema Integrado</span>
           </div>
 
-          {/* Module Cards */}
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {modules.map((module, index) => {
-              const Icon = module.icon
-              return (
+          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 mb-6 leading-tight">
+            Soluciones Integradas
+            <span className="block text-gradient">para la Gestión Interna</span>
+          </h2>
+
+          <p className="text-lg text-slate-500 leading-relaxed max-w-2xl mx-auto">
+            Módulos interconectados que centralizan el registro, el monitoreo y el análisis
+            de resultados de la Secretaría de Participación Ciudadana.
+          </p>
+        </motion.div>
+
+        {/* Cards Grid */}
+        <motion.div
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.1 }}
+          className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto"
+        >
+          {modules.map((module, index) => {
+            const Icon = module.icon
+            return (
+              <motion.div key={module.title} variants={cardVariant} className="group">
                 <Card
-                  key={module.title}
-                  className="relative overflow-hidden border-border/50 hover:shadow-lg transition-shadow"
+                  className={`h-full overflow-hidden border border-slate-200 bg-white
+                    shadow-sm transition-all duration-300 hover:-translate-y-1.5
+                    ${module.borderHover} ${module.shadowHover}`}
                 >
-                  <CardHeader className="pb-2">
-                    <div
-                      className={`inline-flex h-12 w-12 items-center justify-center rounded-lg ${module.color} mb-3`}
+                  {/* Hover gradient overlay */}
+                  <div
+                    className={`absolute inset-0 bg-gradient-to-br ${module.gradientHover}
+                      opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none`}
+                  />
+
+                  <div className="spotlight-glow" />
+
+                  <CardHeader className="pb-3 relative z-10">
+                    <motion.div
+                      className={`inline-flex h-14 w-14 items-center justify-center rounded-xl ${module.iconBg} mb-4 border border-white shadow-sm transition-all group-hover:scale-110`}
+                      whileHover={{ rotate: 8 }}
+                      transition={{ type: "spring", stiffness: 300 }}
                     >
-                      <Icon className="h-6 w-6 text-white" />
-                    </div>
-                    <CardTitle className="text-lg">{module.title}</CardTitle>
-                    <CardDescription>{module.description}</CardDescription>
+                      <Icon className={`h-7 w-7 ${module.iconColor}`} />
+                    </motion.div>
+
+                    <CardTitle className="text-base font-bold text-slate-900">
+                      {module.title}
+                    </CardTitle>
+                    <CardDescription className={`${module.accentColor} font-semibold text-xs uppercase tracking-wide`}>
+                      {module.description}
+                    </CardDescription>
                   </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
+
+                  <CardContent className="relative z-10">
+                    <p className="text-sm text-slate-500 leading-relaxed group-hover:text-slate-700 transition-colors">
                       {module.details}
                     </p>
                   </CardContent>
-                  {/* Decorative number */}
-                  <div className="absolute -bottom-4 -right-2 text-8xl font-bold text-muted/20">
-                    {index + 1}
+
+                  {/* Index number */}
+                  <div className="absolute bottom-4 right-4 text-5xl font-black text-slate-100 group-hover:text-slate-200 transition-colors pointer-events-none select-none">
+                    {(index + 1).toString().padStart(2, '0')}
                   </div>
+
                 </Card>
-              )
-            })}
-          </div>
-        </div>
+              </motion.div>
+            )
+          })}
+        </motion.div>
+
+        {/* Bottom info */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          viewport={{ once: true }}
+          className="mt-16 p-8 rounded-2xl border border-blue-100 bg-gradient-to-br from-blue-50 to-violet-50 text-center max-w-2xl mx-auto shadow-sm"
+        >
+          <p className="text-slate-700 font-medium">
+            Todos los módulos comparten la misma base de datos para garantizar{' '}
+            <span className="text-blue-700 font-bold">coherencia, trazabilidad y reportes en tiempo real</span>.
+          </p>
+        </motion.div>
       </div>
     </section>
   )

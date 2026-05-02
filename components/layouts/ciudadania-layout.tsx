@@ -7,7 +7,6 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
 import {
   Menu,
   X,
@@ -124,8 +123,6 @@ export function CiudadaniaLayout({ children }: { children: React.ReactNode }) {
 
             {/* User Actions */}
             <div className="flex items-center gap-2">
-              <ThemeToggle />
-              
               {isLoggedIn ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>

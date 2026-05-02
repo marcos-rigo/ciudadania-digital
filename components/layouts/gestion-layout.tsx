@@ -7,7 +7,6 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
 import {
   LayoutDashboard,
   Users,
@@ -199,8 +198,6 @@ export function GestionLayout({ children }: { children: React.ReactNode }) {
           </Button>
 
           <div className="flex-1" />
-
-          <ThemeToggle />
 
           <Button variant="ghost" size="icon" className="relative glow">
             <Bell className="h-5 w-5" />

@@ -1,256 +1,334 @@
 "use client"
 
-import { useState, useMemo } from "react"
-import Link from "next/link"
+import { useState, useEffect, useMemo } from "react"
 import { PublicLayout } from "@/components/layouts/public-layout"
 import { PageHeader } from "@/components/ui/page-header"
-import { FiltersBar } from "@/components/ui/filters-bar"
-import { StatusBadge } from "@/components/ui/status-badge"
-import { DataTable, type Column } from "@/components/ui/data-table"
 import { NoResultsState } from "@/components/ui/empty-state"
-import { Card, CardContent } from "@/components/ui/card"
+import { sbGetActividades } from "@/lib/supabase-client"
+import { Search, X, ChevronDown } from "lucide-react"
+import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { acciones, programas, tematicas, publicos, municipios } from "@/lib/mock/data"
-import type { Accion } from "@/lib/types"
-import { LayoutGrid, List, Calendar, MapPin, Users, Clock, ArrowRight } from "lucide-react"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+
+interface Actividad {
+  fecha: string
+  programa: string
+  localidad: string
+  cantidad_personas: number
+  usuario_nombre: string
+}
+
+const ANIOS = ["2026", "2025"]
+
+const FILTRO_FECHA: Record<string, string> = {
+  "2025": "&fecha=gte.2025-01-01&fecha=lt.2026-01-01",
+  "2026": "&fecha=gte.2026-01-01&fecha=lt.2027-01-01",
+}
+
+function formatFecha(f: string) {
+  if (!f) return "-"
+  return new Date(f + "T00:00:00").toLocaleDateString("es-AR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  })
+}
 
 export default function AccionesPage() {
-  const [search, setSearch] = useState("")
-  const [filters, setFilters] = useState<Record<string, string>>({})
-  const [viewMode, setViewMode] = useState<"table" | "cards">("cards")
+  const [anio, setAnio]               = useState("2026")
+  const [data, setData]               = useState<Actividad[]>([])
+  const [loading, setLoading]         = useState(true)
+  const [error, setError]             = useState(false)
+  const [search, setSearch]           = useState("")
+  const [filPrograma, setFilPrograma] = useState("all")
+  const [filLocalidad, setFilLocalidad] = useState("all")
+  const [pagina, setPagina]           = useState(1)
+  const POR_PAGINA = 10
 
-  const filteredAcciones = useMemo(() => {
-    return acciones.filter((accion) => {
+  useEffect(() => {
+    setLoading(true)
+    setError(false)
+    setFilPrograma("all")
+    setFilLocalidad("all")
+    setSearch("")
+    setPagina(1)
+
+    sbGetActividades(
+      `select=fecha,programa,localidad,cantidad_personas,usuario_nombre&order=fecha.desc${FILTRO_FECHA[anio]}`
+    )
+      .then((r) => setData(r as Actividad[]))
+      .catch(() => setError(true))
+      .finally(() => setLoading(false))
+  }, [anio])
+
+  // Opciones únicas para los filtros (dinámicas según el año)
+  const programasUnicos = useMemo(
+    () => [...new Set(data.map((d) => d.programa).filter(Boolean))].sort(),
+    [data]
+  )
+  const localidadesUnicas = useMemo(
+    () => [...new Set(data.map((d) => d.localidad).filter(Boolean))].sort(),
+    [data]
+  )
+
+  const filtered = useMemo(() => {
+    return data.filter((a) => {
       if (search) {
-        const searchLower = search.toLowerCase()
-        const matchesSearch =
-          accion.municipio.toLowerCase().includes(searchLower) ||
-          accion.programaNombre.toLowerCase().includes(searchLower) ||
-          accion.tematicaPrincipal.toLowerCase().includes(searchLower)
-        if (!matchesSearch) return false
+        const q = search.toLowerCase()
+        const match =
+          (a.localidad ?? "").toLowerCase().includes(q) ||
+          (a.programa ?? "").toLowerCase().includes(q)
+        if (!match) return false
       }
-
-      if (filters.programa && filters.programa !== "all") {
-        if (accion.programaId !== filters.programa) return false
-      }
-
-      if (filters.municipio && filters.municipio !== "all") {
-        if (accion.municipio !== filters.municipio) return false
-      }
-
-      if (filters.tematica && filters.tematica !== "all") {
-        if (accion.tematicaPrincipal !== filters.tematica) return false
-      }
-
-      if (filters.publico && filters.publico !== "all") {
-        if (accion.publico !== filters.publico) return false
-      }
-
+      if (filPrograma !== "all" && a.programa !== filPrograma) return false
+      if (filLocalidad !== "all" && a.localidad !== filLocalidad) return false
       return true
     })
-  }, [search, filters])
+  }, [data, search, filPrograma, filLocalidad])
 
-  const handleFilterChange = (filterId: string, value: string) => {
-    setFilters((prev) => ({ ...prev, [filterId]: value }))
-  }
+  // Resetear a página 1 cuando cambian los filtros
+  const applySearch   = (v: string)  => { setSearch(v);      setPagina(1) }
+  const applyPrograma = (v: string)  => { setFilPrograma(v); setPagina(1) }
+  const applyLocalidad = (v: string) => { setFilLocalidad(v); setPagina(1) }
 
-  const handleClearFilters = () => {
+  const hasFilters = search || filPrograma !== "all" || filLocalidad !== "all"
+
+  const clearFilters = () => {
     setSearch("")
-    setFilters({})
+    setFilPrograma("all")
+    setFilLocalidad("all")
+    setPagina(1)
   }
 
-  const columns: Column<Accion>[] = [
-    {
-      key: "fecha",
-      header: "Fecha",
-      cell: (accion) =>
-        new Date(accion.fecha).toLocaleDateString("es-AR", {
-          day: "2-digit",
-          month: "short",
-          year: "numeric",
-        }),
-    },
-    {
-      key: "municipio",
-      header: "Municipio",
-      cell: (accion) => (
-        <div>
-          <span className="font-medium">{accion.municipio}</span>
-          {accion.localidad && (
-            <span className="text-muted-foreground text-xs block">
-              {accion.localidad}
-            </span>
-          )}
-        </div>
-      ),
-    },
-    {
-      key: "programaNombre",
-      header: "Programa",
-    },
-    {
-      key: "tematicaPrincipal",
-      header: "Temática",
-    },
-    {
-      key: "publico",
-      header: "Público",
-    },
-    {
-      key: "cantidadAsistentes",
-      header: "Asistentes",
-      className: "text-right",
-    },
-    {
-      key: "modalidad",
-      header: "Modalidad",
-      cell: (accion) => <StatusBadge status={accion.modalidad} />,
-    },
-    {
-      key: "actions",
-      header: "",
-      cell: (accion) => (
-        <Button asChild variant="ghost" size="sm">
-          <Link href={`/acciones/${accion.id}`}>
-            Ver
-            <ArrowRight className="ml-1 h-3 w-3" />
-          </Link>
-        </Button>
-      ),
-    },
-  ]
+  const totalPaginas = Math.ceil(filtered.length / POR_PAGINA)
+  const paginated    = filtered.slice((pagina - 1) * POR_PAGINA, pagina * POR_PAGINA)
+
+  const totalPersonas = filtered.reduce(
+    (s, a) => s + (parseInt(String(a.cantidad_personas)) || 0),
+    0
+  )
 
   return (
     <PublicLayout>
       <div className="container mx-auto px-4 py-8">
         <PageHeader
           title="Acciones realizadas"
-          description="Registro de todas las acciones realizadas en el marco de nuestros programas."
+          description="Registro de actividades territoriales de la Secretaría de Participación Ciudadana."
           breadcrumbs={[{ label: "Acciones" }]}
           actions={
-            <div className="flex items-center gap-2">
-              <Button
-                variant={viewMode === "cards" ? "default" : "outline"}
-                size="icon"
-                onClick={() => setViewMode("cards")}
-                aria-label="Vista de tarjetas"
-              >
-                <LayoutGrid className="h-4 w-4" />
-              </Button>
-              <Button
-                variant={viewMode === "table" ? "default" : "outline"}
-                size="icon"
-                onClick={() => setViewMode("table")}
-                aria-label="Vista de tabla"
-              >
-                <List className="h-4 w-4" />
-              </Button>
-            </div>
+            <Select value={anio} onValueChange={setAnio}>
+              <SelectTrigger className="w-[110px] border-slate-200 shadow-sm font-semibold">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {ANIOS.map((a) => (
+                  <SelectItem key={a} value={a}>{a}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           }
         />
 
-        <div className="mt-8">
-          <FiltersBar
-            searchValue={search}
-            onSearchChange={setSearch}
-            searchPlaceholder="Buscar acciones..."
-            filters={[
-              {
-                id: "programa",
-                label: "Programa",
-                options: programas.map((p) => ({ value: p.id, label: p.nombre })),
-              },
-              {
-                id: "municipio",
-                label: "Municipio",
-                options: municipios.map((m) => ({ value: m, label: m })),
-              },
-              {
-                id: "tematica",
-                label: "Temática",
-                options: tematicas.map((t) => ({ value: t, label: t })),
-              },
-              {
-                id: "publico",
-                label: "Público",
-                options: publicos.map((p) => ({ value: p, label: p })),
-              },
-            ]}
-            filterValues={filters}
-            onFilterChange={handleFilterChange}
-            onClearFilters={handleClearFilters}
-          />
+        {/* Filtros */}
+        <div className="mt-8 flex flex-col sm:flex-row gap-3">
+          {/* Búsqueda */}
+          <div className="relative flex-1 max-w-sm">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Input
+              placeholder="Buscar acciones..."
+              value={search}
+              onChange={(e) => applySearch(e.target.value)}
+              className="pl-9 bg-white border-slate-200 text-slate-900 placeholder:text-slate-400"
+            />
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            {/* Programa */}
+            <Select value={filPrograma} onValueChange={applyPrograma}>
+              <SelectTrigger className="w-[200px] border-slate-200 shadow-sm">
+                <SelectValue placeholder="Programa" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos los programas</SelectItem>
+                {programasUnicos.map((p) => (
+                  <SelectItem key={p} value={p}>{p}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {/* Municipio / Comuna */}
+            <Select value={filLocalidad} onValueChange={applyLocalidad}>
+              <SelectTrigger className="w-[200px] border-slate-200 shadow-sm">
+                <SelectValue placeholder="Municipio o Comuna" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos los municipios</SelectItem>
+                {localidadesUnicas.map((l) => (
+                  <SelectItem key={l} value={l}>{l}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {hasFilters && (
+              <Button variant="ghost" size="sm" onClick={clearFilters} className="h-9 text-slate-500 hover:text-slate-900">
+                <X className="h-4 w-4 mr-1" />
+                Limpiar
+              </Button>
+            )}
+          </div>
         </div>
 
-        <div className="mt-8">
-          {filteredAcciones.length === 0 ? (
+        {/* Contenido */}
+        <div className="mt-6">
+          {loading ? (
+            <div className="flex items-center justify-center py-24">
+              <span className="w-8 h-8 border-2 border-slate-200 border-t-blue-600 rounded-full animate-spin" />
+            </div>
+          ) : error ? (
+            <div className="text-center py-16 text-slate-500 text-sm">
+              No se pudieron cargar las actividades. Intentá de nuevo más tarde.
+            </div>
+          ) : filtered.length === 0 ? (
             <NoResultsState searchTerm={search} />
-          ) : viewMode === "table" ? (
-            <DataTable
-              columns={columns}
-              data={filteredAcciones}
-              keyExtractor={(accion) => accion.id}
-            />
           ) : (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredAcciones.map((accion) => (
-                <Card
-                  key={accion.id}
-                  className="group hover:shadow-lg transition-shadow border-border/50"
-                >
-                  <CardContent className="pt-6">
-                    <div className="flex items-start justify-between gap-2 mb-4">
-                      <div>
-                        <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors">
-                          {accion.municipio}
-                        </h3>
-                        {accion.localidad && (
-                          <p className="text-sm text-muted-foreground">
-                            {accion.localidad}
-                          </p>
-                        )}
-                      </div>
-                      <StatusBadge status={accion.modalidad} />
-                    </div>
+            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+              {/* Resumen */}
+              <div className="flex items-center justify-between px-6 py-3 bg-slate-50 border-b border-slate-200">
+                <span className="text-sm text-slate-500">
+                  <span className="font-semibold text-slate-900">{filtered.length}</span> actividades
+                </span>
+                <span className="text-sm text-slate-500">
+                  <span className="font-semibold text-blue-700">
+                    {totalPersonas.toLocaleString("es-AR")}
+                  </span>{" "}
+                  personas alcanzadas
+                </span>
+              </div>
 
-                    <div className="space-y-2 text-sm text-muted-foreground">
-                      <div className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4" />
-                        {new Date(accion.fecha).toLocaleDateString("es-AR", {
-                          day: "numeric",
-                          month: "long",
-                          year: "numeric",
-                        })}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <MapPin className="h-4 w-4" />
-                        {accion.programaNombre}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Users className="h-4 w-4" />
-                        {accion.cantidadAsistentes} asistentes • {accion.publico}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Clock className="h-4 w-4" />
-                        {accion.duracionMinutos} minutos
-                      </div>
-                    </div>
+              {/* Tabla */}
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr>
+                      {["Fecha", "Municipio / Comuna", "Programa", "Personas"].map((h) => (
+                        <th
+                          key={h}
+                          className="text-left px-5 py-3 bg-slate-50 text-slate-500 font-semibold text-xs uppercase tracking-wide border-b border-slate-200"
+                        >
+                          {h}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {paginated.map((a, i) => (
+                      <tr
+                        key={i}
+                        className="hover:bg-blue-50/40 border-b border-slate-100 last:border-0 transition-colors duration-150"
+                      >
+                        <td className="px-5 py-3 text-slate-600 tabular-nums whitespace-nowrap">
+                          {formatFecha(a.fecha)}
+                        </td>
+                        <td className="px-5 py-3 font-medium text-slate-900">
+                          {a.localidad || "-"}
+                        </td>
+                        <td className="px-5 py-3 text-slate-700">
+                          {a.programa || "-"}
+                        </td>
+                        <td className="px-5 py-3 font-bold text-blue-700 tabular-nums text-center">
+                          {(parseInt(String(a.cantidad_personas)) || 0).toLocaleString("es-AR")}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
 
-                    <div className="mt-4 pt-4 border-t">
-                      <p className="text-sm font-medium text-primary">
-                        {accion.tematicaPrincipal}
-                      </p>
-                    </div>
+              {/* Paginación */}
+              {totalPaginas > 1 && (
+                <div className="flex items-center justify-between px-5 py-3 border-t border-slate-200 bg-slate-50">
+                  <span className="text-xs text-slate-500">
+                    Página <span className="font-semibold text-slate-700">{pagina}</span> de{" "}
+                    <span className="font-semibold text-slate-700">{totalPaginas}</span>
+                  </span>
 
-                    <Button asChild variant="ghost" className="w-full mt-4">
-                      <Link href={`/acciones/${accion.id}`}>
-                        Ver detalle
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                      </Link>
+                  <div className="flex items-center gap-1">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setPagina(1)}
+                      disabled={pagina === 1}
+                      className="h-8 w-8 p-0 border-slate-200 text-slate-600 disabled:opacity-40"
+                    >
+                      «
                     </Button>
-                  </CardContent>
-                </Card>
-              ))}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setPagina((p) => Math.max(1, p - 1))}
+                      disabled={pagina === 1}
+                      className="h-8 px-3 border-slate-200 text-slate-600 disabled:opacity-40"
+                    >
+                      Anterior
+                    </Button>
+
+                    {/* Números de página */}
+                    <div className="flex items-center gap-1">
+                      {Array.from({ length: totalPaginas }, (_, i) => i + 1)
+                        .filter((n) => n === 1 || n === totalPaginas || Math.abs(n - pagina) <= 1)
+                        .reduce<(number | "…")[]>((acc, n, idx, arr) => {
+                          if (idx > 0 && n - (arr[idx - 1] as number) > 1) acc.push("…")
+                          acc.push(n)
+                          return acc
+                        }, [])
+                        .map((n, idx) =>
+                          n === "…" ? (
+                            <span key={`e${idx}`} className="px-1 text-slate-400 text-sm">…</span>
+                          ) : (
+                            <Button
+                              key={n}
+                              variant={pagina === n ? "default" : "outline"}
+                              size="sm"
+                              onClick={() => setPagina(n as number)}
+                              className={`h-8 w-8 p-0 text-sm ${
+                                pagina === n
+                                  ? "bg-blue-600 text-white border-blue-600 hover:bg-blue-700"
+                                  : "border-slate-200 text-slate-600 hover:border-blue-300"
+                              }`}
+                            >
+                              {n}
+                            </Button>
+                          )
+                        )}
+                    </div>
+
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setPagina((p) => Math.min(totalPaginas, p + 1))}
+                      disabled={pagina === totalPaginas}
+                      className="h-8 px-3 border-slate-200 text-slate-600 disabled:opacity-40"
+                    >
+                      Siguiente
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setPagina(totalPaginas)}
+                      disabled={pagina === totalPaginas}
+                      className="h-8 w-8 p-0 border-slate-200 text-slate-600 disabled:opacity-40"
+                    >
+                      »
+                    </Button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
