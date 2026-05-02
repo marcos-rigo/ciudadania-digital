@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { Mail, User, Shield, Clock, Edit, Trash2, Plus, Loader2 } from 'lucide-react'
+import { Mail, User, Shield, Edit, Trash2, Plus, Loader2, Eye, EyeOff } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -45,6 +45,8 @@ export function ListaUsuarios({ refetch }: { refetch?: number }) {
   const [editNombre, setEditNombre] = useState('')
   const [editRol, setEditRol] = useState('')
   const [editEstado, setEditEstado] = useState('')
+  const [editPassword, setEditPassword] = useState('')
+  const [showEditPwd, setShowEditPwd] = useState(false)
   const [editLoading, setEditLoading] = useState(false)
   const [editError, setEditError] = useState('')
 
@@ -80,11 +82,14 @@ export function ListaUsuarios({ refetch }: { refetch?: number }) {
     setEditNombre(u.nombre)
     setEditRol(u.rol)
     setEditEstado(u.estado)
+    setEditPassword('')
+    setShowEditPwd(false)
     setEditError('')
   }
 
   function cerrarEditar() {
     setUsuarioEditar(null)
+    setEditPassword('')
     setEditError('')
   }
 
@@ -96,7 +101,12 @@ export function ListaUsuarios({ refetch }: { refetch?: number }) {
       const res = await fetch(`/api/admin/usuarios/${encodeURIComponent(usuarioEditar.email)}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nombre: editNombre, rol: editRol, estado: editEstado }),
+        body: JSON.stringify({
+          nombre: editNombre,
+          rol: editRol,
+          estado: editEstado,
+          ...(editPassword ? { password: editPassword } : {}),
+        }),
       })
       const data = await res.json()
       if (!data.ok) {
@@ -321,6 +331,29 @@ export function ListaUsuarios({ refetch }: { refetch?: number }) {
                     <option key={s} value={s} className="capitalize">{s.charAt(0).toUpperCase() + s.slice(1)}</option>
                   ))}
                 </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-[#374151] mb-1.5">
+                  Nueva contraseña <span className="text-[#94a3b8] font-normal">(dejar vacío para no cambiar)</span>
+                </label>
+                <div className="relative">
+                  <input
+                    type={showEditPwd ? 'text' : 'password'}
+                    value={editPassword}
+                    onChange={e => setEditPassword(e.target.value)}
+                    placeholder="••••••••"
+                    className={`${inputCls} pr-10`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowEditPwd(v => !v)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#94a3b8] hover:text-[#4272bb] transition-colors"
+                    tabIndex={-1}
+                  >
+                    {showEditPwd ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
               </div>
 
               {editError && (

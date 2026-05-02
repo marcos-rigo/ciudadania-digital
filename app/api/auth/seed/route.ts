@@ -16,8 +16,8 @@ export async function GET() {
   try {
     const usuariosSeeds = [
       {
-        nombre: 'Superadministrador',
-        email: 'superadmin@participacionciudadana.gob.ar',
+        nombre: 'Marcos Rigo',
+        email: 'marcos.rigo.10@gmail.com',
         password: 'Superadmin2026!',
         rol: 'superadmin',
         estado: 'aprobado',
@@ -25,7 +25,7 @@ export async function GET() {
       },
       {
         nombre: 'Empleado',
-        email: 'empleado@participacionciudadana.gob.ar',
+        email: 'tanda1290@gmail.com',
         password: 'Empleado2026!',
         rol: 'empleado',
         estado: 'aprobado',

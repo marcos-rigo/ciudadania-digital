@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
-import { sbUpdateUsuario, sbDeleteUsuario } from '@/lib/auth-server'
+import { sbUpdateUsuario, sbDeleteUsuario, hashPassword } from '@/lib/auth-server'
 
 async function verificarAdmin() {
   const cookieStore = await cookies()
@@ -32,6 +32,12 @@ export async function PATCH(
     if (body.nombre) campos.nombre = body.nombre
     if (body.rol) campos.rol = body.rol
     if (body.estado) campos.estado = body.estado
+    if (body.password) {
+      if (body.password.length < 6) {
+        return NextResponse.json({ ok: false, error: 'La contraseña debe tener al menos 6 caracteres.' })
+      }
+      campos.password_hash = hashPassword(body.password)
+    }
 
     if (Object.keys(campos).length === 0) {
       return NextResponse.json({ ok: false, error: 'No hay campos para actualizar.' })
