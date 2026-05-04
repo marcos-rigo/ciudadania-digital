@@ -1,5 +1,7 @@
+import { Suspense } from 'react'
 import { cookies } from 'next/headers'
 import { PanelEstadisticas } from '@/components/dashboard/PanelEstadisticas'
+import { Skeleton } from '@/components/ui/skeleton'
 
 export const metadata = { title: 'Estadísticas · Gestión 2026' }
 
@@ -13,5 +15,9 @@ export default async function EstadisticasPage() {
     rol = data.rol || 'lector'
   } catch {}
 
-  return <PanelEstadisticas rol={rol} />
+  return (
+    <Suspense fallback={<Skeleton className="h-96 w-full rounded-2xl" />}>
+      <PanelEstadisticas rol={rol} />
+    </Suspense>
+  )
 }

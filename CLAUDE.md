@@ -30,10 +30,10 @@ Five layout trees:
 
 | Tree | Routes | Layout component |
 |---|---|---|
-| Public | `/`, `/programas`, `/acciones`, `/ciudadania-digital`, etc. | `components/layouts/public-layout.tsx` |
-| Equipo | `/equipo/**` | `components/layouts/admin-layout.tsx` | (mock, no auth) |
-| Gestión (Ciudadanía Digital CMS) | `/gestion/**` | `components/layouts/gestion-layout.tsx` | (mock, no auth) |
-| Ciudadanía Digital | `/ciudadania-digital`, `/trayectos`, `/contenidos` | `components/layouts/ciudadania-layout.tsx` |
+| Public | `/inicio`, `/acciones`, `/resultados`, `/encuestas`, `/transparencia`, `/contacto` | `components/layouts/public-layout.tsx` |
+| Ciudadanía Digital | `/ciudadania-digital`, `/trayectos`, `/trayectos/[slug]`, `/contenidos/videos`, `/contenidos/podcast`, `/evaluaciones`, `/certificados`, `/mi-perfil` | `components/layouts/ciudadania-layout.tsx` |
+| Equipo | `/equipo/**` (mock, no auth) — incluye `/equipo/login` (demo simulado, sin auth real) | `components/layouts/admin-layout.tsx` |
+| Gestión (CMS mock) | `/gestion`, `/gestion/usuarios`, `/gestion/encuestas`, `/gestion/trayectos`, `/gestion/reportes`, `/gestion/contenidos` (mock, no auth) | `components/layouts/gestion-layout.tsx` |
 | Dashboard | `/dashboard/**` | `components/dashboard/DashboardLayout.tsx` |
 
 Root layout: `app/layout.tsx` with `ThemeProvider` (next-themes, dark/light via `class` strategy).
@@ -91,6 +91,7 @@ Route guards in middleware:
 | POST | `/api/auth/reenviar` | Reenvía código de verificación |
 | POST | `/api/auth/reset` | Solicita/completa reset de contraseña |
 | GET | `/api/auth/seed` | Crea los 3 usuarios iniciales (solo dev) |
+| GET | `/api/auth/migrate` | Migración one-shot: actualiza emails de superadmin y empleado conservando sus password_hash |
 | POST | `/api/admin/usuarios` | Crea usuario (requiere rol admin) |
 | GET | `/api/admin/usuarios` | Lista todos los usuarios (requiere rol admin) |
 | PATCH | `/api/admin/usuarios/[email]` | Actualiza nombre/rol/estado (requiere `superadmin`) |
@@ -157,6 +158,9 @@ Interfaces principales en `/lib/types.ts`: `Programa`, `Accion`, `Video`, `Mater
 - UI primitives: `/components/ui/` — shadcn/ui (style: "new-york", Radix UI, Lucide icons). No editar salvo bug.
 - `cn()` de `@/lib/utils` para clases condicionales (clsx + tailwind-merge).
 - Path alias `@/` → raíz del proyecto.
+- Forms: `react-hook-form` + `zod` (usado en formularios de auth).
+- Charts: `recharts` (usado en `PanelEstadisticas`).
+- Animaciones de componentes: `framer-motion`.
 
 ## Theming
 
@@ -169,6 +173,7 @@ Interfaces principales en `/lib/types.ts`: `Programa`, `Accion`, `Video`, `Mater
 
 - `typescript.ignoreBuildErrors: true` — los errores de TS no rompen el build.
 - `images.unoptimized: true` — sin optimización de imágenes de Next.js.
+- Deployment: Vercel (`@vercel/analytics` habilitado).
 
 ## Standalone HTML: `gestion-2026.html`
 
