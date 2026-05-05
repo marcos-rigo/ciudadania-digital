@@ -143,13 +143,15 @@ Todas las páginas públicas y de equipo usan datos estáticos — sin llamadas 
 - `/lib/mock/data.ts` — programas, acciones, videos, materiales, tableros, KPIs, alertas
 - `/lib/mock/ciudadania-data.ts` — trayectos, videos educativos, podcasts, evaluaciones, certificados
 
-Interfaces principales en `/lib/types.ts`: `Programa`, `Accion`, `Video`, `Material`, `Tablero`, `Usuario`, `AnalisisIA`. Interfaces de ciudadanía en `/lib/types-ciudadania.ts`: `Trayecto`, `Modulo`, `Evaluacion`, `Certificado`.
+Interfaces principales en `/lib/types.ts`: `Programa`, `Accion`, `Video`, `Material`, `Tablero`, `Usuario`, `AnalisisIA`. Interfaces de ciudadanía en `/lib/types-ciudadania.ts`: `Trayecto`, `Modulo`, `Evaluacion`, `Certificado`. Tipos del dashboard Power BI en `/types/powerbi.ts`: `PowerBIEmbedProps`, `RefreshState`, `AnioFilter`.
 
 ## Dashboard Components
 
 - `DashboardLayout` — nav header con nombre, badge de rol, botón logout
 - `PanelAdmin` — embed de MS Forms iframe + instrucciones de carga
 - `PanelEstadisticas` — cards de estadísticas + tabla de últimas 10 actividades (fetch real a Supabase)
+- `PowerBIEmbed` — iframe embebido de Power BI con auto-refresh configurable (default 30 min), pausa/reanuda, badge de última actualización color-coded (verde/amarillo/rojo), y skeleton de carga. Tipos en `types/powerbi.ts`.
+- `RefreshButton` — botón de refresh manual y toggle de pausa usado dentro de `PowerBIEmbed`
 - `CrearUsuarioForm` — formulario para crear usuarios (solo admin, POST `/api/admin/usuarios`)
 - `ListaUsuarios` — tabla de usuarios con edición y eliminación inline (solo superadmin, usa PATCH/DELETE `/api/admin/usuarios/[email]`)
 
