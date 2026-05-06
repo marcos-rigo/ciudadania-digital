@@ -105,12 +105,14 @@ export function LoginForm() {
       <form onSubmit={handleSubmit} className="space-y-4" noValidate>
         {/* Email */}
         <div>
-          <label className="block text-xs font-semibold text-[#374151] mb-1.5">
+          <label htmlFor="email" className="block text-xs font-semibold text-[#374151] mb-1.5">
             Correo electrónico
           </label>
           <div className="relative">
             <Mail className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none transition-colors ${emailInvalid ? 'text-red-400' : 'text-[#94a3b8]'}`} />
             <input
+              id="email"
+              name="email"
               type="email"
               value={email}
               onChange={(e) => handleEmailChange(e.target.value)}
@@ -132,12 +134,14 @@ export function LoginForm() {
 
         {/* Contraseña */}
         <div>
-          <label className="block text-xs font-semibold text-[#374151] mb-1.5">
+          <label htmlFor="password" className="block text-xs font-semibold text-[#374151] mb-1.5">
             Contraseña
           </label>
           <div className="relative">
             <Key className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none transition-colors ${passwordInvalid ? 'text-red-400' : 'text-[#94a3b8]'}`} />
             <input
+              id="password"
+              name="password"
               type={showPwd ? 'text' : 'password'}
               value={password}
               onChange={(e) => handlePasswordChange(e.target.value)}
