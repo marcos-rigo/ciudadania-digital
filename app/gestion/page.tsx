@@ -110,7 +110,7 @@ export default function GestionDashboardPage() {
               <CardTitle className="text-lg">Progreso semanal</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="h-[300px]">
+              <div className="h-[220px] sm:h-[300px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={mockEstadisticas.progresoSemanal}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} />
@@ -130,7 +130,7 @@ export default function GestionDashboardPage() {
               <CardTitle className="text-lg">Distribución por nivel</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="h-[300px]">
+              <div className="h-[220px] sm:h-[300px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie

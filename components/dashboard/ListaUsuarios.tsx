@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { Mail, User, Shield, Edit, Trash2, Plus, Loader2, Eye, EyeOff } from 'lucide-react'
+import { Mail, User, Shield, Edit, Trash2, Plus, Loader2, Eye, EyeOff, Lock, AlertTriangle } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -20,7 +20,6 @@ import {
 import { CrearUsuarioForm } from '@/components/dashboard/CrearUsuarioForm'
 
 const ROLES = ['superadmin', 'empleado', 'lector'] as const
-const ESTADOS = ['aprobado', 'pendiente', 'rechazado'] as const
 
 type Usuario = {
   nombre: string
@@ -104,7 +103,6 @@ export function ListaUsuarios({ refetch }: { refetch?: number }) {
         body: JSON.stringify({
           nombre: editNombre,
           rol: editRol,
-          estado: editEstado,
           ...(editPassword ? { password: editPassword } : {}),
         }),
       })
@@ -144,17 +142,10 @@ export function ListaUsuarios({ refetch }: { refetch?: number }) {
     }
   }
 
-  const getEstadoColor = (estado: string) => {
-    switch (estado) {
-      case 'aprobado':  return 'bg-green-50 text-green-700 border-green-200'
-      case 'pendiente': return 'bg-yellow-50 text-yellow-700 border-yellow-200'
-      case 'rechazado': return 'bg-red-50 text-red-700 border-red-200'
-      default:          return 'bg-gray-50 text-gray-700 border-gray-200'
-    }
-  }
-
   const inputCls =
-    'w-full py-2.5 px-3 border border-[#e2e8f0] rounded-lg text-sm text-[#1A2A36] bg-white outline-none focus:border-[#4272bb] focus:ring-2 focus:ring-[#4272bb]/20 transition-all'
+    'w-full py-2.5 px-3 pl-9 border border-slate-200 rounded-lg text-sm text-slate-800 bg-white outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/15 transition-all placeholder:text-slate-400'
+
+  const labelCls = 'block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wide'
 
   return (
     <>
@@ -187,157 +178,199 @@ export function ListaUsuarios({ refetch }: { refetch?: number }) {
       )}
 
       {!loading && !error && usuarios.length > 0 && (
-        <div className="bg-white rounded-lg border border-[#e2e8f0] overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-[#f8fafc] border-b border-[#e2e8f0]">
-                <tr>
-                  <th className="px-4 py-3 text-left font-semibold text-[#374151]">Nombre</th>
-                  <th className="px-4 py-3 text-left font-semibold text-[#374151]">Email</th>
-                  <th className="px-4 py-3 text-left font-semibold text-[#374151]">Rol</th>
-                  <th className="px-4 py-3 text-left font-semibold text-[#374151]">Estado</th>
-                  <th className="px-4 py-3 text-center font-semibold text-[#374151]">Verificado</th>
-                  <th className="px-4 py-3 text-center font-semibold text-[#374151]">Acciones</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#e2e8f0]">
-                {usuarios.map((u, i) => (
-                  <tr key={i} className="hover:bg-[#f8fafc] transition-colors">
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        <User className="w-4 h-4 text-[#94a3b8]" />
-                        <span className="text-[#1A2A36] font-medium">{u.nombre}</span>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        <Mail className="w-4 h-4 text-[#94a3b8]" />
-                        <span className="text-[#64748b]">{u.email}</span>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        <Shield className="w-4 h-4 text-[#4272bb]" />
-                        <span className="text-[#4272bb] font-medium capitalize">{u.rol}</span>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span
-                        className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${getEstadoColor(u.estado)}`}
-                      >
-                        {u.estado === 'aprobado' && '✓ Aprobado'}
-                        {u.estado === 'pendiente' && '⊙ Pendiente'}
-                        {u.estado === 'rechazado' && '✕ Rechazado'}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      {u.email_verificado ? (
-                        <span className="text-green-600 font-bold">✓</span>
-                      ) : (
-                        <span className="text-red-600 font-bold">✕</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center justify-center gap-2">
+        <>
+          {/* Mobile: cards */}
+          <div className="sm:hidden space-y-3">
+            {usuarios.map((u, i) => (
+              <div key={i} className="bg-white border border-[#e2e8f0] rounded-xl p-4 shadow-sm">
+                <div className="flex items-start justify-between gap-3 mb-3">
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <User className="w-4 h-4 text-[#94a3b8] flex-shrink-0" />
+                      <span className="text-[#1A2A36] font-semibold text-sm truncate">{u.nombre}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 ml-6">
+                      <Mail className="w-3.5 h-3.5 text-[#94a3b8] flex-shrink-0" />
+                      <span className="text-[#64748b] text-xs truncate">{u.email}</span>
+                    </div>
+                  </div>
+                  <div className="flex gap-1.5 flex-shrink-0">
+                    {u.rol !== 'superadmin' && (
+                      <>
                         <button
                           onClick={() => abrirEditar(u)}
                           title="Editar usuario"
-                          className="p-1.5 rounded-md text-[#4272bb] hover:bg-[#4272bb]/10 transition-colors"
+                          className="p-2 rounded-lg text-[#4272bb] hover:bg-[#4272bb]/10 transition-colors"
                         >
                           <Edit className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => { setUsuarioEliminar(u); setDeleteError('') }}
                           title="Eliminar usuario"
-                          className="p-1.5 rounded-md text-red-500 hover:bg-red-50 transition-colors"
+                          className="p-2 rounded-lg text-red-500 hover:bg-red-50 transition-colors"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                      </>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Shield className="w-3.5 h-3.5 text-[#4272bb]" />
+                  <span className="text-[#4272bb] text-xs font-semibold capitalize">{u.rol}</span>
+                </div>
+              </div>
+            ))}
           </div>
-        </div>
+
+          {/* Desktop: table */}
+          <div className="hidden sm:block bg-white rounded-lg border border-[#e2e8f0] overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-[#f8fafc] border-b border-[#e2e8f0]">
+                  <tr>
+                    <th className="px-4 py-3 text-left font-semibold text-[#374151]">Nombre</th>
+                    <th className="px-4 py-3 text-left font-semibold text-[#374151]">Email</th>
+                    <th className="px-4 py-3 text-left font-semibold text-[#374151]">Rol</th>
+                    <th className="px-4 py-3 text-center font-semibold text-[#374151]">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#e2e8f0]">
+                  {usuarios.map((u, i) => (
+                    <tr key={i} className="hover:bg-[#f8fafc] transition-colors">
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <User className="w-4 h-4 text-[#94a3b8]" />
+                          <span className="text-[#1A2A36] font-medium">{u.nombre}</span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <Mail className="w-4 h-4 text-[#94a3b8]" />
+                          <span className="text-[#64748b]">{u.email}</span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <Shield className="w-4 h-4 text-[#4272bb]" />
+                          <span className="text-[#4272bb] font-medium capitalize">{u.rol}</span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center justify-center gap-2">
+                          {u.rol !== 'superadmin' ? (
+                            <>
+                              <button
+                                onClick={() => abrirEditar(u)}
+                                title="Editar usuario"
+                                className="p-1.5 rounded-md text-[#4272bb] hover:bg-[#4272bb]/10 transition-colors"
+                              >
+                                <Edit className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={() => { setUsuarioEliminar(u); setDeleteError('') }}
+                                title="Eliminar usuario"
+                                className="p-1.5 rounded-md text-red-500 hover:bg-red-50 transition-colors"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </>
+                          ) : (
+                            <span className="text-xs text-slate-400 italic px-2">—</span>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
       )}
 
-      {/* Dialog: Agregar usuario */}
+      {/* ── Modal: Agregar usuario ── */}
       <Dialog open={mostrarCrear} onOpenChange={setMostrarCrear}>
-        <DialogContent className="sm:max-w-lg">
-          <DialogHeader>
-            <DialogTitle>Agregar usuario</DialogTitle>
-          </DialogHeader>
-          <CrearUsuarioForm
-            onUsuarioCreado={() => {
-              setMostrarCrear(false)
-              setInternalRefetch(n => n + 1)
-            }}
-          />
+        <DialogContent className="bg-white border border-slate-200 shadow-xl sm:max-w-md p-0 gap-0 overflow-hidden">
+          {/* Header del modal */}
+          <div className="flex items-center gap-3 px-6 py-5 border-b border-slate-100">
+            <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center flex-shrink-0">
+              <Plus className="w-4 h-4 text-white" />
+            </div>
+            <div>
+              <DialogTitle className="text-base font-bold text-slate-900">Nuevo usuario</DialogTitle>
+              <p className="text-xs text-slate-500 mt-0.5">Completá los datos para crear la cuenta</p>
+            </div>
+          </div>
+          <div className="px-6 py-5">
+            <CrearUsuarioForm
+              onUsuarioCreado={() => {
+                setMostrarCrear(false)
+                setInternalRefetch(n => n + 1)
+              }}
+            />
+          </div>
         </DialogContent>
       </Dialog>
 
-      {/* Dialog: Editar usuario */}
+      {/* ── Modal: Editar usuario ── */}
       <Dialog open={!!usuarioEditar} onOpenChange={open => { if (!open) cerrarEditar() }}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Editar usuario</DialogTitle>
-          </DialogHeader>
+        <DialogContent className="bg-white border border-slate-200 shadow-xl sm:max-w-md p-0 gap-0 overflow-hidden">
+          {/* Header */}
+          <div className="flex items-center gap-3 px-6 py-5 border-b border-slate-100">
+            <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center flex-shrink-0">
+              <Edit className="w-4 h-4 text-white" />
+            </div>
+            <div>
+              <DialogTitle className="text-base font-bold text-slate-900">Editar usuario</DialogTitle>
+              {usuarioEditar && (
+                <p className="text-xs text-slate-500 mt-0.5 truncate max-w-[260px]">{usuarioEditar.email}</p>
+              )}
+            </div>
+          </div>
 
           {usuarioEditar && (
-            <div className="space-y-4 pt-2">
-              <p className="text-sm text-[#64748b]">
-                Editando: <span className="font-medium text-[#1A2A36]">{usuarioEditar.email}</span>
-              </p>
-
+            <div className="px-6 py-5 space-y-4">
+              {/* Nombre */}
               <div>
-                <label className="block text-xs font-semibold text-[#374151] mb-1.5">
-                  Nombre completo
-                </label>
-                <input
-                  type="text"
-                  value={editNombre}
-                  onChange={e => setEditNombre(e.target.value)}
-                  className={inputCls}
-                />
+                <label className={labelCls}>Nombre completo</label>
+                <div className="relative">
+                  <User className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <input
+                    type="text"
+                    value={editNombre}
+                    onChange={e => setEditNombre(e.target.value)}
+                    className={inputCls}
+                    placeholder="Nombre completo"
+                  />
+                </div>
               </div>
 
+              {/* Rol */}
               <div>
-                <label className="block text-xs font-semibold text-[#374151] mb-1.5">
-                  Rol
-                </label>
-                <select
-                  value={editRol}
-                  onChange={e => setEditRol(e.target.value)}
-                  className={`${inputCls} appearance-none cursor-pointer`}
-                >
-                  {ROLES.map(r => (
-                    <option key={r} value={r} className="capitalize">{r.charAt(0).toUpperCase() + r.slice(1)}</option>
-                  ))}
-                </select>
+                <label className={labelCls}>Rol</label>
+                <div className="relative">
+                  <Shield className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <select
+                    value={editRol}
+                    onChange={e => setEditRol(e.target.value)}
+                    className={`${inputCls} appearance-none cursor-pointer`}
+                  >
+                    {ROLES.map(r => (
+                      <option key={r} value={r}>{r.charAt(0).toUpperCase() + r.slice(1)}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
 
+              {/* Nueva contraseña */}
               <div>
-                <label className="block text-xs font-semibold text-[#374151] mb-1.5">
-                  Estado
-                </label>
-                <select
-                  value={editEstado}
-                  onChange={e => setEditEstado(e.target.value)}
-                  className={`${inputCls} appearance-none cursor-pointer`}
-                >
-                  {ESTADOS.map(s => (
-                    <option key={s} value={s} className="capitalize">{s.charAt(0).toUpperCase() + s.slice(1)}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-[#374151] mb-1.5">
-                  Nueva contraseña <span className="text-[#94a3b8] font-normal">(dejar vacío para no cambiar)</span>
+                <label className={labelCls}>
+                  Nueva contraseña
+                  <span className="ml-1.5 normal-case font-normal text-slate-400">(dejar vacío para no cambiar)</span>
                 </label>
                 <div className="relative">
+                  <Lock className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                   <input
                     type={showEditPwd ? 'text' : 'password'}
                     value={editPassword}
@@ -348,7 +381,7 @@ export function ListaUsuarios({ refetch }: { refetch?: number }) {
                   <button
                     type="button"
                     onClick={() => setShowEditPwd(v => !v)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#94a3b8] hover:text-[#4272bb] transition-colors"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-600 transition-colors"
                     tabIndex={-1}
                   >
                     {showEditPwd ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -357,24 +390,30 @@ export function ListaUsuarios({ refetch }: { refetch?: number }) {
               </div>
 
               {editError && (
-                <div className="bg-red-50 border border-red-200 text-red-700 text-xs rounded-lg px-4 py-2.5">
+                <div className="flex items-start gap-2.5 bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3">
+                  <span className="flex-shrink-0 mt-0.5">⚠</span>
                   {editError}
                 </div>
               )}
 
-              <div className="flex gap-3 pt-2">
+              {/* Acciones */}
+              <div className="flex gap-3 pt-1">
                 <button
                   onClick={cerrarEditar}
-                  className="flex-1 py-2.5 border border-[#e2e8f0] rounded-lg text-sm text-[#64748b] hover:bg-[#f8fafc] transition-all"
+                  className="flex-1 py-2.5 border border-slate-200 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all"
                 >
                   Cancelar
                 </button>
                 <button
                   onClick={guardarEdicion}
                   disabled={editLoading}
-                  className="flex-1 py-2.5 bg-[#4272bb] hover:bg-[#2d5a9e] text-white text-sm font-bold rounded-lg flex items-center justify-center gap-2 transition-all disabled:bg-[#94a3b8] disabled:cursor-not-allowed"
+                  className="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg flex items-center justify-center gap-2 transition-all disabled:opacity-60 disabled:cursor-not-allowed shadow-sm"
                 >
-                  {editLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Guardar cambios'}
+                  {editLoading
+                    ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    : <Edit className="w-3.5 h-3.5" />
+                  }
+                  {editLoading ? 'Guardando...' : 'Guardar cambios'}
                 </button>
               </div>
             </div>
@@ -382,40 +421,59 @@ export function ListaUsuarios({ refetch }: { refetch?: number }) {
         </DialogContent>
       </Dialog>
 
-      {/* AlertDialog: Confirmar eliminación */}
+      {/* ── Modal: Confirmar eliminación ── */}
       <AlertDialog open={!!usuarioEliminar} onOpenChange={open => { if (!open) setUsuarioEliminar(null) }}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>¿Eliminar usuario?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Estás por eliminar a{' '}
-              <span className="font-semibold text-[#1A2A36]">{usuarioEliminar?.nombre}</span>{' '}
-              ({usuarioEliminar?.email}). Esta acción no se puede deshacer.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-
-          {deleteError && (
-            <div className="bg-red-50 border border-red-200 text-red-700 text-xs rounded-lg px-4 py-2.5">
-              {deleteError}
+        <AlertDialogContent className="bg-white border border-slate-200 shadow-xl sm:max-w-sm p-0 gap-0 overflow-hidden">
+          {/* Header rojo */}
+          <div className="flex items-center gap-3 px-6 py-5 border-b border-slate-100">
+            <div className="w-9 h-9 rounded-xl bg-red-100 flex items-center justify-center flex-shrink-0">
+              <AlertTriangle className="w-4 h-4 text-red-600" />
             </div>
-          )}
+            <AlertDialogTitle className="text-base font-bold text-slate-900">
+              ¿Eliminar usuario?
+            </AlertDialogTitle>
+          </div>
 
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={deleteLoading}>Cancelar</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={e => { e.preventDefault(); confirmarEliminar() }}
-              disabled={deleteLoading}
-              className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
-            >
-              {deleteLoading ? (
-                <span className="flex items-center gap-2">
-                  <Loader2 className="w-4 h-4 animate-spin" /> Eliminando...
-                </span>
-              ) : (
-                'Eliminar'
-              )}
-            </AlertDialogAction>
-          </AlertDialogFooter>
+          <div className="px-6 py-5 space-y-4">
+            <AlertDialogDescription className="text-sm text-slate-600 leading-relaxed">
+              Estás por eliminar a{' '}
+              <span className="font-semibold text-slate-900">{usuarioEliminar?.nombre}</span>.
+              Esta acción no se puede deshacer.
+            </AlertDialogDescription>
+
+            {/* Dato del usuario */}
+            <div className="flex items-center gap-2.5 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5">
+              <Mail className="w-4 h-4 text-slate-400 flex-shrink-0" />
+              <span className="text-sm text-slate-600 truncate">{usuarioEliminar?.email}</span>
+            </div>
+
+            {deleteError && (
+              <div className="flex items-start gap-2.5 bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3">
+                <span className="flex-shrink-0 mt-0.5">⚠</span>
+                {deleteError}
+              </div>
+            )}
+
+            <div className="flex gap-3 pt-1">
+              <AlertDialogCancel
+                disabled={deleteLoading}
+                className="flex-1 py-2.5 border border-slate-200 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all bg-white"
+              >
+                Cancelar
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={e => { e.preventDefault(); confirmarEliminar() }}
+                disabled={deleteLoading}
+                className="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-lg flex items-center justify-center gap-2 transition-all disabled:opacity-60 disabled:cursor-not-allowed shadow-sm"
+              >
+                {deleteLoading
+                  ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  : <Trash2 className="w-3.5 h-3.5" />
+                }
+                {deleteLoading ? 'Eliminando...' : 'Eliminar'}
+              </AlertDialogAction>
+            </div>
+          </div>
         </AlertDialogContent>
       </AlertDialog>
     </>

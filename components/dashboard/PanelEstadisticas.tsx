@@ -101,7 +101,7 @@ export function PanelEstadisticas({ rol }: { rol: string }) {
         value="2025"
         className="mt-4 animate-in fade-in-0 duration-200"
       >
-        <div className="bg-white rounded-2xl border border-[#e8edf3] shadow-sm p-8">
+        <div className="bg-white rounded-2xl border border-[#e8edf3] shadow-sm p-4 sm:p-8">
           <h2 className="text-[#1A2A36] font-black text-xl flex items-center gap-2 mb-6">
             <span className="w-8 h-8 bg-[#4272bb] rounded-lg flex items-center justify-center flex-shrink-0">
               <BarChart2 className="text-white w-4 h-4" />
@@ -142,43 +142,69 @@ export function PanelEstadisticas({ rol }: { rol: string }) {
                   Aún no hay actividades registradas para 2025
                 </p>
               ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr>
-                        {['Fecha', 'Programa', 'Localidad', 'Personas', 'Cargado por'].map(h => (
-                          <th
-                            key={h}
-                            className="text-left px-4 py-2.5 bg-[#f6f7f8] text-[#64748b] font-semibold text-xs uppercase tracking-wide border-b border-[#e2e8f0]"
-                          >
-                            {h}
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {ultimas.map((a, i) => (
-                        <tr key={i} className="hover:bg-[#fafbfc] border-b border-[#f1f5f9] last:border-0">
-                          <td className="px-4 py-2.5 text-[#1A2A36]">
+                <>
+                  {/* Mobile: cards */}
+                  <div className="sm:hidden space-y-3">
+                    {ultimas.map((a, i) => (
+                      <div key={i} className="bg-[#f6f7f8] border border-[#e2e8f0] rounded-xl p-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-[#1A2A36] font-semibold text-sm">
                             {a.fecha
                               ? new Date(a.fecha + 'T00:00:00').toLocaleDateString('es-AR', {
-                                  day: '2-digit',
-                                  month: '2-digit',
-                                  year: 'numeric',
+                                  day: '2-digit', month: '2-digit', year: 'numeric',
                                 })
                               : '-'}
-                          </td>
-                          <td className="px-4 py-2.5 text-[#1A2A36]">{a.programa || '-'}</td>
-                          <td className="px-4 py-2.5 text-[#1A2A36]">{a.localidad || '-'}</td>
-                          <td className="px-4 py-2.5 text-[#1A2A36]">
-                            {(parseInt(String(a.cantidad_personas)) || 0).toLocaleString('es-AR')}
-                          </td>
-                          <td className="px-4 py-2.5 text-[#1A2A36]">{a.usuario_nombre || '-'}</td>
+                          </span>
+                          <span className="bg-[#4272bb]/10 text-[#4272bb] font-bold text-xs px-2.5 py-0.5 rounded-full">
+                            {(parseInt(String(a.cantidad_personas)) || 0).toLocaleString('es-AR')} personas
+                          </span>
+                        </div>
+                        <p className="text-[#1A2A36] text-sm font-medium truncate mb-1">{a.programa || '-'}</p>
+                        <div className="flex items-center justify-between">
+                          <span className="text-[#64748b] text-xs">{a.localidad || '-'}</span>
+                          <span className="text-[#94a3b8] text-xs truncate max-w-[140px]">{a.usuario_nombre || '-'}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Desktop: table */}
+                  <div className="hidden sm:block overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr>
+                          {['Fecha', 'Programa', 'Localidad', 'Personas', 'Cargado por'].map(h => (
+                            <th
+                              key={h}
+                              className="text-left px-4 py-2.5 bg-[#f6f7f8] text-[#64748b] font-semibold text-xs uppercase tracking-wide border-b border-[#e2e8f0]"
+                            >
+                              {h}
+                            </th>
+                          ))}
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                      </thead>
+                      <tbody>
+                        {ultimas.map((a, i) => (
+                          <tr key={i} className="hover:bg-[#fafbfc] border-b border-[#f1f5f9] last:border-0">
+                            <td className="px-4 py-2.5 text-[#1A2A36]">
+                              {a.fecha
+                                ? new Date(a.fecha + 'T00:00:00').toLocaleDateString('es-AR', {
+                                    day: '2-digit', month: '2-digit', year: 'numeric',
+                                  })
+                                : '-'}
+                            </td>
+                            <td className="px-4 py-2.5 text-[#1A2A36]">{a.programa || '-'}</td>
+                            <td className="px-4 py-2.5 text-[#1A2A36]">{a.localidad || '-'}</td>
+                            <td className="px-4 py-2.5 text-[#1A2A36]">
+                              {(parseInt(String(a.cantidad_personas)) || 0).toLocaleString('es-AR')}
+                            </td>
+                            <td className="px-4 py-2.5 text-[#1A2A36]">{a.usuario_nombre || '-'}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </>
               )}
             </>
           )}

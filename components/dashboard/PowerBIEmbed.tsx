@@ -138,7 +138,7 @@ export function PowerBIEmbed({
       </div>
 
       {/* Contenedor del iframe */}
-      <div className="relative w-full h-[600px] md:h-[700px] lg:h-[800px]">
+      <div className="relative w-full h-[380px] sm:h-[520px] md:h-[700px] lg:h-[820px]">
         {/* Skeleton superpuesto mientras carga */}
         {state.isLoading && (
           <div className="absolute inset-0 z-10 bg-white p-4 flex flex-col gap-3">

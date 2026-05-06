@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
-import { sbUpdateUsuario, sbDeleteUsuario, hashPassword } from '@/lib/auth-server'
+import { sbUpdateUsuario, sbDeleteUsuario, sbGetUsuario, hashPassword } from '@/lib/auth-server'
 
 async function verificarAdmin() {
   const cookieStore = await cookies()
@@ -65,6 +65,14 @@ export async function DELETE(
   const emailDecoded = decodeURIComponent(email)
 
   try {
+    const usuario = await sbGetUsuario(emailDecoded)
+    if (usuario?.rol === 'superadmin') {
+      return NextResponse.json(
+        { ok: false, error: 'No se puede eliminar a un superadministrador.' },
+        { status: 403 }
+      )
+    }
+
     await sbDeleteUsuario(emailDecoded)
     return NextResponse.json({ ok: true })
   } catch (e) {

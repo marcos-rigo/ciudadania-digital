@@ -54,10 +54,13 @@ Each page uses a component from `components/auth/` that calls the corresponding 
 5. If `estado = 'aprobado'` → set `gestion_session` cookie, return `{ok: true, rol, nombre}`
 6. Client redirects: `superadmin` → `/dashboard/admin/usuarios`, `empleado` → `/dashboard/admin`, others → `/dashboard/estadisticas`
 
-**Session cookie:**
+**Session cookies (two are set on login):**
 ```js
 gestion_session = JSON.stringify({ auth: true, nombre, rol })
-// httpOnly, sameSite: lax, maxAge: 7 days, secure in production
+// httpOnly: true, sameSite: lax, maxAge: 7 days — leído solo por el servidor/middleware
+
+spc_auth = JSON.stringify({ auth: true, nombre, rol })
+// httpOnly: false, sameSite: lax, maxAge: 7 days — leído por componentes cliente para mostrar/ocultar UI
 ```
 
 ### Middleware (proxy.ts)
@@ -97,6 +100,8 @@ Route guards in middleware:
 | PATCH | `/api/admin/usuarios/[email]` | Actualiza nombre/rol/estado (requiere `superadmin`) |
 | DELETE | `/api/admin/usuarios/[email]` | Elimina usuario (requiere `superadmin`) |
 
+**Registro también notifica al admin:** `POST /api/auth/registro` envía email a `NEXT_PUBLIC_EMAIL_ADMIN` informando que hay un nuevo usuario esperando aprobación.
+
 ### Server-side auth helpers (`lib/auth-server.ts`)
 
 - `hashPassword(pwd)` — SHA256 hash
@@ -113,6 +118,8 @@ Route guards in middleware:
 ### Client-side Supabase (`lib/supabase-client.ts`)
 
 - `sbGetActividades(filtros)` — lee tabla `actividades` (para `PanelEstadisticas`)
+
+**Supabase directo (sin SDK):** Tanto `lib/auth-server.ts` como `lib/supabase-client.ts` usan la REST API de Supabase directamente con `fetch`, sin el SDK de Supabase. Los filtros se pasan como `URLSearchParams` con operadores PostgREST (`eq.`, `gte.`, `lt.`). Las respuestas non-ok lanzan error en el servidor; el cliente recibe `{ ok: false, error }`. Todas las llamadas usan `cache: 'no-store'`.
 
 ## Supabase Schema
 
@@ -149,7 +156,7 @@ Interfaces principales en `/lib/types.ts`: `Programa`, `Accion`, `Video`, `Mater
 
 - `DashboardLayout` — nav header con nombre, badge de rol, botón logout
 - `PanelAdmin` — embed de MS Forms iframe + instrucciones de carga
-- `PanelEstadisticas` — cards de estadísticas + tabla de últimas 10 actividades (fetch real a Supabase)
+- `PanelEstadisticas` — cards de estadísticas + tabla de últimas 10 actividades (fetch real a Supabase). Lee el query param `?anio=2025|2026` para cambiar entre pestañas de Power BI.
 - `PowerBIEmbed` — iframe embebido de Power BI con auto-refresh configurable (default 30 min), pausa/reanuda, badge de última actualización color-coded (verde/amarillo/rojo), y skeleton de carga. Tipos en `types/powerbi.ts`.
 - `RefreshButton` — botón de refresh manual y toggle de pausa usado dentro de `PowerBIEmbed`
 - `CrearUsuarioForm` — formulario para crear usuarios (solo admin, POST `/api/admin/usuarios`)
@@ -161,15 +168,23 @@ Interfaces principales en `/lib/types.ts`: `Programa`, `Accion`, `Video`, `Mater
 - `cn()` de `@/lib/utils` para clases condicionales (clsx + tailwind-merge).
 - Path alias `@/` → raíz del proyecto.
 - Forms: `react-hook-form` + `zod` (usado en formularios de auth).
+- OTP input: `input-otp` (para el campo de 6 dígitos en `/verificar`).
+- Toasts: `sonner` (notificaciones).
 - Charts: `recharts` (usado en `PanelEstadisticas`).
 - Animaciones de componentes: `framer-motion`.
+- Scroll animations: `hooks/use-in-view.tsx` — custom hook con `IntersectionObserver` (`threshold: 0.15`), devuelve `{ ref, inView }` para animaciones on-scroll.
 
 ## Theming
 
 **Tailwind v4** — configurado con `@import 'tailwindcss'` en `app/globals.css` (sin archivo JS de config separado; `tailwind.config.js` existe pero está vacío). CSS custom properties en hex (no OKLCH) en `app/globals.css`. Tailwind config con:
 - Sombras glow: `glow-sm`, `glow`, `glow-lg`, `glow-accent`
 - Animaciones: `pulse-glow`, `float`, `shimmer`
-- Fuentes: Poppins (UI), Lora (contenido serif)
+- Fuentes: Poppins (`--font-poppins`, UI sans-serif), Lora (`--font-lora`, contenido serif)
+
+Clases CSS utilitarias custom definidas en `app/globals.css`:
+- `.glass` / `.glass-premium` — glassmorphism con `backdrop-blur` y `backdrop-saturate`
+- `.bg-noise` — textura grain con SVG turbulence filter
+- `.text-gradient` — gradiente multi-color en texto
 
 ## Build Config
 

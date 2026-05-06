@@ -31,7 +31,7 @@ const pasos = [
 export function PanelAdmin() {
   return (
     <div className="space-y-6">
-      <div className="bg-white rounded-2xl border border-[#e8edf3] shadow-sm p-8">
+      <div className="bg-white rounded-2xl border border-[#e8edf3] shadow-sm p-4 sm:p-8">
         <h2 className="text-[#1A2A36] font-black text-xl flex items-center gap-2 mb-2">
           <span className="w-8 h-8 bg-[#4272bb] rounded-lg flex items-center justify-center flex-shrink-0">
             <Info className="text-white w-4 h-4" />
@@ -77,7 +77,7 @@ export function PanelAdmin() {
         </a>
       </div>
 
-      <div className="bg-white rounded-2xl border border-[#e8edf3] shadow-sm p-6">
+      <div className="bg-white rounded-2xl border border-[#e8edf3] shadow-sm p-4 sm:p-6">
         <h2 className="text-[#1A2A36] font-black flex items-center gap-2 mb-5">
           <span className="w-8 h-8 bg-[#4272bb] rounded-lg flex items-center justify-center flex-shrink-0">
             <FileText className="text-white w-4 h-4" />
@@ -87,7 +87,7 @@ export function PanelAdmin() {
         <div className="rounded-xl overflow-hidden border border-[#e2e8f0]">
           <iframe
             src={`${FORMS_URL}&embed=true`}
-            style={{ display: 'block', width: '100%', height: '720px', border: 'none' }}
+            className="block w-full border-0 h-[480px] sm:h-[600px] lg:h-[720px]"
             allowFullScreen
             title="Formulario de carga de actividades"
           />
