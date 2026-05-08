@@ -60,7 +60,7 @@ export async function POST(request: Request) {
     })
 
     // Cookie legible por JS para mostrar/ocultar items de nav en el cliente
-    cookieStore.set('spc_auth', '1', {
+    cookieStore.set('spc_auth', JSON.stringify({ nombre, rol }), {
       httpOnly: false,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',

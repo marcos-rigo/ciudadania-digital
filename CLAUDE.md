@@ -31,8 +31,8 @@ Five layout trees:
 | Tree | Routes | Layout component |
 |---|---|---|
 | Public | `/inicio`, `/acciones`, `/resultados`, `/encuestas`, `/transparencia`, `/contacto` | `components/layouts/public-layout.tsx` |
-| Ciudadanía Digital | `/ciudadania-digital`, `/trayectos`, `/trayectos/[slug]`, `/contenidos/videos`, `/contenidos/podcast`, `/evaluaciones`, `/certificados`, `/mi-perfil` | `components/layouts/ciudadania-layout.tsx` |
-| Equipo | `/equipo/**` (mock, no auth) — incluye `/equipo/login` (demo simulado, sin auth real) | `components/layouts/admin-layout.tsx` |
+| Ciudadanía Digital | `/ciudadania-digital`, `/trayectos`, `/trayectos/[slug]`, `/contenidos/videos`, `/contenidos/videos/[id]`, `/contenidos/podcast`, `/evaluaciones`, `/certificados`, `/mi-perfil` | `components/layouts/ciudadania-layout.tsx` |
+| Equipo | `/equipo/**` (mock, no auth) — incluye `/equipo/login` (demo simulado, sin auth real), `/equipo/programas`, `/equipo/acciones`, `/equipo/reportes`, `/equipo/tableros`, `/equipo/asistente-ia`, `/equipo/capacitacion`, `/equipo/configuracion` | `components/layouts/admin-layout.tsx` |
 | Gestión (CMS mock) | `/gestion`, `/gestion/usuarios`, `/gestion/encuestas`, `/gestion/trayectos`, `/gestion/reportes`, `/gestion/contenidos` (mock, no auth) | `components/layouts/gestion-layout.tsx` |
 | Dashboard | `/dashboard/**` | `components/dashboard/DashboardLayout.tsx` |
 
@@ -59,8 +59,8 @@ Each page uses a component from `components/auth/` that calls the corresponding 
 gestion_session = JSON.stringify({ auth: true, nombre, rol })
 // httpOnly: true, sameSite: lax, maxAge: 7 days — leído solo por el servidor/middleware
 
-spc_auth = JSON.stringify({ auth: true, nombre, rol })
-// httpOnly: false, sameSite: lax, maxAge: 7 days — leído por componentes cliente para mostrar/ocultar UI
+spc_auth = JSON.stringify({ nombre, rol })
+// httpOnly: false, sameSite: lax, maxAge: 7 days — leído por componentes cliente para mostrar/ocultar UI y mostrar nombre/rol en navbar
 ```
 
 ### Middleware (proxy.ts)
