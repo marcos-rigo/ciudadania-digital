@@ -6,12 +6,7 @@ import Image from "next/image"
 import { usePathname, useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { Calendar, BarChart3, LogIn, LogOut, LayoutDashboard, Menu, X } from "lucide-react"
-
-const NAV_ITEMS = [
-  { href: "/acciones",   label: "Acciones",   icon: Calendar  },
-  { href: "/resultados", label: "Resultados", icon: BarChart3 },
-]
+import { LogIn, LogOut, LayoutDashboard, BarChart2, Users, Menu, X } from "lucide-react"
 
 interface SpcAuth {
   nombre: string
@@ -38,11 +33,6 @@ const BADGE: Record<string, { cls: string; label: string }> = {
   lector:     { cls: "bg-slate-100 text-slate-600 border border-slate-200",     label: "Lector"     },
 }
 
-function dashboardHref(rol: string) {
-  if (rol === "superadmin") return "/dashboard/admin/usuarios"
-  if (rol === "empleado")   return "/dashboard/admin"
-  return "/dashboard/estadisticas"
-}
 
 export function PublicLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
@@ -74,7 +64,6 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
 
   const loggedIn = user !== null
   const badge    = BADGE[user?.rol ?? ""] ?? null
-  const href     = dashboardHref(user?.rol ?? "")
 
   const navLinkCls = (active: boolean) =>
     cn(
@@ -129,21 +118,28 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
           <div className="flex-1 flex items-center justify-center">
             {loggedIn && (
               <nav className="hidden lg:flex items-center gap-1">
-                {NAV_ITEMS.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={navLinkCls(pathname === item.href)}
-                  >
-                    {item.label}
+                {(user?.rol === 'superadmin' || user?.rol === 'empleado') && (
+                  <Link href="/dashboard/admin" className={navLinkCls(false)}>
+                    <span className="flex items-center gap-1.5">
+                      <LayoutDashboard className="w-4 h-4" />
+                      Carga
+                    </span>
                   </Link>
-                ))}
-                <Link href={href} className={navLinkCls(false)}>
+                )}
+                <Link href="/dashboard/estadisticas" className={navLinkCls(false)}>
                   <span className="flex items-center gap-1.5">
-                    <LayoutDashboard className="w-4 h-4" />
-                    Dashboard
+                    <BarChart2 className="w-4 h-4" />
+                    Estadísticas
                   </span>
                 </Link>
+                {user?.rol === 'superadmin' && (
+                  <Link href="/dashboard/admin/usuarios" className={navLinkCls(false)}>
+                    <span className="flex items-center gap-1.5">
+                      <Users className="w-4 h-4" />
+                      Usuarios
+                    </span>
+                  </Link>
+                )}
               </nav>
             )}
           </div>
@@ -210,25 +206,22 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
 
             {loggedIn ? (
               <>
-                {NAV_ITEMS.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setMenuOpen(false)}
-                    className={mobileNavLinkCls(pathname === item.href)}
-                  >
-                    <item.icon className="w-4 h-4" />
-                    {item.label}
+                {(user?.rol === 'superadmin' || user?.rol === 'empleado') && (
+                  <Link href="/dashboard/admin" onClick={() => setMenuOpen(false)} className={mobileNavLinkCls(false)}>
+                    <LayoutDashboard className="w-4 h-4" />
+                    Carga
                   </Link>
-                ))}
-                <Link
-                  href={href}
-                  onClick={() => setMenuOpen(false)}
-                  className={mobileNavLinkCls(false)}
-                >
-                  <LayoutDashboard className="w-4 h-4" />
-                  Dashboard
+                )}
+                <Link href="/dashboard/estadisticas" onClick={() => setMenuOpen(false)} className={mobileNavLinkCls(false)}>
+                  <BarChart2 className="w-4 h-4" />
+                  Estadísticas
                 </Link>
+                {user?.rol === 'superadmin' && (
+                  <Link href="/dashboard/admin/usuarios" onClick={() => setMenuOpen(false)} className={mobileNavLinkCls(false)}>
+                    <Users className="w-4 h-4" />
+                    Usuarios
+                  </Link>
+                )}
                 <div className="pt-2 border-t border-slate-100">
                   <button
                     onClick={handleLogout}
@@ -280,26 +273,27 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
             {/* Enlaces rápidos */}
             {loggedIn && (
               <div>
-                <h3 className="font-semibold text-slate-900 mb-4">Enlaces Rápidos</h3>
+                <h3 className="font-semibold text-slate-900 mb-4">Dashboard</h3>
                 <ul className="space-y-2">
-                  {NAV_ITEMS.map((item) => (
-                    <li key={item.href}>
-                      <Link
-                        href={item.href}
-                        className="text-sm text-slate-500 hover:text-blue-600 transition-colors duration-200"
-                      >
-                        {item.label}
+                  {(user?.rol === 'superadmin' || user?.rol === 'empleado') && (
+                    <li>
+                      <Link href="/dashboard/admin" className="text-sm text-slate-500 hover:text-blue-600 transition-colors duration-200">
+                        Carga
                       </Link>
                     </li>
-                  ))}
+                  )}
                   <li>
-                    <Link
-                      href={href}
-                      className="text-sm text-slate-500 hover:text-blue-600 transition-colors duration-200"
-                    >
-                      Dashboard
+                    <Link href="/dashboard/estadisticas" className="text-sm text-slate-500 hover:text-blue-600 transition-colors duration-200">
+                      Estadísticas
                     </Link>
                   </li>
+                  {user?.rol === 'superadmin' && (
+                    <li>
+                      <Link href="/dashboard/admin/usuarios" className="text-sm text-slate-500 hover:text-blue-600 transition-colors duration-200">
+                        Usuarios
+                      </Link>
+                    </li>
+                  )}
                 </ul>
               </div>
             )}

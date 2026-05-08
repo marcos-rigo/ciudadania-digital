@@ -14,6 +14,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  LineChart, Line, PieChart, Pie, Cell,
+} from 'recharts'
 import { PowerBIEmbed } from './PowerBIEmbed'
 import type { AnioFilter } from '@/types/powerbi'
 
@@ -32,6 +36,16 @@ const FILTRO_FECHA: Record<string, string> = {
 
 const POR_PAGINA = 10
 
+const MESES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic']
+const CHART_COLORS = ['#1e3d8f','#2b54c2','#4a72d8','#0ea5e9','#06b6d4','#14b8a6','#22c55e','#84cc16']
+
+const tooltipStyle = {
+  backgroundColor: '#fff',
+  border: '1px solid #e2e8f0',
+  borderRadius: '10px',
+  fontSize: '12px',
+}
+
 function formatFecha(f: string) {
   if (!f) return '-'
   return new Date(f + 'T00:00:00').toLocaleDateString('es-AR', {
@@ -39,11 +53,44 @@ function formatFecha(f: string) {
   })
 }
 
+function agruparPorMes(actividades: Actividad[]) {
+  const porMes = Array.from({ length: 12 }, () => ({ actividades: 0, asistentes: 0 }))
+  for (const a of actividades) {
+    const mes = parseInt(a.fecha?.slice(5, 7) ?? '0') - 1
+    if (mes >= 0 && mes < 12) {
+      porMes[mes].actividades++
+      porMes[mes].asistentes += a.cantidad_personas || 0
+    }
+  }
+  return MESES.map((mes, i) => ({ mes, ...porMes[i] }))
+}
+
+function agruparPorCampo(actividades: Actividad[], campo: keyof Actividad) {
+  const conteo: Record<string, number> = {}
+  for (const a of actividades) {
+    const clave = String(a[campo] || 'Sin datos')
+    conteo[clave] = (conteo[clave] || 0) + 1
+  }
+  return Object.entries(conteo)
+    .map(([nombre, valor]) => ({ nombre, valor }))
+    .sort((a, b) => b.valor - a.valor)
+}
+
 function StatCard({ value, label }: { value: string; label: string }) {
   return (
     <div className="card-glow bg-white border border-slate-100 rounded-2xl p-5 text-center">
       <div className="metric-value text-3xl font-black leading-none">{value}</div>
       <div className="text-xs text-slate-400 mt-2 font-medium tracking-wide">{label}</div>
+    </div>
+  )
+}
+
+function ChartCard({ title, subtitle, children }: { title: string; subtitle: string; children: React.ReactNode }) {
+  return (
+    <div className="card-glow bg-white border border-slate-200/80 rounded-2xl p-6">
+      <h3 className="font-bold text-slate-900 mb-0.5 text-sm">{title}</h3>
+      <p className="text-xs text-slate-400 mb-5">{subtitle}</p>
+      <div className="h-[260px]">{children}</div>
     </div>
   )
 }
@@ -65,15 +112,15 @@ export function PanelEstadisticas({ rol }: { rol: string }) {
   }
 
   // ── Data ──────────────────────────────────────────────────
-  const [data, setData]     = useState<Actividad[]>([])
+  const [data, setData]       = useState<Actividad[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError]   = useState(false)
+  const [error, setError]     = useState(false)
 
   // ── Filtros ───────────────────────────────────────────────
-  const [search, setSearch]           = useState('')
-  const [filPrograma, setFilPrograma] = useState('all')
+  const [search, setSearch]             = useState('')
+  const [filPrograma, setFilPrograma]   = useState('all')
   const [filLocalidad, setFilLocalidad] = useState('all')
-  const [pagina, setPagina]           = useState(1)
+  const [pagina, setPagina]             = useState(1)
 
   useEffect(() => {
     if (anio !== '2025') return
@@ -122,16 +169,22 @@ export function PanelEstadisticas({ rol }: { rol: string }) {
   const applyPrograma  = (v: string) => { setFilPrograma(v);  setPagina(1) }
   const applyLocalidad = (v: string) => { setFilLocalidad(v); setPagina(1) }
   const hasFilters = !!(search || filPrograma !== 'all' || filLocalidad !== 'all')
-  const clearFilters   = () => { setSearch(''); setFilPrograma('all'); setFilLocalidad('all'); setPagina(1) }
+  const clearFilters = () => { setSearch(''); setFilPrograma('all'); setFilLocalidad('all'); setPagina(1) }
 
-  // ── Stats ─────────────────────────────────────────────────
+  // ── Stats (sobre filtered) ────────────────────────────────
   const totalActividades = filtered.length
   const totalPersonas    = filtered.reduce((s, r) => s + (parseInt(String(r.cantidad_personas)) || 0), 0)
+  const municipiosUnicos = new Set(filtered.map((a) => a.localidad).filter(Boolean)).size
   const promedio         = totalActividades > 0 ? Math.round(totalPersonas / totalActividades) : 0
 
   // ── Paginación ────────────────────────────────────────────
   const totalPaginas = Math.ceil(filtered.length / POR_PAGINA)
   const paginated    = filtered.slice((pagina - 1) * POR_PAGINA, pagina * POR_PAGINA)
+
+  // ── Datos para gráficos (sobre data completa, sin filtros) ─
+  const evolucion    = useMemo(() => agruparPorMes(data), [data])
+  const porPrograma  = useMemo(() => agruparPorCampo(data, 'programa'), [data])
+  const porLocalidad = useMemo(() => agruparPorCampo(data, 'localidad'), [data])
 
   return (
     <Tabs value={anio} onValueChange={handleAnioChange} className="w-full">
@@ -152,10 +205,10 @@ export function PanelEstadisticas({ rol }: { rol: string }) {
       </TabsList>
 
       {/* ── Tab 2025 ── */}
-      <TabsContent value="2025" className="mt-4 animate-in fade-in-0 duration-200">
-        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-4 sm:p-8 space-y-6">
+      <TabsContent value="2025" className="mt-4 animate-in fade-in-0 duration-200 space-y-6">
 
-          {/* Heading */}
+        {/* Heading */}
+        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-4 sm:p-8 space-y-6">
           <h2 className="text-slate-800 font-black text-xl flex items-center gap-2">
             <span className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm shadow-blue-500/20">
               <BarChart2 className="text-white w-4 h-4" />
@@ -179,10 +232,11 @@ export function PanelEstadisticas({ rol }: { rol: string }) {
 
           {!loading && !error && (
             <>
-              {/* Stat cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {/* Stat cards — 4 columnas */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 <StatCard value={totalActividades.toLocaleString('es-AR')} label="Actividades" />
                 <StatCard value={totalPersonas.toLocaleString('es-AR')}    label="Personas alcanzadas" />
+                <StatCard value={municipiosUnicos.toLocaleString('es-AR')} label="Municipios alcanzados" />
                 <StatCard value={promedio.toLocaleString('es-AR')}         label="Promedio por actividad" />
               </div>
 
@@ -395,6 +449,73 @@ export function PanelEstadisticas({ rol }: { rol: string }) {
             </>
           )}
         </div>
+
+        {/* ── Gráficos (visibles solo cuando hay datos) ── */}
+        {!loading && !error && data.length > 0 && (
+          <div className="grid lg:grid-cols-2 gap-6">
+
+            <ChartCard title="Evolución Mensual de Actividades" subtitle="Actividades realizadas por mes · 2025">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={evolucion}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                  <XAxis dataKey="mes" tick={{ fontSize: 11 }} stroke="#cbd5e1" />
+                  <YAxis tick={{ fontSize: 11 }} stroke="#cbd5e1" />
+                  <Tooltip contentStyle={tooltipStyle} />
+                  <Line type="monotone" dataKey="actividades" stroke="#1e3d8f" strokeWidth={2.5}
+                    dot={{ fill: '#1e3d8f', strokeWidth: 2, r: 3 }} name="Actividades" />
+                </LineChart>
+              </ResponsiveContainer>
+            </ChartCard>
+
+            <ChartCard title="Personas Alcanzadas por Mes" subtitle="Total de participantes por mes · 2025">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={evolucion}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                  <XAxis dataKey="mes" tick={{ fontSize: 11 }} stroke="#cbd5e1" />
+                  <YAxis tick={{ fontSize: 11 }} stroke="#cbd5e1" />
+                  <Tooltip contentStyle={tooltipStyle} />
+                  <Bar dataKey="asistentes" fill="#2b54c2" radius={[4,4,0,0]} name="Asistentes" />
+                </BarChart>
+              </ResponsiveContainer>
+            </ChartCard>
+
+            <ChartCard title="Distribución por Programa" subtitle="Cantidad de actividades por campaña o proyecto">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={porPrograma} layout="vertical">
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                  <XAxis type="number" tick={{ fontSize: 11 }} stroke="#cbd5e1" />
+                  <YAxis dataKey="nombre" type="category" tick={{ fontSize: 10 }} width={155} stroke="#cbd5e1" />
+                  <Tooltip contentStyle={tooltipStyle} />
+                  <Bar dataKey="valor" fill="#0ea5e9" radius={[0,4,4,0]} name="Actividades" />
+                </BarChart>
+              </ResponsiveContainer>
+            </ChartCard>
+
+            <ChartCard title="Cobertura Territorial" subtitle="Actividades por municipio o comuna (top 6)">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={porLocalidad.slice(0, 6)}
+                    cx="50%" cy="50%"
+                    labelLine={false}
+                    label={({ nombre, percent }) =>
+                      `${nombre.split(' ')[0]} ${(percent * 100).toFixed(0)}%`
+                    }
+                    outerRadius={95}
+                    dataKey="valor"
+                  >
+                    {porLocalidad.slice(0, 6).map((_, i) => (
+                      <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip contentStyle={tooltipStyle} />
+                </PieChart>
+              </ResponsiveContainer>
+            </ChartCard>
+
+          </div>
+        )}
+
       </TabsContent>
 
       {/* ── Tab 2026: Power BI embed ── */}

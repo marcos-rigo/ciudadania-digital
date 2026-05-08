@@ -30,7 +30,7 @@ Five layout trees:
 
 | Tree | Routes | Layout component |
 |---|---|---|
-| Public | `/inicio`, `/acciones`, `/resultados`, `/encuestas`, `/transparencia`, `/contacto` | `components/layouts/public-layout.tsx` |
+| Public | `/inicio`, `/encuestas`, `/transparencia`, `/contacto` | `components/layouts/public-layout.tsx` |
 | Ciudadanía Digital | `/ciudadania-digital`, `/trayectos`, `/trayectos/[slug]`, `/contenidos/videos`, `/contenidos/videos/[id]`, `/contenidos/podcast`, `/evaluaciones`, `/certificados`, `/mi-perfil` | `components/layouts/ciudadania-layout.tsx` |
 | Equipo | `/equipo/**` (mock, no auth) — incluye `/equipo/login` (demo simulado, sin auth real), `/equipo/programas`, `/equipo/acciones`, `/equipo/reportes`, `/equipo/tableros`, `/equipo/asistente-ia`, `/equipo/capacitacion`, `/equipo/configuracion` | `components/layouts/admin-layout.tsx` |
 | Gestión (CMS mock) | `/gestion`, `/gestion/usuarios`, `/gestion/encuestas`, `/gestion/trayectos`, `/gestion/reportes`, `/gestion/contenidos` (mock, no auth) | `components/layouts/gestion-layout.tsx` |
@@ -154,9 +154,9 @@ Interfaces principales en `/lib/types.ts`: `Programa`, `Accion`, `Video`, `Mater
 
 ## Dashboard Components
 
-- `DashboardLayout` — nav header con nombre, badge de rol, botón logout
+- `DashboardLayout` — nav header con nombre, badge de rol, botón logout. Logo lleva a `/inicio`. Nav order: Inicio → Carga → Estadísticas → Usuarios.
 - `PanelAdmin` — embed de MS Forms iframe + instrucciones de carga
-- `PanelEstadisticas` — cards de estadísticas + tabla de últimas 10 actividades (fetch real a Supabase). Lee el query param `?anio=2025|2026` para cambiar entre pestañas de Power BI.
+- `PanelEstadisticas` — tab 2025: fetch completo de actividades, 4 KPI cards (actividades, personas, municipios, promedio), filtros (search + programa + localidad) + paginación 10 por página, y 4 gráficos recharts (evolución mensual, personas por mes, por programa, cobertura territorial). Stats/tabla sobre `filtered`; gráficos sobre `data` completa. Tab 2026: PowerBIEmbed. Lee el query param `?anio=2025|2026`.
 - `PowerBIEmbed` — iframe embebido de Power BI con auto-refresh configurable (default 30 min), pausa/reanuda, badge de última actualización color-coded (verde/amarillo/rojo), y skeleton de carga. Tipos en `types/powerbi.ts`.
 - `RefreshButton` — botón de refresh manual y toggle de pausa usado dentro de `PowerBIEmbed`
 - `CrearUsuarioForm` — formulario para crear usuarios (solo admin, POST `/api/admin/usuarios`)
@@ -183,8 +183,18 @@ Interfaces principales en `/lib/types.ts`: `Programa`, `Accion`, `Video`, `Mater
 
 Clases CSS utilitarias custom definidas en `app/globals.css`:
 - `.glass` / `.glass-premium` — glassmorphism con `backdrop-blur` y `backdrop-saturate`
+- `.glass-dark` — glassmorphism oscuro (`rgba(13,21,38,.55)`)
 - `.bg-noise` — textura grain con SVG turbulence filter
+- `.bg-hero-premium` — fondo blanco con dot grid + 3 mesh gradients (para hero y secciones principales)
+- `.bg-auth-premium` — fondo azul claro con dot grid + gradients (para páginas de auth)
+- `.bg-content-subtle` — fondo gris suave `#f4f6fa` con dot grid (para secciones internas)
 - `.text-gradient` — gradiente multi-color en texto
+- `.card-glow` — sombra sutil + hover lift (`translateY(-2px)`) para cards
+- `.metric-value` — texto con gradiente azul para números de estadísticas
+- `.divider-fade` — línea divisoria horizontal con fade
+- `.badge-aprobado` / `.badge-pendiente` / `.badge-rechazado` — badges de estado de usuario
+- `.badge-rol-superadmin` / `.badge-rol-empleado` / `.badge-rol-lector` — badges de rol
+- `.section-divider` — decoración de encabezado de sección
 
 ## Build Config
 
