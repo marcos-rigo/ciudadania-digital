@@ -60,11 +60,7 @@ const benefits = [
 
 export function BenefitsSection() {
   return (
-    <section className="py-24 bg-slate-50 relative overflow-hidden">
-      {/* Background */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-gradient-to-r from-blue-100 via-violet-100 to-blue-100 rounded-full blur-3xl opacity-40" />
-      </div>
+    <section className="py-24 bg-content-subtle relative overflow-hidden">
 
       <div className="container mx-auto px-4 relative z-10">
         {/* Header */}
@@ -86,9 +82,8 @@ export function BenefitsSection() {
             return (
               <div
                 key={benefit.title}
-                className={`group relative p-6 rounded-2xl bg-white border border-slate-200 shadow-sm
-                  transition-all duration-300 hover:-translate-y-1
-                  hover:shadow-[0_8px_32px_rgba(15,23,42,0.08)]
+                className={`group relative p-6 rounded-2xl bg-white border border-slate-200/80
+                  card-glow transition-all duration-300 hover:-translate-y-1
                   ${benefit.hover}`}
               >
                 <div className="flex items-start gap-4">

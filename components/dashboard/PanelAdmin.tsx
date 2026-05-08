@@ -31,30 +31,30 @@ const pasos = [
 export function PanelAdmin() {
   return (
     <div className="space-y-6">
-      <div className="bg-white rounded-2xl border border-[#e8edf3] shadow-sm p-4 sm:p-8">
-        <h2 className="text-[#1A2A36] font-black text-xl flex items-center gap-2 mb-2">
-          <span className="w-8 h-8 bg-[#4272bb] rounded-lg flex items-center justify-center flex-shrink-0">
+      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-4 sm:p-8">
+        <h2 className="text-slate-800 font-black text-xl flex items-center gap-2 mb-2">
+          <span className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm shadow-blue-500/20">
             <Info className="text-white w-4 h-4" />
           </span>
           ¿Cómo funciona el sistema de carga?
         </h2>
-        <p className="text-[#64748b] text-sm mb-6">
+        <p className="text-slate-500 text-sm mb-6">
           Seguí estos pasos cada vez que registres una actividad de la Secretaría.
         </p>
         <div className="space-y-3">
           {pasos.map(p => (
             <div
               key={p.n}
-              className="flex gap-4 items-start p-4 rounded-xl bg-[#f6f7f8] border border-[#e2e8f0] hover:border-[#4272bb] hover:shadow-sm transition-all"
+              className="flex gap-4 items-start p-4 rounded-xl bg-slate-50/70 border border-slate-200/80 hover:border-blue-300/70 hover:bg-white hover:shadow-[0_4px_16px_rgba(43,84,194,.07)] transition-all"
             >
-              <div className="w-9 h-9 bg-[#4272bb] text-white rounded-full flex items-center justify-center font-black text-sm flex-shrink-0">
+              <div className="w-9 h-9 bg-gradient-to-br from-blue-600 to-blue-700 text-white rounded-xl flex items-center justify-center font-black text-sm flex-shrink-0 shadow-sm shadow-blue-500/20">
                 {p.n}
               </div>
               <div>
-                <h5 className="font-bold text-[#1A2A36] text-sm mb-0.5">{p.title}</h5>
-                <p className="text-[#4a5568] text-xs leading-relaxed">{p.desc}</p>
+                <h5 className="font-bold text-slate-800 text-sm mb-0.5">{p.title}</h5>
+                <p className="text-slate-500 text-xs leading-relaxed">{p.desc}</p>
                 {p.badge && (
-                  <span className="inline-flex items-center gap-1 mt-1.5 bg-green-100 text-green-700 text-[11px] font-semibold px-2.5 py-0.5 rounded-full">
+                  <span className="inline-flex items-center gap-1 mt-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200/70 text-[11px] font-semibold px-2.5 py-0.5 rounded-full">
                     <CheckCircle2 className="w-3 h-3" />
                     {p.badge}
                   </span>
@@ -77,14 +77,14 @@ export function PanelAdmin() {
         </a>
       </div>
 
-      <div className="bg-white rounded-2xl border border-[#e8edf3] shadow-sm p-4 sm:p-6">
-        <h2 className="text-[#1A2A36] font-black flex items-center gap-2 mb-5">
-          <span className="w-8 h-8 bg-[#4272bb] rounded-lg flex items-center justify-center flex-shrink-0">
+      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-4 sm:p-6">
+        <h2 className="text-slate-800 font-black flex items-center gap-2 mb-5">
+          <span className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm shadow-blue-500/20">
             <FileText className="text-white w-4 h-4" />
           </span>
           Datos para Informe de Gestión 2026
         </h2>
-        <div className="rounded-xl overflow-hidden border border-[#e2e8f0]">
+        <div className="rounded-2xl overflow-hidden border border-slate-200/80 shadow-[0_4px_24px_rgba(15,23,42,.07)]">
           <iframe
             src={`${FORMS_URL}&embed=true`}
             className="block w-full border-0 h-[480px] sm:h-[600px] lg:h-[720px]"

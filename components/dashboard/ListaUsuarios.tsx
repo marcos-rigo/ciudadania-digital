@@ -224,59 +224,62 @@ export function ListaUsuarios({ refetch }: { refetch?: number }) {
           </div>
 
           {/* Desktop: table */}
-          <div className="hidden sm:block bg-white rounded-lg border border-[#e2e8f0] overflow-hidden">
+          <div className="hidden sm:block rounded-2xl overflow-hidden border border-slate-200/80 shadow-sm">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-[#f8fafc] border-b border-[#e2e8f0]">
+                <thead className="bg-slate-50/80">
                   <tr>
-                    <th className="px-4 py-3 text-left font-semibold text-[#374151]">Nombre</th>
-                    <th className="px-4 py-3 text-left font-semibold text-[#374151]">Email</th>
-                    <th className="px-4 py-3 text-left font-semibold text-[#374151]">Rol</th>
-                    <th className="px-4 py-3 text-center font-semibold text-[#374151]">Acciones</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-200/70">Nombre</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-200/70">Email</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-200/70">Rol</th>
+                    <th className="px-4 py-3 text-center text-xs font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-200/70">Acciones</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#e2e8f0]">
+                <tbody className="bg-white divide-y divide-slate-100">
                   {usuarios.map((u, i) => (
-                    <tr key={i} className="hover:bg-[#f8fafc] transition-colors">
+                    <tr key={i} className="hover:bg-blue-50/20 transition-colors">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
-                          <User className="w-4 h-4 text-[#94a3b8]" />
-                          <span className="text-[#1A2A36] font-medium">{u.nombre}</span>
+                          <User className="w-4 h-4 text-slate-300 flex-shrink-0" />
+                          <span className="text-slate-800 font-medium">{u.nombre}</span>
                         </div>
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
-                          <Mail className="w-4 h-4 text-[#94a3b8]" />
-                          <span className="text-[#64748b]">{u.email}</span>
+                          <Mail className="w-4 h-4 text-slate-300 flex-shrink-0" />
+                          <span className="text-slate-500 text-xs">{u.email}</span>
                         </div>
                       </td>
                       <td className="px-4 py-3">
-                        <div className="flex items-center gap-2">
-                          <Shield className="w-4 h-4 text-[#4272bb]" />
-                          <span className="text-[#4272bb] font-medium capitalize">{u.rol}</span>
-                        </div>
+                        <span className={
+                          u.rol === 'superadmin' ? 'badge-rol-superadmin' :
+                          u.rol === 'empleado'   ? 'badge-rol-empleado'   :
+                          'badge-rol-lector'
+                        }>
+                          {u.rol === 'superadmin' ? 'Superadmin' : u.rol === 'empleado' ? 'Empleado' : 'Lector'}
+                        </span>
                       </td>
                       <td className="px-4 py-3">
-                        <div className="flex items-center justify-center gap-2">
+                        <div className="flex items-center justify-center gap-1.5">
                           {u.rol !== 'superadmin' ? (
                             <>
                               <button
                                 onClick={() => abrirEditar(u)}
                                 title="Editar usuario"
-                                className="p-1.5 rounded-md text-[#4272bb] hover:bg-[#4272bb]/10 transition-colors"
+                                className="p-1.5 rounded-lg text-blue-500 hover:bg-blue-50 hover:text-blue-700 transition-colors"
                               >
                                 <Edit className="w-4 h-4" />
                               </button>
                               <button
                                 onClick={() => { setUsuarioEliminar(u); setDeleteError('') }}
                                 title="Eliminar usuario"
-                                className="p-1.5 rounded-md text-red-500 hover:bg-red-50 transition-colors"
+                                className="p-1.5 rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-600 transition-colors"
                               >
                                 <Trash2 className="w-4 h-4" />
                               </button>
                             </>
                           ) : (
-                            <span className="text-xs text-slate-400 italic px-2">—</span>
+                            <span className="text-xs text-slate-300 italic px-2">—</span>
                           )}
                         </div>
                       </td>

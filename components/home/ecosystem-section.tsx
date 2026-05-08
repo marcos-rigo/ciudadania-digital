@@ -64,12 +64,9 @@ const cardVariant = {
 
 export function EcosystemSection() {
   return (
-    <section className="py-24 md:py-32 relative overflow-hidden bg-white">
-      {/* Background */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-50 to-transparent rounded-full blur-3xl opacity-70" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-violet-50 to-transparent rounded-full blur-3xl opacity-60" />
-      </div>
+    <section className="py-24 md:py-32 relative overflow-hidden bg-hero-premium">
+      {/* Grain */}
+      <div className="bg-noise" />
 
       <div className="container mx-auto px-4 relative z-10">
         {/* Header */}
@@ -110,9 +107,9 @@ export function EcosystemSection() {
             return (
               <motion.div key={module.title} variants={cardVariant} className="group">
                 <Card
-                  className={`h-full overflow-hidden border border-slate-200 bg-white
-                    shadow-sm transition-all duration-300 hover:-translate-y-1.5
-                    ${module.borderHover} ${module.shadowHover}`}
+                  className={`h-full overflow-hidden border border-slate-200/80 bg-white/95
+                    card-glow transition-all duration-300 hover:-translate-y-1.5
+                    ${module.borderHover}`}
                 >
                   {/* Hover gradient overlay */}
                   <div
@@ -162,7 +159,7 @@ export function EcosystemSection() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
           viewport={{ once: true }}
-          className="mt-16 p-8 rounded-2xl border border-blue-100 bg-gradient-to-br from-blue-50 to-violet-50 text-center max-w-2xl mx-auto shadow-sm"
+          className="mt-16 p-8 rounded-2xl border border-blue-200/60 bg-gradient-to-br from-blue-50/80 to-violet-50/60 text-center max-w-2xl mx-auto card-glow"
         >
           <p className="text-slate-700 font-medium">
             Todos los módulos comparten la misma base de datos para garantizar{' '}

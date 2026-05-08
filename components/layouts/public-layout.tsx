@@ -49,9 +49,16 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
   const router   = useRouter()
   const [user, setUser]       = useState<SpcAuth | null>(null)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
 
   useEffect(() => {
     setUser(readSpcAuth())
+  }, [])
+
+  useEffect(() => {
+    const fn = () => setScrolled(window.scrollY > 8)
+    window.addEventListener('scroll', fn, { passive: true })
+    return () => window.removeEventListener('scroll', fn)
   }, [])
 
   // Cerrar menú al cambiar ruta
@@ -88,7 +95,10 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       {/* ── HEADER ── */}
-      <header className="sticky top-0 z-50 w-full bg-white/90 backdrop-blur-xl border-b border-slate-200 shadow-sm">
+      <header className={cn(
+        "sticky top-0 z-50 w-full bg-white/92 backdrop-blur-xl transition-all duration-200",
+        scrolled ? "border-b border-slate-200/80 shadow-sm" : "border-b border-transparent"
+      )}>
         {/* Accent bar */}
         <div className="h-0.5 w-full bg-gradient-to-r from-blue-600 via-violet-600 to-blue-600" />
 

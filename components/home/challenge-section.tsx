@@ -16,12 +16,7 @@ const rightItems = [
 
 export function ChallengeSection() {
   return (
-    <section className="py-24 bg-slate-50 relative overflow-hidden">
-      {/* Background accent */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 right-0 w-72 h-72 bg-gradient-to-br from-blue-100 to-transparent rounded-full blur-3xl opacity-60" />
-        <div className="absolute bottom-0 left-0 w-72 h-72 bg-gradient-to-tr from-violet-100 to-transparent rounded-full blur-3xl opacity-50" />
-      </div>
+    <section className="py-24 bg-content-subtle relative overflow-hidden">
 
       <div className="container mx-auto px-4 relative z-10">
         {/* Header */}
@@ -37,7 +32,7 @@ export function ChallengeSection() {
 
         <div className="grid lg:grid-cols-2 gap-6 lg:gap-8 max-w-5xl mx-auto">
           {/* La Oportunidad */}
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 hover:shadow-[0_8px_32px_rgba(37,99,235,0.10)] hover:border-blue-200 transition-all duration-300 group">
+          <div className="bg-white rounded-2xl border border-slate-200/80 card-glow p-8 hover:border-blue-200 transition-all duration-300 group">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-sm font-semibold mb-6">
               <Lightbulb className="h-4 w-4" />
               La Oportunidad
@@ -62,7 +57,7 @@ export function ChallengeSection() {
           </div>
 
           {/* La Experiencia */}
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 hover:shadow-[0_8px_32px_rgba(109,40,217,0.10)] hover:border-violet-200 transition-all duration-300 group">
+          <div className="bg-white rounded-2xl border border-slate-200/80 card-glow p-8 hover:border-violet-200 transition-all duration-300 group">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-sm font-semibold mb-6">
               <CheckCircle2 className="h-4 w-4" />
               La Experiencia

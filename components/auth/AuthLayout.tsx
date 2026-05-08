@@ -4,15 +4,12 @@ import { ArrowLeft } from 'lucide-react'
 
 export function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50">
-      {/* Accent bar top */}
-      <div className="h-1 w-full bg-gradient-to-r from-blue-600 via-violet-600 to-blue-600" />
-
+    <div className="min-h-screen flex flex-col bg-auth-premium">
       {/* Back button */}
-      <div className="px-6 pt-5">
+      <div className="px-6 pt-5 relative z-10">
         <Link
           href="/inicio"
-          className="inline-flex items-center gap-2 text-slate-500 hover:text-blue-600 text-sm font-medium transition-colors duration-200"
+          className="inline-flex items-center gap-2 text-slate-500 hover:text-blue-700 text-sm font-medium transition-colors duration-200"
         >
           <ArrowLeft className="w-4 h-4" />
           Volver al inicio
@@ -20,15 +17,14 @@ export function AuthLayout({ children }: { children: React.ReactNode }) {
       </div>
 
       {/* Card */}
-      <div className="flex-1 flex items-center justify-center px-4 py-8">
-        <div className="w-full max-w-[440px] bg-white rounded-[20px] px-10 py-12 shadow-[0_8px_40px_rgba(37,99,235,.10)] border border-slate-200">
+      <div className="flex-1 flex items-center justify-center px-4 py-8 relative z-10">
+        <div className="w-full max-w-[440px] bg-white/96 backdrop-blur-sm rounded-2xl px-10 py-12 shadow-[0_16px_64px_rgba(43,84,194,.16),0_4px_20px_rgba(15,23,42,.08)] border border-blue-100/70">
           {children}
         </div>
       </div>
 
       {/* Footer */}
-      <footer className="border-t border-slate-200 bg-white">
-        <div className="h-0.5 w-full bg-gradient-to-r from-blue-600 via-violet-600 to-blue-600" />
+      <footer className="border-t border-white/50 bg-white/40 backdrop-blur-sm relative z-10">
         <div className="container mx-auto px-4 py-8">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-6">
             <p className="text-sm text-slate-400">

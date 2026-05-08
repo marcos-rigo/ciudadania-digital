@@ -8,15 +8,15 @@ import { cn } from '@/lib/utils'
 
 const BADGE: Record<string, { cls: string; label: string }> = {
   superadmin: {
-    cls: 'bg-violet-100 text-violet-700 border border-violet-200',
+    cls: 'bg-violet-500/20 text-violet-300 border border-violet-500/30',
     label: 'Superadmin',
   },
   empleado: {
-    cls: 'bg-blue-100 text-blue-700 border border-blue-200',
+    cls: 'bg-blue-500/20 text-blue-300 border border-blue-500/30',
     label: 'Empleado',
   },
   lector: {
-    cls: 'bg-slate-100 text-slate-600 border border-slate-200',
+    cls: 'bg-slate-500/20 text-slate-300 border border-slate-500/30',
     label: 'Lector',
   },
 }
@@ -49,50 +49,54 @@ export function DashboardLayout({ nombre, rol, children }: Props) {
     cn(
       'px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 flex items-center gap-2',
       active
-        ? 'bg-blue-50 text-blue-700 shadow-sm border border-blue-200'
-        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+        ? 'bg-white/12 text-white border border-white/15'
+        : 'text-slate-300 hover:text-white hover:bg-white/8'
     )
 
   const mobileNavLinkCls = (active: boolean) =>
     cn(
       'flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 w-full',
       active
-        ? 'bg-blue-50 text-blue-700 border border-blue-200'
-        : 'text-slate-600 hover:bg-slate-100'
+        ? 'bg-white/12 text-white border border-white/15'
+        : 'text-slate-300 hover:bg-white/8 hover:text-white'
     )
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      {/* ── HEADER — mismo estilo que public-layout ── */}
-      <header className="sticky top-0 z-50 w-full bg-white/90 backdrop-blur-xl border-b border-slate-200 shadow-sm">
+    <div className="min-h-screen flex flex-col bg-content-subtle">
+      {/* ── HEADER OSCURO ── */}
+      <header className="sticky top-0 z-50 w-full bg-[#0a1428]/95 backdrop-blur-xl shadow-lg">
         {/* Accent bar */}
-        <div className="h-0.5 w-full bg-gradient-to-r from-blue-600 via-violet-600 to-blue-600" />
+        <div className="h-0.5 w-full bg-gradient-to-r from-blue-600 via-violet-500 to-blue-600" />
 
         <div className="flex h-16 items-center px-4 lg:px-8 gap-4">
           {/* Hamburger — solo mobile */}
           <button
-            className="lg:hidden flex-shrink-0 flex items-center justify-center w-9 h-9 rounded-lg text-slate-500 hover:bg-slate-100 transition-colors"
+            className="lg:hidden flex-shrink-0 flex items-center justify-center w-9 h-9 rounded-lg text-slate-300 hover:bg-white/10 transition-colors"
             onClick={() => setMenuOpen(v => !v)}
             aria-label="Menú de navegación"
           >
             {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
 
-          {/* Logo — idéntico al de /inicio */}
-          <Link href="/dashboard/estadisticas" className="flex items-center shrink-0">
+          {/* Logo — invertido para header oscuro */}
+          <Link href="/inicio" className="flex items-center shrink-0">
             <div className="relative h-14 w-48">
               <Image
                 src="/logo1.png"
                 alt="Secretaría de Participación Ciudadana"
                 fill
-                className="object-contain"
+                className="object-contain brightness-0 invert"
               />
             </div>
           </Link>
 
-          {/* Nav centrado — mismo estilo que /inicio */}
+          {/* Nav centrado */}
           <div className="flex-1 flex items-center justify-center">
             <nav className="hidden lg:flex items-center gap-1">
+              <Link href="/inicio" className={navLinkCls(false)}>
+                <Globe className="w-4 h-4" />
+                Inicio
+              </Link>
               {puedeCargar && (
                 <Link href="/dashboard/admin" className={navLinkCls(cargaActive)}>
                   <LayoutDashboard className="w-4 h-4" />
@@ -109,18 +113,14 @@ export function DashboardLayout({ nombre, rol, children }: Props) {
                   Usuarios
                 </Link>
               )}
-              <Link href="/inicio" className={navLinkCls(false)}>
-                <Globe className="w-4 h-4" />
-                Sitio público
-              </Link>
             </nav>
           </div>
 
           {/* Derecha: usuario + logout */}
           <div className="flex items-center gap-2 shrink-0">
-            {/* Badge de usuario */}
-            <div className="hidden sm:flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-full pl-3 pr-2 py-1.5">
-              <span className="text-sm font-medium text-slate-700 max-w-[140px] truncate">
+            {/* Chip de usuario — desktop */}
+            <div className="hidden sm:flex items-center gap-2 bg-white/8 border border-white/12 rounded-full pl-3 pr-2 py-1.5">
+              <span className="text-sm font-medium text-slate-200 max-w-[140px] truncate">
                 {nombre}
               </span>
               <span className={cn('text-[11px] font-bold px-2.5 py-0.5 rounded-full', badge.cls)}>
@@ -136,7 +136,7 @@ export function DashboardLayout({ nombre, rol, children }: Props) {
             <button
               onClick={handleLogout}
               title="Cerrar sesión"
-              className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium bg-slate-50 hover:bg-red-50 border border-slate-200 hover:border-red-200 rounded-lg transition-all duration-200 text-slate-500 hover:text-red-600"
+              className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium bg-white/5 hover:bg-red-500/15 border border-white/10 hover:border-red-500/25 rounded-lg transition-all duration-200 text-slate-400 hover:text-red-400"
             >
               <LogOut className="w-4 h-4" />
               <span className="hidden sm:inline">Salir</span>
@@ -146,17 +146,20 @@ export function DashboardLayout({ nombre, rol, children }: Props) {
 
         {/* Mobile nav */}
         {menuOpen && (
-          <div className="lg:hidden border-t border-slate-100 bg-white/95 backdrop-blur-xl px-4 py-3 space-y-1 shadow-lg">
+          <div className="lg:hidden border-t border-white/8 bg-[#0a1428]/98 backdrop-blur-xl px-4 py-3 space-y-1 shadow-xl">
             {/* Info de usuario en mobile */}
-            <div className="flex items-center gap-3 px-4 py-3 mb-1 bg-slate-50 rounded-xl">
+            <div className="flex items-center gap-3 px-4 py-3 mb-1 bg-white/8 rounded-xl border border-white/8">
               <div className="min-w-0">
-                <p className="text-sm font-semibold text-slate-800 truncate">{nombre}</p>
+                <p className="text-sm font-semibold text-white truncate">{nombre}</p>
                 <span className={cn('text-[11px] font-bold px-2 py-0.5 rounded-full', badge.cls)}>
                   {badge.label}
                 </span>
               </div>
             </div>
 
+            <Link href="/inicio" onClick={() => setMenuOpen(false)} className={mobileNavLinkCls(false)}>
+              <Globe className="w-4 h-4" /> Inicio
+            </Link>
             {puedeCargar && (
               <Link href="/dashboard/admin" onClick={() => setMenuOpen(false)} className={mobileNavLinkCls(cargaActive)}>
                 <LayoutDashboard className="w-4 h-4" /> Carga
@@ -170,14 +173,11 @@ export function DashboardLayout({ nombre, rol, children }: Props) {
                 <Users className="w-4 h-4" /> Usuarios
               </Link>
             )}
-            <Link href="/inicio" onClick={() => setMenuOpen(false)} className={mobileNavLinkCls(false)}>
-              <Globe className="w-4 h-4" /> Sitio público
-            </Link>
 
-            <div className="pt-2 border-t border-slate-100">
+            <div className="pt-2 border-t border-white/8">
               <button
                 onClick={() => { setMenuOpen(false); handleLogout() }}
-                className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 w-full transition-colors"
+                className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-red-400 hover:bg-red-500/15 w-full transition-colors"
               >
                 <LogOut className="w-4 h-4" /> Cerrar sesión
               </button>
@@ -190,9 +190,9 @@ export function DashboardLayout({ nombre, rol, children }: Props) {
         {children}
       </main>
 
-      {/* Footer — mismo estilo que /inicio */}
+      {/* Footer */}
       <footer className="border-t border-slate-200 bg-white mt-auto">
-        <div className="h-0.5 w-full bg-gradient-to-r from-blue-600 via-violet-600 to-blue-600" />
+        <div className="h-0.5 w-full bg-gradient-to-r from-blue-600 via-violet-500 to-blue-600" />
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-sm text-slate-400">
