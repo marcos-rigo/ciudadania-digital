@@ -1,11 +1,11 @@
 'use client'
 
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { BarChart2 } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import { RefreshButton } from './RefreshButton'
-import type { PowerBIEmbedProps, RefreshState } from '@/types/powerbi'
+import type { PowerBIEmbedProps } from '@/types/powerbi'
 
 const POWERBI_SRC =
   'https://app.powerbi.com/reportEmbed?reportId=b8b0a508-a804-43fe-b434-193641e9fae4&autoAuth=true&ctid=843d9746-0674-48bf-a402-a45cd06f541a&actionBarEnabled=true'
@@ -17,7 +17,6 @@ function formatMinutos(date: Date): string {
   return `hace ${diff} min`
 }
 
-// Verde <10 min · Amarillo 10-30 min · Rojo >30 min
 function badgeClasses(date: Date | null): string {
   if (!date) return 'bg-slate-100 text-slate-500 border-slate-200'
   const min = Math.floor((Date.now() - date.getTime()) / 60000)
@@ -29,50 +28,12 @@ function badgeClasses(date: Date | null): string {
 export function PowerBIEmbed({
   src = POWERBI_SRC,
   title = 'datos-SPC',
-  autoRefreshMinutes = 30,
 }: PowerBIEmbedProps) {
   const [iframeKey, setIframeKey] = useState('init')
-  const [state, setState] = useState<RefreshState>({
-    isLoading: true,
-    lastRefresh: null,
-    isPaused: false,
-  })
-  // Tick para re-renderizar el badge de tiempo sin tocar el estado principal
+  const [isLoading, setIsLoading] = useState(true)
+  const [lastRefresh, setLastRefresh] = useState<Date | null>(null)
   const [, setTick] = useState(0)
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const isFirstLoad = useRef(true)
-
-  const stopInterval = useCallback(() => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current)
-      intervalRef.current = null
-    }
-  }, [])
-
-  const startInterval = useCallback(() => {
-    stopInterval()
-    intervalRef.current = setInterval(() => {
-      setIframeKey(`auto-${Date.now()}`)
-      setState(s => ({ ...s, isLoading: true }))
-    }, autoRefreshMinutes * 60 * 1000)
-  }, [autoRefreshMinutes, stopInterval])
-
-  // Gestionar el intervalo según isPaused
-  useEffect(() => {
-    if (!state.isPaused) startInterval()
-    else stopInterval()
-    return stopInterval
-  }, [state.isPaused, startInterval, stopInterval])
-
-  // Pausar auto-refresh cuando la pestaña del browser está inactiva
-  useEffect(() => {
-    function handleVisibility() {
-      if (document.hidden) stopInterval()
-      else if (!state.isPaused) startInterval()
-    }
-    document.addEventListener('visibilitychange', handleVisibility)
-    return () => document.removeEventListener('visibilitychange', handleVisibility)
-  }, [state.isPaused, startInterval, stopInterval])
 
   // Actualizar el texto "hace X min" cada minuto
   useEffect(() => {
@@ -82,7 +43,8 @@ export function PowerBIEmbed({
 
   function handleLoad() {
     const now = new Date()
-    setState(s => ({ ...s, isLoading: false, lastRefresh: now }))
+    setIsLoading(false)
+    setLastRefresh(now)
     if (!isFirstLoad.current) {
       toast.success('Dashboard actualizado', {
         description: `Actualizado a las ${now.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}`,
@@ -94,11 +56,7 @@ export function PowerBIEmbed({
 
   function handleRefresh() {
     setIframeKey(`manual-${Date.now()}`)
-    setState(s => ({ ...s, isLoading: true }))
-  }
-
-  function handleTogglePause() {
-    setState(s => ({ ...s, isPaused: !s.isPaused }))
+    setIsLoading(true)
   }
 
   return (
@@ -118,29 +76,20 @@ export function PowerBIEmbed({
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
-          {/* Badge de última actualización */}
           <span
-            className={`inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full border ${badgeClasses(state.lastRefresh)}`}
+            className={`inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full border ${badgeClasses(lastRefresh)}`}
           >
             <span className="w-1.5 h-1.5 rounded-full bg-current" />
-            {state.lastRefresh
-              ? `Última actualización: ${formatMinutos(state.lastRefresh)}`
-              : 'Cargando…'}
+            {lastRefresh ? `Última actualización: ${formatMinutos(lastRefresh)}` : 'Cargando…'}
           </span>
 
-          <RefreshButton
-            isLoading={state.isLoading}
-            isPaused={state.isPaused}
-            onRefresh={handleRefresh}
-            onTogglePause={handleTogglePause}
-          />
+          <RefreshButton isLoading={isLoading} onRefresh={handleRefresh} />
         </div>
       </div>
 
       {/* Contenedor del iframe */}
       <div className="relative w-full h-[380px] sm:h-[520px] md:h-[700px] lg:h-[820px]">
-        {/* Skeleton superpuesto mientras carga */}
-        {state.isLoading && (
+        {isLoading && (
           <div className="absolute inset-0 z-10 bg-white p-4 flex flex-col gap-3">
             <Skeleton className="h-10 w-3/4 rounded-lg" />
             <Skeleton className="flex-1 w-full rounded-xl" />
@@ -156,8 +105,7 @@ export function PowerBIEmbed({
           onLoad={handleLoad}
         />
 
-        {/* Hint de scroll en mobile */}
-        {!state.isLoading && (
+        {!isLoading && (
           <div className="absolute bottom-3 right-3 sm:hidden pointer-events-none">
             <span className="bg-black/60 text-white text-[11px] px-2.5 py-1.5 rounded-full backdrop-blur-sm">
               Deslizá para explorar →

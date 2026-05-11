@@ -8,8 +8,40 @@ const ROLES = [
   { value: 'superadmin', label: 'Superadministrador' },
 ]
 
+const NOMBRE_RE = /^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ ]+$/
+const EMAIL_RE = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/
+
+function validarNombre(v: string) {
+  if (!v.trim()) return 'El nombre es obligatorio.'
+  if (!NOMBRE_RE.test(v)) return 'Solo se permiten letras y espacios.'
+  if (v.trim().length > 15) return 'Máximo 15 caracteres.'
+  return ''
+}
+
+function validarEmail(v: string) {
+  if (!v.trim()) return 'El correo es obligatorio.'
+  if (!EMAIL_RE.test(v.trim())) return 'Ingresá un correo electrónico válido.'
+  return ''
+}
+
+function validarPassword(v: string) {
+  if (!v) return 'La contraseña es obligatoria.'
+  if (v.length < 6) return 'Mínimo 6 caracteres.'
+  if (!/[A-Z]/.test(v)) return 'Debe incluir al menos una mayúscula.'
+  if (!/[a-z]/.test(v)) return 'Debe incluir al menos una minúscula.'
+  if (!/[0-9]/.test(v)) return 'Debe incluir al menos un número.'
+  if (!/[^a-zA-Z0-9]/.test(v)) return 'Debe incluir al menos un signo especial (ej: @, #, !).'
+  return ''
+}
+
 const inputCls =
-  'w-full py-2.5 px-3 pl-9 border border-slate-200 rounded-lg text-sm text-slate-800 bg-white outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/15 transition-all placeholder:text-slate-400'
+  'w-full py-2.5 px-3 pl-9 border rounded-lg text-sm text-slate-800 bg-white outline-none focus:ring-2 transition-all placeholder:text-slate-400'
+
+function inputState(touched: boolean, error: string) {
+  if (!touched) return 'border-slate-200 focus:border-blue-500 focus:ring-blue-500/15'
+  if (error) return 'border-red-400 focus:border-red-400 focus:ring-red-400/15'
+  return 'border-green-400 focus:border-green-400 focus:ring-green-400/15'
+}
 
 const labelCls = 'block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wide'
 
@@ -20,18 +52,28 @@ export function CrearUsuarioForm({ onUsuarioCreado }: { onUsuarioCreado: () => v
   const [rol, setRol] = useState('empleado')
   const [showPwd, setShowPwd] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
+  const [apiError, setApiError] = useState('')
   const [success, setSuccess] = useState('')
+
+  const [touched, setTouched] = useState({ nombre: false, email: false, password: false })
+
+  const errors = {
+    nombre: validarNombre(nombre),
+    email: validarEmail(email),
+    password: validarPassword(password),
+  }
+
+  function touch(field: keyof typeof touched) {
+    setTouched(t => ({ ...t, [field]: true }))
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    setError('')
+    setApiError('')
     setSuccess('')
+    setTouched({ nombre: true, email: true, password: true })
 
-    if (!nombre || !email || !password) {
-      setError('Completá todos los campos.')
-      return
-    }
+    if (errors.nombre || errors.email || errors.password) return
 
     setLoading(true)
     try {
@@ -39,7 +81,7 @@ export function CrearUsuarioForm({ onUsuarioCreado }: { onUsuarioCreado: () => v
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          nombre,
+          nombre: nombre.trim(),
           email: email.trim().toLowerCase(),
           password,
           rol,
@@ -50,18 +92,19 @@ export function CrearUsuarioForm({ onUsuarioCreado }: { onUsuarioCreado: () => v
       const data = await res.json()
 
       if (!data.ok) {
-        setError(data.error || 'Error al crear usuario.')
+        setApiError(data.error || 'Error al crear usuario.')
         return
       }
 
-      setSuccess(`Usuario ${nombre} creado correctamente.`)
+      setSuccess(`Usuario ${nombre.trim()} creado correctamente.`)
       setNombre('')
       setEmail('')
       setPassword('')
       setRol('empleado')
+      setTouched({ nombre: false, email: false, password: false })
       onUsuarioCreado()
     } catch {
-      setError('Error de conexión. Intentá de nuevo.')
+      setApiError('Error de conexión. Intentá de nuevo.')
     } finally {
       setLoading(false)
     }
@@ -78,11 +121,22 @@ export function CrearUsuarioForm({ onUsuarioCreado }: { onUsuarioCreado: () => v
             type="text"
             value={nombre}
             onChange={e => setNombre(e.target.value)}
+            onBlur={() => touch('nombre')}
             placeholder="María García"
-            className={inputCls}
+            maxLength={15}
+            className={`${inputCls} ${inputState(touched.nombre, errors.nombre)}`}
             autoComplete="off"
           />
         </div>
+        {touched.nombre && errors.nombre && (
+          <p className="mt-1 text-xs text-red-500">{errors.nombre}</p>
+        )}
+        {!errors.nombre && touched.nombre && (
+          <p className="mt-1 text-xs text-slate-400 text-right">{nombre.trim().length}/15</p>
+        )}
+        {!touched.nombre && (
+          <p className="mt-1 text-xs text-slate-400">Solo letras, máximo 15 caracteres.</p>
+        )}
       </div>
 
       {/* Email */}
@@ -94,11 +148,15 @@ export function CrearUsuarioForm({ onUsuarioCreado }: { onUsuarioCreado: () => v
             type="email"
             value={email}
             onChange={e => setEmail(e.target.value)}
+            onBlur={() => touch('email')}
             placeholder="maria@ejemplo.com"
-            className={inputCls}
+            className={`${inputCls} ${inputState(touched.email, errors.email)}`}
             autoComplete="off"
           />
         </div>
+        {touched.email && errors.email && (
+          <p className="mt-1 text-xs text-red-500">{errors.email}</p>
+        )}
       </div>
 
       {/* Contraseña */}
@@ -110,8 +168,9 @@ export function CrearUsuarioForm({ onUsuarioCreado }: { onUsuarioCreado: () => v
             type={showPwd ? 'text' : 'password'}
             value={password}
             onChange={e => setPassword(e.target.value)}
-            placeholder="Mínimo 6 caracteres"
-            className={`${inputCls} pr-10`}
+            onBlur={() => touch('password')}
+            placeholder="Ej: MiClave1!"
+            className={`${inputCls} pr-10 ${inputState(touched.password, errors.password)}`}
             autoComplete="new-password"
           />
           <button
@@ -123,6 +182,13 @@ export function CrearUsuarioForm({ onUsuarioCreado }: { onUsuarioCreado: () => v
             {showPwd ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
           </button>
         </div>
+        {touched.password && errors.password ? (
+          <p className="mt-1 text-xs text-red-500">{errors.password}</p>
+        ) : !touched.password ? (
+          <p className="mt-1 text-xs text-slate-400">
+            Mín. 6 caracteres · mayúscula · minúscula · número · signo especial
+          </p>
+        ) : null}
       </div>
 
       {/* Rol */}
@@ -133,7 +199,7 @@ export function CrearUsuarioForm({ onUsuarioCreado }: { onUsuarioCreado: () => v
           <select
             value={rol}
             onChange={e => setRol(e.target.value)}
-            className={`${inputCls} appearance-none cursor-pointer`}
+            className={`${inputCls} border-slate-200 focus:border-blue-500 focus:ring-blue-500/15 appearance-none cursor-pointer`}
           >
             {ROLES.map(r => (
               <option key={r.value} value={r.value}>{r.label}</option>
@@ -148,10 +214,10 @@ export function CrearUsuarioForm({ onUsuarioCreado }: { onUsuarioCreado: () => v
       </div>
 
       {/* Feedback */}
-      {error && (
+      {apiError && (
         <div className="flex items-start gap-2.5 bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3">
           <span className="mt-0.5 flex-shrink-0">⚠</span>
-          {error}
+          {apiError}
         </div>
       )}
       {success && (

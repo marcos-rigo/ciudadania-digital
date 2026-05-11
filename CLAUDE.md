@@ -44,7 +44,7 @@ Root layout: `app/layout.tsx` with `ThemeProvider` (next-themes, dark/light via 
 
 Auth pages: `/login`, `/registro`, `/verificar`, `/pendiente`, `/reset`, `/reset/nueva`
 
-Each page uses a component from `components/auth/` that calls the corresponding API route.
+Each page uses a component from `components/auth/` that calls the corresponding API route. `AuthLayout` (`components/auth/AuthLayout.tsx`) is a shared wrapper used by all auth pages — maneja el fondo `.bg-auth-premium` y el centrado vertical.
 
 **Login flow:**
 1. POST `/api/auth/login` → hash SHA256, query Supabase `usuarios` by email
@@ -69,7 +69,7 @@ spc_auth = JSON.stringify({ nombre, rol })
 
 **Solo `/dashboard/**` está protegido por el middleware.** Las rutas `/gestion/**` y `/equipo/**` son accesibles sin autenticación — son UIs de demo con datos mock.
 
-Matcher: `['/login', '/dashboard/:path*']`
+Matcher: `['/((?!_next/).*)]'` — intercepta todas las rutas excepto assets de Next.js. La lógica solo actúa sobre `/dashboard` y `/login`.
 
 Route guards in middleware:
 - `/dashboard/admin/usuarios` — only `superadmin`; others redirected to `/dashboard/estadisticas`
@@ -151,6 +151,15 @@ Todas las páginas públicas y de equipo usan datos estáticos — sin llamadas 
 - `/lib/mock/ciudadania-data.ts` — trayectos, videos educativos, podcasts, evaluaciones, certificados
 
 Interfaces principales en `/lib/types.ts`: `Programa`, `Accion`, `Video`, `Material`, `Tablero`, `Usuario`, `AnalisisIA`. Interfaces de ciudadanía en `/lib/types-ciudadania.ts`: `Trayecto`, `Modulo`, `Evaluacion`, `Certificado`. Tipos del dashboard Power BI en `/types/powerbi.ts`: `PowerBIEmbedProps`, `RefreshState`, `AnioFilter`.
+
+## Home Page Components (`/inicio`)
+
+Secciones en `components/home/` (todas client-side con framer-motion):
+- `HeroSection` — hero principal con CTA y animaciones
+- `EcosystemSection` — descripción del ecosistema de participación
+- `BenefitsSection` — beneficios de la plataforma
+- `ScalabilitySection` — sección de escalabilidad/alcance
+- `ChallengeSection` — sección de desafíos (existe pero no se usa en `/inicio` actualmente)
 
 ## Dashboard Components
 
