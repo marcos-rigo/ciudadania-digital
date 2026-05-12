@@ -117,7 +117,8 @@ Route guards in middleware:
 
 ### Client-side Supabase (`lib/supabase-client.ts`)
 
-- `sbGetActividades(filtros)` — lee tabla `actividades` (para `PanelEstadisticas`)
+- `sbGetActividades(filtros)` — lee tabla `actividades` (para `PanelEstadisticas` tab 2025)
+- `sbGetActividades2026(filtros?)` — lee tabla `actividades_2026` con `select=*&order=fecha.desc` (para tab 2026)
 
 **Supabase directo (sin SDK):** Tanto `lib/auth-server.ts` como `lib/supabase-client.ts` usan la REST API de Supabase directamente con `fetch`, sin el SDK de Supabase. Los filtros se pasan como `URLSearchParams` con operadores PostgREST (`eq.`, `gte.`, `lt.`). Las respuestas non-ok lanzan error en el servidor; el cliente recibe `{ ok: false, error }`. Todas las llamadas usan `cache: 'no-store'`.
 
@@ -138,6 +139,9 @@ RLS: deshabilitado (`ALTER TABLE usuarios DISABLE ROW LEVEL SECURITY`).
 
 ### Tabla `actividades`
 Columnas usadas en el código: `fecha`, `programa`, `localidad`, `cantidad_personas`, `usuario_nombre`, `created_at`. Alimentada por Microsoft Forms → Excel (no por el app Next.js directamente).
+
+### Tabla `actividades_2026`
+Columnas: `id`, `fecha`, `programa`, `localidad`, `cantidad_personas`, `usuario_nombre`, `estrategia`, `institucion`, `direccion`, `duracion`, `grupo_etario`, `tematica`, `descripcion`, `created_at`. Misma fuente (MS Forms). Lógica de agregación en `lib/estadisticas-utils.ts` (`calcularKPIs`, `agruparPorMes`, `calcularPersonasPorMes`, `agruparPorPrograma`, `agruparPorLocalidad`, `agruparPorTematica`).
 
 ## Usuarios seed (dev)
 
@@ -165,7 +169,7 @@ Secciones en `components/home/` (todas client-side con framer-motion):
 
 - `DashboardLayout` — nav header con nombre, badge de rol, botón logout. Logo lleva a `/inicio`. Nav order: Inicio → Carga → Estadísticas → Usuarios.
 - `PanelAdmin` — embed de MS Forms iframe + instrucciones de carga
-- `PanelEstadisticas` — tab 2025: fetch completo de actividades, 4 KPI cards (actividades, personas, municipios, promedio), filtros (search + programa + localidad) + paginación 10 por página, y 4 gráficos recharts (evolución mensual, personas por mes, por programa, cobertura territorial). Stats/tabla sobre `filtered`; gráficos sobre `data` completa. Tab 2026: PowerBIEmbed. Lee el query param `?anio=2025|2026`.
+- `PanelEstadisticas` — lee el query param `?anio=2025|2026`. Tab 2025: fetch de tabla `actividades`, 4 KPI cards, filtros (search + programa + localidad) + paginación 10/pág, 4 gráficos recharts (evolución mensual, personas por mes, por programa, cobertura territorial). Stats/tabla sobre `filtered`; gráficos sobre `data` completa. Tab 2026: header con badge "En vivo" + botón de refresh manual; 4 KPI cards con animación framer-motion (fadeUp + stagger); 5 gráficos recharts (BarChart evolución mensual, AreaChart personas/mes con gradiente, Donut por programa, BarChart horizontal top municipios, BarChart horizontal temáticas); estado vacío elegante si no hay datos; separador visual; `PowerBIEmbed` al final. Datos de 2026 desde tabla `actividades_2026` vía `sbGetActividades2026` (fetch en primer render del tab, refresh manual). Lógica de gráficos delegada a `lib/estadisticas-utils.ts`.
 - `PowerBIEmbed` — iframe embebido de Power BI con auto-refresh configurable (default 30 min), pausa/reanuda, badge de última actualización color-coded (verde/amarillo/rojo), y skeleton de carga. Tipos en `types/powerbi.ts`.
 - `RefreshButton` — botón de refresh manual y toggle de pausa usado dentro de `PowerBIEmbed`
 - `CrearUsuarioForm` — formulario para crear usuarios (solo admin, POST `/api/admin/usuarios`)
@@ -207,9 +211,12 @@ Clases CSS utilitarias custom definidas en `app/globals.css`:
 
 ## Build Config
 
+Config file: `next.config.mjs`.
+
 - `typescript.ignoreBuildErrors: true` — los errores de TS no rompen el build.
 - `images.unoptimized: true` — sin optimización de imágenes de Next.js.
 - Deployment: Vercel (`@vercel/analytics` habilitado).
+- ESLint: configurado via Next.js built-in; no `eslint.config.*` separado.
 
 ## Standalone HTML: `gestion-2026.html`
 

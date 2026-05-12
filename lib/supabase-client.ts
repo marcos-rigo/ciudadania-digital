@@ -15,3 +15,14 @@ export async function sbGetActividades(filtros: string): Promise<Record<string, 
   }
   return r.json()
 }
+
+export async function sbGetActividades2026(filtros?: string): Promise<Record<string, unknown>[]> {
+  const base = `${SB_URL}/rest/v1/actividades_2026?select=*&order=fecha.desc`
+  const url = filtros ? `${base}&${filtros}` : base
+  const r = await fetch(url, { headers, cache: 'no-store' })
+  if (!r.ok) {
+    const texto = await r.text()
+    throw new Error(`Supabase ${r.status}: ${texto}`)
+  }
+  return r.json()
+}

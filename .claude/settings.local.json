@@ -9,7 +9,11 @@
       "Bash(npm install *)",
       "Bash(npx next *)",
       "Bash(Remove-Item -Path \"C:\\\\Users\\\\marco\\\\OneDrive\\\\Escritorio\\\\SPC\\\\app\\\\acciones\\\\page.tsx\" -Force)",
-      "Bash(Remove-Item -Path \"C:\\\\Users\\\\marco\\\\OneDrive\\\\Escritorio\\\\SPC\\\\app\\\\acciones\" -Force -ErrorAction SilentlyContinue)"
+      "Bash(Remove-Item -Path \"C:\\\\Users\\\\marco\\\\OneDrive\\\\Escritorio\\\\SPC\\\\app\\\\acciones\" -Force -ErrorAction SilentlyContinue)",
+      "Bash(git -C \"C:\\\\Users\\\\marco\\\\OneDrive\\\\Escritorio\\\\SPC\" diff HEAD~3 --name-only)",
+      "Bash(Get-Content \"C:\\\\Users\\\\marco\\\\OneDrive\\\\Escritorio\\\\SPC\\\\app\\\\acciones\\\\page.tsx\")",
+      "Bash(Select-Object -First 5)",
+      "Bash(Get-Content \"C:\\\\Users\\\\marco\\\\OneDrive\\\\Escritorio\\\\SPC\\\\app\\\\resultados\\\\page.tsx\")"
     ]
   }
 }
