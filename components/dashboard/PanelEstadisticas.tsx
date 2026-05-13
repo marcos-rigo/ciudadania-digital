@@ -1022,7 +1022,7 @@ export function PanelEstadisticas({ rol }: { rol: string }) {
             {/* Botón centrado sobre la imagen */}
             <div className="absolute inset-0 flex items-center justify-center">
               <a
-                href="https://frtutneduar-my.sharepoint.com/:u:/g/personal/marcos_rigo_alu_frt_utn_edu_ar/IQBhg25vUZFeRbD_VtwLnyidAeaNnbiE0EvaDaJdr29-i0k?e=dJfESM"
+                href="https://frtutneduar-my.sharepoint.com/:u:/g/personal/marcos_rigo_alu_frt_utn_edu_ar/IQBhg25vUZFeRbD_VtwLnyidAeaNnbiE0EvaDaJdr29-i0k"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="
@@ -1051,7 +1051,7 @@ export function PanelEstadisticas({ rol }: { rol: string }) {
               Actualizado manualmente · Power BI Desktop
             </p>
             <a
-              href="https://frtutneduar-my.sharepoint.com/:u:/g/personal/marcos_rigo_alu_frt_utn_edu_ar/IQBhg25vUZFeRbD_VtwLnyidAeaNnbiE0EvaDaJdr29-i0k?e=dJfESM"
+              href="https://frtutneduar-my.sharepoint.com/:u:/g/personal/marcos_rigo_alu_frt_utn_edu_ar/IQBhg25vUZFeRbD_VtwLnyidAeaNnbiE0EvaDaJdr29-i0k"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:text-blue-700 transition-colors"
