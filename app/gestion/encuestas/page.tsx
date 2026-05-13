@@ -130,6 +130,7 @@ export default function GestionEncuestasPage() {
         {/* Table */}
         <Card className="border-none shadow-sm transition-smooth animate-fade-up reveal">
           <CardContent className="p-0">
+            <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -208,6 +209,7 @@ export default function GestionEncuestasPage() {
                 ))}
               </TableBody>
             </Table>
+            </div>
           </CardContent>
         </Card>
       </div>

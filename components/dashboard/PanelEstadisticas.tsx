@@ -9,7 +9,7 @@ import {
 } from '@/lib/estadisticas-utils'
 import { motion } from 'framer-motion'
 import {
-  BarChart2, Search, X, RefreshCw, Calendar, Users, MapPin, TrendingUp,
+  BarChart2, Search, X, RefreshCw, Calendar, Users, MapPin, TrendingUp, ExternalLink,
 } from 'lucide-react'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { Input } from '@/components/ui/input'
@@ -26,7 +26,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   LineChart, Line, PieChart, Pie, Cell, AreaChart, Area,
 } from 'recharts'
-import { PowerBIEmbed } from './PowerBIEmbed'
+import Image from 'next/image'
 import type { AnioFilter } from '@/types/powerbi'
 
 interface Actividad {
@@ -371,8 +371,8 @@ export function PanelEstadisticas({ rol }: { rol: string }) {
               <div className="divider-fade" />
 
               {/* Filtros */}
-              <div className="flex flex-col sm:flex-row gap-3">
-                <div className="relative flex-1 max-w-sm">
+              <div className="flex flex-col gap-3">
+                <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                   <Input
                     placeholder="Buscar por programa o localidad..."
@@ -381,9 +381,9 @@ export function PanelEstadisticas({ rol }: { rol: string }) {
                     className="pl-9 bg-white border-slate-200 text-slate-900 placeholder:text-slate-400"
                   />
                 </div>
-                <div className="flex flex-wrap gap-2">
+                <div className="grid grid-cols-2 sm:grid-cols-[1fr_1fr_auto] gap-2">
                   <Select value={filPrograma} onValueChange={applyPrograma}>
-                    <SelectTrigger className="w-[200px] border-slate-200 shadow-sm">
+                    <SelectTrigger className="border-slate-200 shadow-sm">
                       <SelectValue placeholder="Programa" />
                     </SelectTrigger>
                     <SelectContent>
@@ -395,8 +395,8 @@ export function PanelEstadisticas({ rol }: { rol: string }) {
                   </Select>
 
                   <Select value={filLocalidad} onValueChange={applyLocalidad}>
-                    <SelectTrigger className="w-[200px] border-slate-200 shadow-sm">
-                      <SelectValue placeholder="Municipio o Comuna" />
+                    <SelectTrigger className="border-slate-200 shadow-sm">
+                      <SelectValue placeholder="Municipio" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">Todos los municipios</SelectItem>
@@ -408,7 +408,7 @@ export function PanelEstadisticas({ rol }: { rol: string }) {
 
                   {hasFilters && (
                     <Button variant="ghost" size="sm" onClick={clearFilters}
-                      className="h-9 text-slate-500 hover:text-slate-900">
+                      className="h-9 text-slate-500 hover:text-slate-900 col-span-2 sm:col-span-1">
                       <X className="h-4 w-4 mr-1" />
                       Limpiar
                     </Button>
@@ -718,8 +718,8 @@ export function PanelEstadisticas({ rol }: { rol: string }) {
                   <div className="divider-fade" />
 
                   {/* Filtros */}
-                  <div className="flex flex-col sm:flex-row gap-3">
-                    <div className="relative flex-1 max-w-sm">
+                  <div className="flex flex-col gap-3">
+                    <div className="relative">
                       <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                       <Input
                         placeholder="Buscar por programa o localidad..."
@@ -728,9 +728,9 @@ export function PanelEstadisticas({ rol }: { rol: string }) {
                         className="pl-9 bg-white border-slate-200 text-slate-900 placeholder:text-slate-400"
                       />
                     </div>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="grid grid-cols-2 sm:grid-cols-[1fr_1fr_auto] gap-2">
                       <Select value={filPrograma2026} onValueChange={applyPrograma2026}>
-                        <SelectTrigger className="w-[200px] border-slate-200 shadow-sm">
+                        <SelectTrigger className="border-slate-200 shadow-sm">
                           <SelectValue placeholder="Programa" />
                         </SelectTrigger>
                         <SelectContent>
@@ -742,8 +742,8 @@ export function PanelEstadisticas({ rol }: { rol: string }) {
                       </Select>
 
                       <Select value={filLocalidad2026} onValueChange={applyLocalidad2026}>
-                        <SelectTrigger className="w-[200px] border-slate-200 shadow-sm">
-                          <SelectValue placeholder="Municipio o Comuna" />
+                        <SelectTrigger className="border-slate-200 shadow-sm">
+                          <SelectValue placeholder="Municipio" />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="all">Todos los municipios</SelectItem>
@@ -755,7 +755,7 @@ export function PanelEstadisticas({ rol }: { rol: string }) {
 
                       {hasFilters2026 && (
                         <Button variant="ghost" size="sm" onClick={clearFilters2026}
-                          className="h-9 text-slate-500 hover:text-slate-900">
+                          className="h-9 text-slate-500 hover:text-slate-900 col-span-2 sm:col-span-1">
                           <X className="h-4 w-4 mr-1" />
                           Limpiar
                         </Button>
@@ -997,7 +997,7 @@ export function PanelEstadisticas({ rol }: { rol: string }) {
           </>
         )}
 
-        {/* Sección 5: Separador + PowerBI */}
+        {/* Sección 5: Tablero Power BI estático */}
         <div className="relative flex items-center gap-4 py-2">
           <div className="flex-1 h-px bg-gradient-to-r from-transparent via-slate-200 to-slate-200" />
           <span className="text-xs font-medium text-slate-400 whitespace-nowrap px-1">
@@ -1005,7 +1005,62 @@ export function PanelEstadisticas({ rol }: { rol: string }) {
           </span>
           <div className="flex-1 h-px bg-gradient-to-r from-slate-200 via-slate-200 to-transparent" />
         </div>
-        <PowerBIEmbed />
+
+        <div className="glass card-glow rounded-2xl overflow-hidden border border-blue-100/60 shadow-[0_8px_32px_rgba(43,84,194,.10)]">
+          {/* Imagen con overlay y botón centrado */}
+          <div className="relative w-full group">
+            <Image
+              src="/tablero-2026.png"
+              alt="Tablero Power BI 2026"
+              width={1600}
+              height={900}
+              className="w-full h-auto rounded-t-2xl object-cover block"
+              priority={false}
+            />
+            {/* Overlay degradado */}
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-900/70 via-slate-900/20 to-transparent rounded-t-2xl" />
+            {/* Botón centrado sobre la imagen */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <a
+                href="https://frtutneduar-my.sharepoint.com/:u:/g/personal/marcos_rigo_alu_frt_utn_edu_ar/IQBhg25vUZFeRbD_VtwLnyidAeaNnbiE0EvaDaJdr29-i0k?e=dJfESM"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="
+                  inline-flex items-center gap-2.5
+                  px-5 py-3 sm:px-7 sm:py-3.5
+                  rounded-xl
+                  bg-white/95 hover:bg-white
+                  text-blue-700 hover:text-blue-800
+                  font-semibold text-sm sm:text-base
+                  shadow-[0_4px_24px_rgba(0,0,0,.22)]
+                  border border-white/80
+                  backdrop-blur-sm
+                  transition-all duration-200
+                  hover:scale-105 hover:shadow-[0_8px_32px_rgba(0,0,0,.28)]
+                  active:scale-100
+                "
+              >
+                <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
+                Ver tablero completo
+              </a>
+            </div>
+          </div>
+          {/* Pie de card */}
+          <div className="px-5 py-4 sm:px-7 sm:py-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-white/60 backdrop-blur-sm border-t border-blue-100/40">
+            <p className="text-xs text-slate-400 font-medium tracking-wide">
+              Actualizado manualmente · Power BI Desktop
+            </p>
+            <a
+              href="https://frtutneduar-my.sharepoint.com/:u:/g/personal/marcos_rigo_alu_frt_utn_edu_ar/IQBhg25vUZFeRbD_VtwLnyidAeaNnbiE0EvaDaJdr29-i0k?e=dJfESM"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:text-blue-700 transition-colors"
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+              Abrir en SharePoint
+            </a>
+          </div>
+        </div>
 
       </TabsContent>
     </Tabs>

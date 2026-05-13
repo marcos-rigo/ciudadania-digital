@@ -104,7 +104,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
 
           {/* Logo */}
           <Link href="/inicio" className="flex items-center shrink-0">
-            <div className="relative h-14 w-44">
+            <div className="relative h-10 w-32 sm:h-14 sm:w-44">
               <Image
                 src="/logo1.png"
                 alt="Secretaría de Participación Ciudadana"
@@ -314,11 +314,11 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
               <p className="text-sm text-slate-400">
                 © {new Date().getFullYear()} José Farhat. Todos los derechos reservados.
               </p>
-              <div className="flex items-center gap-6">
-                <div className="relative h-12 w-40">
+              <div className="flex items-center gap-4">
+                <div className="relative h-9 w-28 sm:h-12 sm:w-36">
                   <Image src="/logo1.png" alt="SPC Tucumán" fill className="object-contain" />
                 </div>
-                <div className="relative h-12 w-40">
+                <div className="relative h-9 w-28 sm:h-12 sm:w-36">
                   <Image src="/logo2.png" alt="Gobierno de Tucumán" fill className="object-contain" />
                 </div>
               </div>

@@ -324,17 +324,15 @@ export default function ReportesPage() {
           <TabsContent value="historial" className="space-y-6">
             <Card>
               <CardHeader>
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div>
                     <CardTitle>Reportes Generados</CardTitle>
                     <CardDescription>Historial de reportes y exportaciones</CardDescription>
                   </div>
-                  <div className="flex gap-2">
-                    <div className="relative">
-                      <Input placeholder="Buscar reportes..." className="w-64" />
-                    </div>
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <Input placeholder="Buscar reportes..." className="sm:w-48" />
                     <Select defaultValue="todos">
-                      <SelectTrigger className="w-40">
+                      <SelectTrigger className="sm:w-36">
                         <SelectValue placeholder="Filtrar por tipo" />
                       </SelectTrigger>
                       <SelectContent>
@@ -352,15 +350,15 @@ export default function ReportesPage() {
                   {reportesGenerados.map((reporte) => (
                     <div
                       key={reporte.id}
-                      className="flex items-center justify-between p-4 rounded-lg border hover:bg-muted/50 transition-colors"
+                      className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-lg border hover:bg-muted/50 transition-colors"
                     >
-                      <div className="flex items-center gap-4">
-                        <div className="p-2 rounded-lg bg-muted">
+                      <div className="flex items-center gap-4 min-w-0">
+                        <div className="p-2 rounded-lg bg-muted shrink-0">
                           {getFormatoIcon(reporte.formato)}
                         </div>
-                        <div>
-                          <p className="font-medium">{reporte.nombre}</p>
-                          <div className="flex items-center gap-3 mt-1 text-sm text-muted-foreground">
+                        <div className="min-w-0">
+                          <p className="font-medium truncate">{reporte.nombre}</p>
+                          <div className="flex flex-wrap items-center gap-2 mt-1 text-sm text-muted-foreground">
                             <span>{reporte.tipo}</span>
                             <span>•</span>
                             <span>{reporte.fecha}</span>
@@ -373,7 +371,7 @@ export default function ReportesPage() {
                           </div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2 shrink-0">
                         {getEstadoBadge(reporte.estado)}
                         {reporte.estado === "completado" && (
                           <div className="flex gap-1">

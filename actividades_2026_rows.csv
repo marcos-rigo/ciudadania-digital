@@ -1,0 +1,4 @@
+id,fecha,programa,localidad,cantidad_personas,usuario_nombre,created_at,estrategia,institucion,direccion,duracion,grupo_etario,tematica,descripcion
+71d1ea9e-5fac-4d0c-95f1-c1b6ac8c5d60,2026-01-01,test,test,1,test,2026-05-12 21:09:39.721202+00,,,,,,,
+d770978e-3a59-46bb-bf7d-bb00ae298c08,2026-05-22,Familias en la Web,Banda del rio sali,50,Secretaría de Participación Ciudadana,2026-05-12 23:37:12.765594+00,Charla macro,Colegio inamculada concepcion,San martin 45,3,"[""Adultos jóvenes"",""Adultos mayores""]","[""Ciudadanía Digital"",""Huella Digital"",""Estafas Digitales"",""Sharenting""]",Charla macro con padres del colegio
+fcee648c-cb59-45b2-81e5-91780cf23a68,2026-04-08,Docentes Conectados,SMT,300,Secretaría de Participación Ciudadana,2026-05-12 22:21:49.684614+00,Laboratorio de Innovación,Teatro mercedes,san martin,3,"[""Adultos jóvenes"",""Adultos mayores""]","[""Ciudadanía Digital"",""Huella Digital""]",Charla macro

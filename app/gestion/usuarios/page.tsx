@@ -94,6 +94,7 @@ export default function GestionUsuariosPage() {
         {/* Table */}
         <Card className="border-none shadow-sm transition-smooth animate-fade-up reveal">
           <CardContent className="p-0">
+            <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -183,6 +184,7 @@ export default function GestionUsuariosPage() {
                 })}
               </TableBody>
             </Table>
+            </div>
           </CardContent>
         </Card>
 
@@ -219,7 +221,7 @@ export default function GestionUsuariosPage() {
                   </div>
 
                   {/* Stats */}
-                  <div className="grid grid-cols-4 gap-4">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                     {[
                         {
                         icon: BookOpen,

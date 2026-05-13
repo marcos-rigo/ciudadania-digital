@@ -70,8 +70,8 @@ export default function PodcastPage() {
       {/* Filters */}
       <section className="py-6 border-b border-muted">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col lg:flex-row gap-4">
-            <div className="relative flex-1">
+          <div className="flex flex-col gap-4">
+            <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Buscar episodios..."
@@ -80,9 +80,9 @@ export default function PodcastPage() {
                 className="pl-10"
               />
             </div>
-            <div className="flex flex-wrap gap-3">
+            <div className="grid grid-cols-2 gap-3">
               <Select value={selectedTema} onValueChange={setSelectedTema}>
-                <SelectTrigger className="w-40">
+                <SelectTrigger>
                   <SelectValue placeholder="Tema" />
                 </SelectTrigger>
                 <SelectContent>
@@ -99,7 +99,7 @@ export default function PodcastPage() {
                 value={selectedTrayecto}
                 onValueChange={setSelectedTrayecto}
               >
-                <SelectTrigger className="w-[180px]">
+                <SelectTrigger>
                   <SelectValue placeholder="Trayecto" />
                 </SelectTrigger>
                 <SelectContent>
@@ -152,18 +152,18 @@ export default function PodcastPage() {
                     className="border-none shadow-sm hover:shadow-md transition-shadow"
                   >
                     <CardContent className="p-6">
-                      <div className="flex flex-col lg:flex-row gap-6">
+                      <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
                         {/* Thumbnail */}
-                        <div className="shrink-0">
+                        <div className="shrink-0 self-start">
                             {podcast.thumbnail ? (
                             <img
                               src={podcast.thumbnail}
                               alt={podcast.titulo}
-                              className="h-32 w-32 rounded-xl object-cover"
+                              className="h-24 w-24 sm:h-32 sm:w-32 rounded-xl object-cover"
                             />
                           ) : (
-                            <div className="h-32 w-32 rounded-xl bg-gradient-to-br from-purple-100 to-purple-200 flex items-center justify-center dark:from-primary/20 dark:to-primary/30">
-                              <Mic className="h-12 w-12 text-purple-600 dark:text-primary" />
+                            <div className="h-24 w-24 sm:h-32 sm:w-32 rounded-xl bg-gradient-to-br from-purple-100 to-purple-200 flex items-center justify-center dark:from-primary/20 dark:to-primary/30">
+                              <Mic className="h-10 w-10 sm:h-12 sm:w-12 text-purple-600 dark:text-primary" />
                             </div>
                           )}
                         </div>

@@ -80,7 +80,7 @@ export function DashboardLayout({ nombre, rol, children }: Props) {
 
           {/* Logo — invertido para header oscuro */}
           <Link href="/inicio" className="flex items-center shrink-0">
-            <div className="relative h-14 w-48">
+            <div className="relative h-10 w-36 sm:h-14 sm:w-48">
               <Image
                 src="/logo1.png"
                 alt="Secretaría de Participación Ciudadana"

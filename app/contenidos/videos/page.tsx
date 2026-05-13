@@ -79,8 +79,8 @@ export default function VideosPage() {
       {/* Filters */}
       <section className="py-6 border-b border-muted">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col lg:flex-row gap-4">
-            <div className="relative flex-1">
+          <div className="flex flex-col gap-4">
+            <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Buscar videos..."
@@ -89,9 +89,9 @@ export default function VideosPage() {
                 className="pl-10"
               />
             </div>
-            <div className="flex flex-wrap gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               <Select value={selectedTema} onValueChange={setSelectedTema}>
-                <SelectTrigger className="w-[160px]">
+                <SelectTrigger>
                   <SelectValue placeholder="Tema" />
                 </SelectTrigger>
                 <SelectContent>
@@ -108,7 +108,7 @@ export default function VideosPage() {
                 value={selectedTrayecto}
                 onValueChange={setSelectedTrayecto}
               >
-                <SelectTrigger className="w-[180px]">
+                <SelectTrigger>
                   <SelectValue placeholder="Trayecto" />
                 </SelectTrigger>
                 <SelectContent>
@@ -122,7 +122,7 @@ export default function VideosPage() {
               </Select>
 
               <Select value={selectedNivel} onValueChange={setSelectedNivel}>
-                <SelectTrigger className="w-[140px]">
+                <SelectTrigger>
                   <SelectValue placeholder="Nivel" />
                 </SelectTrigger>
                 <SelectContent>

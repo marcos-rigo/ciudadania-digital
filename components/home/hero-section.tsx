@@ -79,7 +79,7 @@ export function HeroSection() {
 
           {/* TÍTULO */}
           <motion.div variants={fadeUpSpring} className="space-y-1">
-            <h1 className="text-4xl sm:text-6xl lg:text-5xl font-black tracking-tight leading-[1.05] text-balance">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-black tracking-tight leading-[1.05] text-balance">
               <span className="block text-slate-900">Gestión Inteligente</span>
               <motion.span
                 className="block text-gradient"
@@ -93,7 +93,7 @@ export function HeroSection() {
 
           {/* SUBTÍTULO */}
           <motion.div variants={fadeUpSpring} className="max-w-2xl">
-            <p className="text-base sm:text-lg lg:text-base text-slate-600 leading-relaxed">
+            <p className="text-base sm:text-lg text-slate-600 leading-relaxed">
               Visualización de datos transparentes y gestión estratégica de resultados territoriales para decisiones fundamentadas.
             </p>
             <p className="text-slate-400 font-medium mt-1.5 text-sm italic">
@@ -158,7 +158,7 @@ export function HeroSection() {
                     >
                       {stat.value}
                     </motion.p>
-                    <p className="text-[10px] text-slate-400 mt-1 font-medium tracking-wide uppercase leading-tight">
+                    <p className="text-[11px] sm:text-xs text-slate-400 mt-1 font-medium tracking-wide uppercase leading-tight">
                       {stat.label}
                     </p>
                   </motion.div>

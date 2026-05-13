@@ -18,7 +18,7 @@ export function AuthLayout({ children }: { children: React.ReactNode }) {
 
       {/* Card */}
       <div className="flex-1 flex items-center justify-center px-4 py-8 relative z-10">
-        <div className="w-full max-w-[440px] bg-white/96 backdrop-blur-sm rounded-2xl px-10 py-12 shadow-[0_16px_64px_rgba(43,84,194,.16),0_4px_20px_rgba(15,23,42,.08)] border border-blue-100/70">
+        <div className="w-full max-w-[440px] bg-white/96 backdrop-blur-sm rounded-2xl px-6 py-10 sm:px-10 sm:py-12 shadow-[0_16px_64px_rgba(43,84,194,.16),0_4px_20px_rgba(15,23,42,.08)] border border-blue-100/70">
           {children}
         </div>
       </div>

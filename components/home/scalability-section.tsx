@@ -15,7 +15,7 @@ export function ScalabilitySection() {
             <div className="absolute top-4 right-32 w-24 h-24 rounded-full bg-white/5 pointer-events-none" />
 
             <div className="relative z-10 flex flex-col sm:flex-row gap-8 items-center justify-between">
-              <div className="text-left">
+              <div className="text-center sm:text-left">
                 <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/15 border border-white/20 text-sm font-semibold mb-4">
                   <Lock className="h-3.5 w-3.5" />
                   Acceso restringido al equipo interno
