@@ -188,6 +188,8 @@ Secciones en `components/home/` (todas client-side con framer-motion):
 - Charts: `recharts` (usado en `PanelEstadisticas`).
 - Animaciones de componentes: `framer-motion`.
 - Scroll animations: `hooks/use-in-view.tsx` — custom hook con `IntersectionObserver` (`threshold: 0.15`), devuelve `{ ref, inView }` para animaciones on-scroll.
+- Responsive: `hooks/use-mobile.ts` (`useIsMobile()`) — breakpoint en 768px via `matchMedia`.
+- Fechas: `date-fns` disponible para formateo y manipulación de fechas.
 
 ## Theming
 

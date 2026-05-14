@@ -1,0 +1,87 @@
+@startuml arquitectura-spc
+!theme plain
+skinparam backgroundColor #FAFAFA
+skinparam defaultFontSize 12
+skinparam roundCorner 8
+skinparam ArrowColor #555
+skinparam component { BackgroundColor #FFFFFF; BorderColor #6366F1 }
+skinparam package { BackgroundColor #EEF2FF; BorderColor #4F46E5; FontStyle bold }
+skinparam database { BackgroundColor #ECFDF5; BorderColor #059669 }
+skinparam cloud { BackgroundColor #FEF3C7; BorderColor #D97706 }
+
+title Arquitectura SPC · Next.js 16
+
+' ── EXTERNOS ──
+cloud "Supabase" as SB {
+  database "usuarios" as DB_U
+  database "actividades\n2025 / 2026" as DB_A
+}
+cloud "Resend\n(emails)" as RESEND
+cloud "MS Forms" as MSFORMS
+cloud "SharePoint\n(Power BI)" as SP
+
+' ── MIDDLEWARE ──
+package "proxy.ts  (middleware)" as MW {
+  component "Protege /dashboard/**\nverifica cookie gestion_session\nguards por rol" as MW_CORE
+}
+
+' ── FRONTEND ──
+package "Páginas públicas  (mock, sin auth)" as PUB {
+  component "/inicio · /encuestas\n/transparencia · /contacto" as P1
+  component "/ciudadania-digital\n/trayectos · /contenidos\n/evaluaciones · /certificados" as P2
+  component "/equipo/**  (demo)\n/gestion/**  (CMS mock)" as P3
+}
+
+package "Auth" as AUTH {
+  component "/login · /registro\n/verificar · /reset" as AUTH_PAGES
+}
+
+package "/dashboard/**  (requiere sesión)" as DASH {
+  component "/dashboard/admin\nEmbed MS Forms" as D_ADMIN
+  component "/dashboard/estadisticas\nKPIs + gráficos recharts\n?anio=2025|2026" as D_STATS
+  component "/dashboard/admin/usuarios\nCRUD usuarios\n(solo superadmin)" as D_USR
+}
+
+' ── API ──
+package "API Routes" as API {
+  component "/api/auth/*\nlogin · registro · verificar\nreset · logout" as API_AUTH
+  component "/api/admin/usuarios\nGET · POST · PATCH · DELETE" as API_ADMIN
+}
+
+' ── LIB ──
+package "lib/" as LIB {
+  component "auth-server.ts\n(hashPwd, OTP, email)" as LIB_AUTH
+  component "supabase-client.ts\n(REST directo, sin SDK)" as LIB_SB
+  component "estadisticas-utils.ts\n(KPIs, agrupaciones)" as LIB_STATS
+  component "mock/data.ts\nmock/ciudadania-data.ts" as LIB_MOCK
+}
+
+' ── STANDALONE ──
+package "gestion-2026.html\n(deploy separado)" as HTML {
+  component "Auth client-side\n+ embed MS Forms" as HTML_CORE
+}
+
+' ── RELACIONES ──
+MW_CORE --> AUTH_PAGES : sin sesión → /login
+MW_CORE --> DASH       : sesión válida
+
+AUTH_PAGES --> API_AUTH
+API_AUTH   --> LIB_AUTH
+LIB_AUTH   --> DB_U
+LIB_AUTH   --> RESEND
+
+DASH --> API_ADMIN
+API_ADMIN --> LIB_AUTH
+
+D_ADMIN --> MSFORMS    : iframe
+D_STATS --> LIB_SB
+D_STATS --> LIB_STATS
+LIB_SB  --> DB_A
+D_STATS ..> SP         : link tablero
+
+PUB --> LIB_MOCK
+
+MSFORMS ..> DB_A       : Power Automate
+HTML_CORE --> DB_U     : fetch REST
+
+@enduml
