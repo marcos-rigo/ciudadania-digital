@@ -14,7 +14,6 @@ import {
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { Skeleton } from '@/components/ui/skeleton'
 import {
   Select,
   SelectContent,
@@ -24,7 +23,7 @@ import {
 } from '@/components/ui/select'
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  LineChart, Line, PieChart, Pie, Cell, AreaChart, Area,
+  PieChart, Pie, Cell, AreaChart, Area,
 } from 'recharts'
 import Image from 'next/image'
 import type { AnioFilter } from '@/types/powerbi'
@@ -62,7 +61,16 @@ const FILTRO_FECHA: Record<string, string> = {
 const POR_PAGINA = 10
 
 const MESES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic']
-const CHART_COLORS = ['#1e3d8f','#2b54c2','#4a72d8','#0ea5e9','#06b6d4','#14b8a6','#22c55e','#84cc16']
+const CHART_COLORS = [
+  '#2563eb', // azul
+  '#16a34a', // verde
+  '#ea580c', // naranja
+  '#9333ea', // violeta
+  '#0891b2', // cyan
+  '#dc2626', // rojo
+  '#ca8a04', // amarillo
+  '#db2777', // rosa
+]
 
 const tooltipStyle = {
   backgroundColor: '#fff',
@@ -136,15 +144,21 @@ function KPICard({ icon, value, label }: { icon: React.ReactNode; value: string;
 }
 
 function ChartCard({
-  title, subtitle, children, height = 260,
+  title, subtitle, description, footer, children, height = 260,
 }: {
-  title: string; subtitle: string; children: React.ReactNode; height?: number
+  title: string; subtitle: string; description?: string; footer?: React.ReactNode; children: React.ReactNode; height?: number
 }) {
   return (
-    <div className="card-glow bg-white border border-slate-200/80 rounded-2xl p-6">
+    <div className="card-glow bg-white border border-slate-200/80 rounded-2xl p-4 sm:p-6">
       <h3 className="font-bold text-slate-900 mb-0.5 text-sm">{title}</h3>
-      <p className="text-xs text-slate-400 mb-5">{subtitle}</p>
+      <p className="text-xs text-slate-400 mb-4 sm:mb-5">{subtitle}</p>
       <div style={{ height: `${height}px` }}>{children}</div>
+      {description && (
+        <p className="text-xs text-slate-500 mt-4 leading-relaxed border-t border-slate-100 pt-3">
+          {description}
+        </p>
+      )}
+      {footer && <div className={description ? 'mt-3' : 'mt-4 border-t border-slate-100 pt-3'}>{footer}</div>}
     </div>
   )
 }
@@ -382,29 +396,33 @@ export function PanelEstadisticas({ rol }: { rol: string }) {
                   />
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-[1fr_1fr_auto] gap-2">
-                  <Select value={filPrograma} onValueChange={applyPrograma}>
-                    <SelectTrigger className="border-slate-200 shadow-sm">
-                      <SelectValue placeholder="Programa" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Todos los programas</SelectItem>
-                      {programasUnicos.map((p) => (
-                        <SelectItem key={p} value={p}>{p}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <div className="min-w-0">
+                    <Select value={filPrograma} onValueChange={applyPrograma}>
+                      <SelectTrigger className="w-full border-slate-200 shadow-sm">
+                        <SelectValue placeholder="Programas" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Todos los programas</SelectItem>
+                        {programasUnicos.map((p) => (
+                          <SelectItem key={p} value={p}>{p}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-                  <Select value={filLocalidad} onValueChange={applyLocalidad}>
-                    <SelectTrigger className="border-slate-200 shadow-sm">
-                      <SelectValue placeholder="Municipio" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Todos los municipios</SelectItem>
-                      {localidadesUnicas.map((l) => (
-                        <SelectItem key={l} value={l}>{l}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <div className="min-w-0">
+                    <Select value={filLocalidad} onValueChange={applyLocalidad}>
+                      <SelectTrigger className="w-full border-slate-200 shadow-sm">
+                        <SelectValue placeholder="Municipios" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Todos los municipios</SelectItem>
+                        {localidadesUnicas.map((l) => (
+                          <SelectItem key={l} value={l}>{l}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
 
                   {hasFilters && (
                     <Button variant="ghost" size="sm" onClick={clearFilters}
@@ -531,64 +549,141 @@ export function PanelEstadisticas({ rol }: { rol: string }) {
         {/* Gráficos 2025 */}
         {!loading && !error && data.length > 0 && (
           <div className="grid lg:grid-cols-2 gap-6">
-            <ChartCard title="Evolución Mensual de Actividades" subtitle="Actividades realizadas por mes · 2025">
+            <ChartCard
+              title="Evolución Mensual de Actividades"
+              subtitle="Actividades realizadas por mes · 2025"
+              description="Cada barra muestra cuántas actividades se realizaron en ese mes. Permite identificar los períodos de mayor actividad institucional durante el año."
+            >
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={evolucion}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                  <XAxis dataKey="mes" tick={{ fontSize: 11 }} stroke="#cbd5e1" />
-                  <YAxis tick={{ fontSize: 11 }} stroke="#cbd5e1" />
-                  <Tooltip contentStyle={tooltipStyle} />
-                  <Line type="monotone" dataKey="actividades" stroke="#1e3d8f" strokeWidth={2.5}
-                    dot={{ fill: '#1e3d8f', strokeWidth: 2, r: 3 }} name="Actividades" />
-                </LineChart>
-              </ResponsiveContainer>
-            </ChartCard>
-
-            <ChartCard title="Personas Alcanzadas por Mes" subtitle="Total de participantes por mes · 2025">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={evolucion}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                  <XAxis dataKey="mes" tick={{ fontSize: 11 }} stroke="#cbd5e1" />
-                  <YAxis tick={{ fontSize: 11 }} stroke="#cbd5e1" />
-                  <Tooltip contentStyle={tooltipStyle} />
-                  <Bar dataKey="asistentes" fill="#2b54c2" radius={[4,4,0,0]} name="Asistentes" />
+                <BarChart data={evolucion} barSize={24}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                  <XAxis dataKey="mes" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+                  <Tooltip contentStyle={tooltipStyle} cursor={{ fill: 'rgba(37,99,235,0.05)' }}
+                    formatter={(v: number) => [v, 'Actividades']}
+                    labelFormatter={(l) => `Mes: ${l}`} />
+                  <Bar dataKey="actividades" fill="#2563eb" radius={[4, 4, 0, 0]} name="Actividades" />
                 </BarChart>
               </ResponsiveContainer>
             </ChartCard>
 
-            <ChartCard title="Distribución por Programa" subtitle="Cantidad de actividades por campaña o proyecto">
+            <ChartCard
+              title="Personas Alcanzadas por Mes"
+              subtitle="Total de participantes por mes · 2025"
+              description="Suma de personas que participaron en actividades cada mes. Un valor alto refleja mayor impacto territorial en ese período."
+            >
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={porPrograma} layout="vertical">
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                  <XAxis type="number" tick={{ fontSize: 11 }} stroke="#cbd5e1" />
-                  <YAxis dataKey="nombre" type="category" tick={{ fontSize: 10 }} width={155} stroke="#cbd5e1" />
-                  <Tooltip contentStyle={tooltipStyle} />
-                  <Bar dataKey="valor" fill="#0ea5e9" radius={[0,4,4,0]} name="Actividades" />
-                </BarChart>
+                <AreaChart data={evolucion}>
+                  <defs>
+                    <linearGradient id="gradAsistentes2025" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%"  stopColor="#16a34a" stopOpacity={0.25} />
+                      <stop offset="95%" stopColor="#16a34a" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                  <XAxis dataKey="mes" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+                  <Tooltip contentStyle={tooltipStyle}
+                    formatter={(v: number) => [v.toLocaleString('es-AR'), 'Personas']}
+                    labelFormatter={(l) => `Mes: ${l}`} />
+                  <Area type="monotone" dataKey="asistentes" stroke="#16a34a" strokeWidth={2.5}
+                    fill="url(#gradAsistentes2025)" name="Personas"
+                    dot={{ fill: '#16a34a', strokeWidth: 2, r: 3 }}
+                    activeDot={{ r: 5, fill: '#15803d' }} />
+                </AreaChart>
               </ResponsiveContainer>
             </ChartCard>
 
-            <ChartCard title="Cobertura Territorial" subtitle="Actividades por municipio o comuna (top 6)">
+            <ChartCard
+              title="Distribución por Programa"
+              subtitle="Cantidad de actividades por campaña o proyecto · 2025"
+              description="Compara cuántas actividades realizó cada programa. Las barras más largas indican los programas con mayor volumen de trabajo en el año."
+            >
               <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={porLocalidad.slice(0, 6)}
-                    cx="50%" cy="50%"
-                    labelLine={false}
-                    label={({ nombre, percent }) =>
-                      `${nombre.split(' ')[0]} ${(percent * 100).toFixed(0)}%`
-                    }
-                    outerRadius={95}
-                    dataKey="valor"
-                  >
-                    {porLocalidad.slice(0, 6).map((_, i) => (
+                <BarChart data={porPrograma} layout="vertical" barSize={12}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={false} />
+                  <XAxis type="number" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+                  <YAxis dataKey="nombre" type="category" tick={{ fontSize: 10, fill: '#64748b' }} width={155} axisLine={false} tickLine={false} />
+                  <Tooltip contentStyle={tooltipStyle}
+                    formatter={(v: number) => [v, 'Actividades']}
+                    labelFormatter={(l) => `Programa: ${l}`} />
+                  <Bar dataKey="valor" radius={[0, 4, 4, 0]} name="Actividades">
+                    {porPrograma.map((_, i) => (
                       <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
                     ))}
-                  </Pie>
-                  <Tooltip contentStyle={tooltipStyle} />
-                </PieChart>
+                  </Bar>
+                </BarChart>
               </ResponsiveContainer>
             </ChartCard>
+
+            {(() => {
+              const coberturaData = porLocalidad.slice(0, 6)
+              const totalCobertura = coberturaData.reduce((s, d) => s + d.valor, 0)
+
+              const renderPieLabel = ({
+                nombre, percent, x, y,
+              }: { nombre: string; percent: number; x: number; y: number }) => {
+                if (percent < 0.05) return <g />
+                const nombre_ = nombre.length > 15 ? nombre.slice(0, 13) + '…' : nombre
+                return (
+                  <text textAnchor="middle" dominantBaseline="central" fontSize={9.5} fontFamily="inherit">
+                    <tspan x={x} y={y - 7} fill="#1e293b" fontWeight={600}>{nombre_}</tspan>
+                    <tspan x={x} y={y + 7} fill="#64748b">{(percent * 100).toFixed(1)}%</tspan>
+                  </text>
+                )
+              }
+
+              return (
+                <ChartCard
+                  title="Cobertura Territorial"
+                  subtitle="Actividades por municipio o comuna · top 6 · 2025"
+                  description="Cada sector del gráfico representa un municipio. Al presionar aparece el nombre completo, la cantidad de actividades y el porcentaje sobre el total."
+                  footer={
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-4">
+                      {coberturaData.map((d, i) => (
+                        <div key={d.nombre} className="flex items-center gap-2 min-w-0">
+                          <span
+                            className="w-3 h-3 rounded-full shrink-0 shadow-sm"
+                            style={{ backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }}
+                          />
+                          <span className="text-xs text-slate-700 font-medium truncate flex-1">{d.nombre}</span>
+                          <span className="text-xs text-slate-400 tabular-nums shrink-0 ml-1">
+                            {d.valor} · {((d.valor / totalCobertura) * 100).toFixed(0)}%
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  }
+                >
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={coberturaData}
+                        cx="50%" cy="50%"
+                        label={renderPieLabel}
+                        labelLine={false}
+                        outerRadius={78}
+                        paddingAngle={3}
+                        dataKey="valor"
+                        nameKey="nombre"
+                      >
+                        {coberturaData.map((_, i) => (
+                          <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip
+                        contentStyle={tooltipStyle}
+                        formatter={(v: number, name: string) => [
+                          `${v} actividades · ${((v / totalCobertura) * 100).toFixed(1)}%`,
+                          'Municipio',
+                        ]}
+                        labelFormatter={(nombre) => nombre}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </ChartCard>
+              )
+            })()}
           </div>
         )}
 
@@ -597,123 +692,88 @@ export function PanelEstadisticas({ rol }: { rol: string }) {
       {/* ── Tab 2026 ── */}
       <TabsContent value="2026" className="mt-4 animate-in fade-in-0 duration-200 space-y-6">
 
-        {/* Sección 1: Header */}
-        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 sm:p-8">
-          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-            <div>
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm shadow-blue-500/20">
-                  <BarChart2 className="text-white w-4 h-4" />
-                </div>
-                <h2 className="text-slate-800 font-black text-xl">Actividades 2026</h2>
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  En vivo
-                </span>
-              </div>
-              <p className="text-sm text-slate-400 ml-11">
-                Datos en tiempo real · Actualizado automáticamente
-              </p>
-            </div>
+        {/* Bloque principal — mismo estilo que 2025 */}
+        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-4 sm:p-8 space-y-6">
+
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <h2 className="text-slate-800 font-black text-xl flex flex-wrap items-center gap-2">
+              <span className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm shadow-blue-500/20">
+                <BarChart2 className="text-white w-4 h-4" />
+              </span>
+              Actividades · 2026
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                En vivo
+              </span>
+            </h2>
             <Button
               onClick={fetchData2026}
               disabled={loading2026}
               variant="outline"
               size="sm"
-              className="flex items-center gap-2 border-slate-200 text-slate-600 hover:text-slate-900 hover:border-slate-300 self-start sm:self-auto"
+              className="flex items-center gap-2 border-slate-200 text-slate-600 hover:text-slate-900 hover:border-slate-300 self-start sm:self-auto shrink-0"
             >
               <RefreshCw className={`h-4 w-4 ${loading2026 ? 'animate-spin' : ''}`} />
               Actualizar
             </Button>
           </div>
-        </div>
 
-        {/* Skeleton carga */}
-        {(loading2026 || !hasFetched2026) && !error2026 && (
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {[...Array(4)].map((_, i) => (
-                <div key={i} className="card-glow bg-white border border-slate-100 rounded-2xl p-5 text-center">
-                  <Skeleton className="h-3 w-10 mx-auto mb-3 rounded-xl" />
-                  <Skeleton className="h-8 w-20 mx-auto mb-2" />
-                  <Skeleton className="h-3 w-28 mx-auto" />
-                </div>
-              ))}
+          {/* Cargando */}
+          {(loading2026 || !hasFetched2026) && !error2026 && (
+            <div className="text-center py-16">
+              <span className="w-8 h-8 border-2 border-slate-200 border-t-blue-600 rounded-full animate-spin inline-block" />
             </div>
-            <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 space-y-4">
-              <Skeleton className="h-4 w-48" />
-              <Skeleton className="h-10 w-full max-w-sm" />
-              <Skeleton className="h-[200px] w-full rounded-xl" />
-            </div>
-          </div>
-        )}
+          )}
 
-        {/* Error */}
-        {error2026 && !loading2026 && (
-          <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-8 text-center">
-            <p className="text-red-500 text-sm font-medium">
+          {/* Error */}
+          {error2026 && !loading2026 && (
+            <div className="text-center py-8 text-red-600 text-sm">
               Error al cargar los datos. Intentá de nuevo más tarde.
-            </p>
-          </div>
-        )}
+            </div>
+          )}
 
-        {/* Contenido principal */}
-        {hasFetched2026 && !loading2026 && !error2026 && (
-          <>
-            {data2026.length === 0 ? (
-              /* Sección 4: Estado vacío */
-              <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-12 text-center">
-                <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-slate-100">
-                  <Calendar className="w-7 h-7 text-slate-300" />
+          {/* Contenido */}
+          {hasFetched2026 && !loading2026 && !error2026 && (
+            <>
+              {data2026.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-slate-100">
+                    <Calendar className="w-7 h-7 text-slate-300" />
+                  </div>
+                  <p className="text-slate-700 font-semibold text-base mb-2">
+                    Todavía no hay actividades registradas para 2026
+                  </p>
+                  <p className="text-slate-400 text-sm max-w-sm mx-auto leading-relaxed">
+                    Los datos aparecerán aquí automáticamente una vez que se registren actividades mediante el formulario.
+                  </p>
                 </div>
-                <p className="text-slate-700 font-semibold text-base mb-2">
-                  Todavía no hay actividades registradas para 2026
-                </p>
-                <p className="text-slate-400 text-sm max-w-sm mx-auto leading-relaxed">
-                  Los datos aparecerán aquí automáticamente una vez que se registren actividades mediante el formulario.
-                </p>
-              </div>
-            ) : (
-              <>
-                {/* Sección 2: KPI Cards */}
-                <motion.div
-                  variants={staggerCards}
-                  initial="hidden"
-                  animate="show"
-                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
-                >
-                  <motion.div variants={fadeUpCard}>
-                    <KPICard
-                      icon={<Calendar className="w-5 h-5 text-blue-600" />}
-                      value={kpis2026.total.toLocaleString('es-AR')}
-                      label="Actividades registradas"
-                    />
+              ) : (
+                <>
+                  {/* KPI Cards */}
+                  <motion.div
+                    variants={staggerCards}
+                    initial="hidden"
+                    animate="show"
+                    className="grid grid-cols-2 lg:grid-cols-4 gap-4"
+                  >
+                    <motion.div variants={fadeUpCard}>
+                      <KPICard icon={<Calendar className="w-5 h-5 text-blue-600" />}
+                        value={kpis2026.total.toLocaleString('es-AR')} label="Actividades registradas" />
+                    </motion.div>
+                    <motion.div variants={fadeUpCard}>
+                      <KPICard icon={<Users className="w-5 h-5 text-emerald-600" />}
+                        value={kpis2026.personas.toLocaleString('es-AR')} label="Personas alcanzadas" />
+                    </motion.div>
+                    <motion.div variants={fadeUpCard}>
+                      <KPICard icon={<MapPin className="w-5 h-5 text-violet-600" />}
+                        value={kpis2026.localidades.toLocaleString('es-AR')} label="Municipios cubiertos" />
+                    </motion.div>
+                    <motion.div variants={fadeUpCard}>
+                      <KPICard icon={<TrendingUp className="w-5 h-5 text-amber-600" />}
+                        value={kpis2026.promedio.toLocaleString('es-AR')} label="Promedio por actividad" />
+                    </motion.div>
                   </motion.div>
-                  <motion.div variants={fadeUpCard}>
-                    <KPICard
-                      icon={<Users className="w-5 h-5 text-emerald-600" />}
-                      value={kpis2026.personas.toLocaleString('es-AR')}
-                      label="Personas alcanzadas"
-                    />
-                  </motion.div>
-                  <motion.div variants={fadeUpCard}>
-                    <KPICard
-                      icon={<MapPin className="w-5 h-5 text-violet-600" />}
-                      value={kpis2026.localidades.toLocaleString('es-AR')}
-                      label="Municipios cubiertos"
-                    />
-                  </motion.div>
-                  <motion.div variants={fadeUpCard}>
-                    <KPICard
-                      icon={<TrendingUp className="w-5 h-5 text-amber-600" />}
-                      value={kpis2026.promedio.toLocaleString('es-AR')}
-                      label="Promedio por actividad"
-                    />
-                  </motion.div>
-                </motion.div>
-
-                {/* Listado de actividades 2026 */}
-                <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-4 sm:p-8 space-y-6">
 
                   <div className="divider-fade" />
 
@@ -729,68 +789,65 @@ export function PanelEstadisticas({ rol }: { rol: string }) {
                       />
                     </div>
                     <div className="grid grid-cols-2 sm:grid-cols-[1fr_1fr_auto] gap-2">
-                      <Select value={filPrograma2026} onValueChange={applyPrograma2026}>
-                        <SelectTrigger className="border-slate-200 shadow-sm">
-                          <SelectValue placeholder="Programa" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">Todos los programas</SelectItem>
-                          {programasUnicos2026.map((p) => (
-                            <SelectItem key={p} value={p}>{p}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-
-                      <Select value={filLocalidad2026} onValueChange={applyLocalidad2026}>
-                        <SelectTrigger className="border-slate-200 shadow-sm">
-                          <SelectValue placeholder="Municipio" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">Todos los municipios</SelectItem>
-                          {localidadesUnicas2026.map((l) => (
-                            <SelectItem key={l} value={l}>{l}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-
+                      <div className="min-w-0">
+                        <Select value={filPrograma2026} onValueChange={applyPrograma2026}>
+                          <SelectTrigger className="w-full border-slate-200 shadow-sm">
+                            <SelectValue placeholder="Programas" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">Todos los programas</SelectItem>
+                            {programasUnicos2026.map((p) => (
+                              <SelectItem key={p} value={p}>{p}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="min-w-0">
+                        <Select value={filLocalidad2026} onValueChange={applyLocalidad2026}>
+                          <SelectTrigger className="w-full border-slate-200 shadow-sm">
+                            <SelectValue placeholder="Municipios" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">Todos los municipios</SelectItem>
+                            {localidadesUnicas2026.map((l) => (
+                              <SelectItem key={l} value={l}>{l}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
                       {hasFilters2026 && (
                         <Button variant="ghost" size="sm" onClick={clearFilters2026}
                           className="h-9 text-slate-500 hover:text-slate-900 col-span-2 sm:col-span-1">
-                          <X className="h-4 w-4 mr-1" />
-                          Limpiar
+                          <X className="h-4 w-4 mr-1" />Limpiar
                         </Button>
                       )}
                     </div>
                   </div>
 
+                  {/* Tabla */}
                   {filtered2026.length === 0 ? (
                     <p className="text-center text-slate-400 italic py-8 text-sm">
                       No hay actividades que coincidan con los filtros.
                     </p>
                   ) : (
                     <div className="rounded-2xl overflow-hidden border border-slate-200/80 shadow-sm">
-                      {/* Resumen barra */}
                       <div className="flex items-center justify-between px-5 py-3 bg-slate-50/80 border-b border-slate-200/70">
                         <span className="text-xs text-slate-500">
                           <span className="font-semibold text-slate-700">{filtered2026.length}</span> actividades
                         </span>
                         <span className="text-xs text-slate-500">
-                          <span className="font-semibold text-blue-700">
-                            {kpis2026.personas.toLocaleString('es-AR')}
-                          </span>{' '}
+                          <span className="font-semibold text-blue-700">{kpis2026.personas.toLocaleString('es-AR')}</span>{' '}
                           personas alcanzadas
                         </span>
                       </div>
 
-                      {/* Desktop: tabla */}
+                      {/* Desktop */}
                       <div className="hidden sm:block overflow-x-auto">
                         <table className="w-full text-sm">
                           <thead>
                             <tr className="bg-slate-50/60">
                               {['Fecha', 'Municipio / Comuna', 'Programa', 'Temática', 'Personas', 'Cargado por'].map((h) => (
-                                <th key={h} className="text-left px-5 py-3 text-slate-400 font-semibold text-xs uppercase tracking-wider border-b border-slate-200/70">
-                                  {h}
-                                </th>
+                                <th key={h} className="text-left px-5 py-3 text-slate-400 font-semibold text-xs uppercase tracking-wider border-b border-slate-200/70">{h}</th>
                               ))}
                             </tr>
                           </thead>
@@ -813,7 +870,7 @@ export function PanelEstadisticas({ rol }: { rol: string }) {
                         </table>
                       </div>
 
-                      {/* Mobile: cards */}
+                      {/* Mobile */}
                       <div className="sm:hidden divide-y divide-slate-100">
                         {paginated2026.map((a, i) => (
                           <div key={i} className="px-4 py-4 hover:bg-blue-50/20 transition-colors">
@@ -824,9 +881,7 @@ export function PanelEstadisticas({ rol }: { rol: string }) {
                               </span>
                             </div>
                             <p className="text-slate-800 text-sm font-semibold truncate">{a.programa || '-'}</p>
-                            {a.tematica && (
-                              <p className="text-slate-400 text-xs truncate mt-0.5">{a.tematica}</p>
-                            )}
+                            {a.tematica && <p className="text-slate-400 text-xs truncate mt-0.5">{a.tematica}</p>}
                             <div className="flex items-center justify-between mt-1">
                               <span className="text-slate-500 text-xs">{a.localidad || '-'}</span>
                               <span className="text-slate-400 text-xs truncate max-w-[150px]">{a.usuario_nombre || '-'}</span>
@@ -852,8 +907,7 @@ export function PanelEstadisticas({ rol }: { rol: string }) {
                                 .filter((n) => n === 1 || n === totalPaginas2026 || Math.abs(n - pagina2026) <= 1)
                                 .reduce<(number | '…')[]>((acc, n, idx, arr) => {
                                   if (idx > 0 && n - (arr[idx - 1] as number) > 1) acc.push('…')
-                                  acc.push(n)
-                                  return acc
+                                  acc.push(n); return acc
                                 }, [])
                                 .map((n, idx) =>
                                   n === '…' ? (
@@ -876,128 +930,145 @@ export function PanelEstadisticas({ rol }: { rol: string }) {
                       )}
                     </div>
                   )}
-                </div>
+                </>
+              )}
+            </>
+          )}
+        </div>
 
-                {/* Sección 3: Gráficos */}
-                <div className="space-y-6">
+        {/* Gráficos 2026 — mismo grid que 2025 */}
+        {hasFetched2026 && !loading2026 && !error2026 && data2026.length > 0 && (
+          <div className="grid lg:grid-cols-2 gap-6">
 
-                  {/* G1: BarChart Evolución mensual */}
-                  <ChartCard
-                    title="Evolución Mensual de Actividades"
-                    subtitle="Cantidad de actividades realizadas por mes · 2026"
+            <ChartCard
+              title="Evolución Mensual de Actividades"
+              subtitle="Actividades realizadas por mes · 2026"
+              description="Cada barra muestra cuántas actividades se realizaron ese mes. Permite ver los picos de actividad institucional a lo largo del año."
+            >
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={evolMes2026} barSize={24}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                  <XAxis dataKey="mes" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+                  <Tooltip contentStyle={tooltipStyle} cursor={{ fill: 'rgba(37,99,235,0.05)' }}
+                    formatter={(v: number) => [v, 'Actividades']}
+                    labelFormatter={(l) => `Mes: ${l}`} />
+                  <Bar dataKey="cantidad" fill="#2563eb" radius={[4, 4, 0, 0]} name="Actividades" />
+                </BarChart>
+              </ResponsiveContainer>
+            </ChartCard>
+
+            <ChartCard
+              title="Personas Alcanzadas por Mes"
+              subtitle="Total de participantes por mes · 2026"
+              description="Personas que asistieron a las actividades cada mes. Un área más amplia refleja mayor impacto directo en la comunidad en ese período."
+            >
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={personasMes2026}>
+                  <defs>
+                    <linearGradient id="gradPersonas2026" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%"  stopColor="#16a34a" stopOpacity={0.25} />
+                      <stop offset="95%" stopColor="#16a34a" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                  <XAxis dataKey="mes" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+                  <Tooltip contentStyle={tooltipStyle}
+                    formatter={(v: number) => [v.toLocaleString('es-AR'), 'Personas']}
+                    labelFormatter={(l) => `Mes: ${l}`} />
+                  <Area type="monotone" dataKey="personas" stroke="#16a34a" strokeWidth={2.5}
+                    fill="url(#gradPersonas2026)" name="Personas"
+                    dot={{ fill: '#16a34a', strokeWidth: 2, r: 3 }}
+                    activeDot={{ r: 5, fill: '#15803d' }} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </ChartCard>
+
+            <ChartCard
+              title="Distribución por Programa"
+              subtitle="Actividades por campaña o proyecto · 2026"
+              description="Proporción de actividades que corresponde a cada programa. Al presionar cada sector se ve el nombre y la cantidad exacta."
+            >
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={porPrograma2026.slice(0, 7).map((d) => ({ name: d.programa, value: d.cantidad }))}
+                    cx="50%" cy="50%"
+                    innerRadius={55} outerRadius={90} paddingAngle={3}
+                    dataKey="value" labelLine={false}
+                    label={({ name, percent }) =>
+                      percent > 0.06 ? `${(name as string).split(' ')[0]} ${(percent * 100).toFixed(0)}%` : ''
+                    }
                   >
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={evolMes2026} barSize={28}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
-                        <XAxis dataKey="mes" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-                        <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-                        <Tooltip contentStyle={tooltipStyle} cursor={{ fill: 'rgba(43,84,194,0.04)' }} formatter={(v: number) => [v, 'Actividades']} />
-                        <Bar dataKey="cantidad" fill="#2b54c2" radius={[4, 4, 0, 0]} name="Actividades" />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </ChartCard>
+                    {porPrograma2026.slice(0, 7).map((_, i) => (
+                      <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip contentStyle={tooltipStyle}
+                    formatter={(v: number, name: string) => [v, name]}
+                    labelFormatter={(l) => `Programa: ${l}`} />
+                </PieChart>
+              </ResponsiveContainer>
+            </ChartCard>
 
-                  {/* G2: AreaChart Personas por mes */}
-                  <ChartCard
-                    title="Personas Alcanzadas por Mes"
-                    subtitle="Total de participantes acumulados por mes · 2026"
+            <ChartCard
+              title="Top Municipios"
+              subtitle="Municipios con más actividades registradas · 2026"
+              description="Ranking de los municipios o comunas con mayor cantidad de actividades. Cada barra tiene su propio color para identificarlos rápidamente."
+            >
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={porLocalidad2026.slice(0, 8).map((d) => ({ nombre: d.localidad, valor: d.cantidad }))}
+                  layout="vertical" barSize={13}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={false} />
+                  <XAxis type="number" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+                  <YAxis dataKey="nombre" type="category" tick={{ fontSize: 10, fill: '#64748b' }} width={145} axisLine={false} tickLine={false} />
+                  <Tooltip contentStyle={tooltipStyle}
+                    formatter={(v: number) => [v, 'Actividades']}
+                    labelFormatter={(l) => `Municipio: ${l}`} />
+                  <Bar dataKey="valor" radius={[0, 4, 4, 0]} name="Actividades">
+                    {porLocalidad2026.slice(0, 8).map((_, i) => (
+                      <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </ChartCard>
+
+            <div className="lg:col-span-2">
+              <ChartCard
+                title="Temáticas más Trabajadas"
+                subtitle="Distribución de actividades por temática · 2026"
+                description="Ejes de contenido más frecuentes en las actividades. Cada temática tiene un color distinto; al presionar se ve la cantidad exacta. Refleja las prioridades de la agenda institucional."
+                height={340}
+              >
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={porTematica2026.slice(0, 10).map((d) => ({ nombre: d.tematica, valor: d.cantidad }))}
+                    layout="vertical" barSize={13}
                   >
-                    <ResponsiveContainer width="100%" height="100%">
-                      <AreaChart data={personasMes2026}>
-                        <defs>
-                          <linearGradient id="gradPersonas2026" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%"  stopColor="#2b54c2" stopOpacity={0.25} />
-                            <stop offset="95%" stopColor="#2b54c2" stopOpacity={0}    />
-                          </linearGradient>
-                        </defs>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
-                        <XAxis dataKey="mes" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-                        <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-                        <Tooltip contentStyle={tooltipStyle} formatter={(v: number) => [v.toLocaleString('es-AR'), 'Personas']} />
-                        <Area type="monotone" dataKey="personas" stroke="#2b54c2" strokeWidth={2.5}
-                          fill="url(#gradPersonas2026)" name="Personas"
-                          dot={{ fill: '#2b54c2', strokeWidth: 2, r: 3 }}
-                          activeDot={{ r: 5, fill: '#1e3d8f' }} />
-                      </AreaChart>
-                    </ResponsiveContainer>
-                  </ChartCard>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={false} />
+                    <XAxis type="number" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+                    <YAxis dataKey="nombre" type="category" tick={{ fontSize: 10, fill: '#64748b' }} width={200} axisLine={false} tickLine={false} />
+                    <Tooltip contentStyle={tooltipStyle}
+                      formatter={(v: number) => [v, 'Actividades']}
+                      labelFormatter={(l) => `Temática: ${l}`} />
+                    <Bar dataKey="valor" radius={[0, 4, 4, 0]} name="Actividades">
+                      {porTematica2026.slice(0, 10).map((_, i) => (
+                        <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </ChartCard>
+            </div>
 
-                  {/* G3 + G4: grid 2 columnas */}
-                  <div className="grid lg:grid-cols-2 gap-6">
-
-                    {/* G3: Donut por programa */}
-                    <ChartCard title="Distribución por Programa" subtitle="Actividades por campaña o proyecto · 2026">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <PieChart>
-                          <Pie
-                            data={porPrograma2026.slice(0, 7).map((d) => ({ name: d.programa, value: d.cantidad }))}
-                            cx="50%" cy="50%"
-                            innerRadius={55} outerRadius={90} paddingAngle={2}
-                            dataKey="value" labelLine={false}
-                            label={({ name, percent }) =>
-                              percent > 0.05
-                                ? `${(name as string).split(' ')[0]} ${(percent * 100).toFixed(0)}%`
-                                : ''
-                            }
-                          >
-                            {porPrograma2026.slice(0, 7).map((_, i) => (
-                              <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
-                            ))}
-                          </Pie>
-                          <Tooltip contentStyle={tooltipStyle} formatter={(v: number) => [v, 'Actividades']} />
-                        </PieChart>
-                      </ResponsiveContainer>
-                    </ChartCard>
-
-                    {/* G4: BarChart horizontal top municipios */}
-                    <ChartCard title="Top Municipios" subtitle="Municipios con más actividades registradas · 2026">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <BarChart
-                          data={porLocalidad2026.slice(0, 8).map((d) => ({ nombre: d.localidad, valor: d.cantidad }))}
-                          layout="vertical" barSize={13}
-                        >
-                          <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={false} />
-                          <XAxis type="number" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-                          <YAxis dataKey="nombre" type="category" tick={{ fontSize: 10, fill: '#64748b' }} width={145} axisLine={false} tickLine={false} />
-                          <Tooltip contentStyle={tooltipStyle} formatter={(v: number) => [v, 'Actividades']} />
-                          <Bar dataKey="valor" fill="#4a72d8" radius={[0, 4, 4, 0]} name="Actividades" />
-                        </BarChart>
-                      </ResponsiveContainer>
-                    </ChartCard>
-
-                  </div>
-
-                  {/* G5: BarChart horizontal temáticas */}
-                  <ChartCard
-                    title="Temáticas más Trabajadas"
-                    subtitle="Distribución de actividades por temática · 2026"
-                    height={340}
-                  >
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart
-                        data={porTematica2026.slice(0, 10).map((d) => ({ nombre: d.tematica, valor: d.cantidad }))}
-                        layout="vertical" barSize={13}
-                      >
-                        <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={false} />
-                        <XAxis type="number" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-                        <YAxis dataKey="nombre" type="category" tick={{ fontSize: 10, fill: '#64748b' }} width={200} axisLine={false} tickLine={false} />
-                        <Tooltip contentStyle={tooltipStyle} formatter={(v: number) => [v, 'Actividades']} />
-                        <Bar dataKey="valor" radius={[0, 4, 4, 0]} name="Actividades">
-                          {porTematica2026.slice(0, 10).map((_, i) => (
-                            <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
-                          ))}
-                        </Bar>
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </ChartCard>
-
-                </div>
-              </>
-            )}
-          </>
+          </div>
         )}
 
-        {/* Sección 5: Tablero Power BI estático */}
+        {/* Tablero Power BI estático */}
         <div className="relative flex items-center gap-4 py-2">
           <div className="flex-1 h-px bg-gradient-to-r from-transparent via-slate-200 to-slate-200" />
           <span className="text-xs font-medium text-slate-400 whitespace-nowrap px-1">
@@ -1007,8 +1078,7 @@ export function PanelEstadisticas({ rol }: { rol: string }) {
         </div>
 
         <div className="glass card-glow rounded-2xl overflow-hidden border border-blue-100/60 shadow-[0_8px_32px_rgba(43,84,194,.10)]">
-          {/* Imagen con overlay y botón centrado */}
-          <div className="relative w-full group">
+          <div className="relative w-full">
             <Image
               src="/tablero-2026.png"
               alt="Tablero Power BI 2026"
@@ -1017,35 +1087,19 @@ export function PanelEstadisticas({ rol }: { rol: string }) {
               className="w-full h-auto rounded-t-2xl object-cover block"
               priority={false}
             />
-            {/* Overlay degradado */}
             <div className="absolute inset-0 bg-gradient-to-t from-slate-900/70 via-slate-900/20 to-transparent rounded-t-2xl" />
-            {/* Botón centrado sobre la imagen */}
             <div className="absolute inset-0 flex items-center justify-center">
               <a
                 href="https://frtutneduar-my.sharepoint.com/:u:/g/personal/marcos_rigo_alu_frt_utn_edu_ar/IQBhg25vUZFeRbD_VtwLnyidAeaNnbiE0EvaDaJdr29-i0k"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="
-                  inline-flex items-center gap-2.5
-                  px-5 py-3 sm:px-7 sm:py-3.5
-                  rounded-xl
-                  bg-white/95 hover:bg-white
-                  text-blue-700 hover:text-blue-800
-                  font-semibold text-sm sm:text-base
-                  shadow-[0_4px_24px_rgba(0,0,0,.22)]
-                  border border-white/80
-                  backdrop-blur-sm
-                  transition-all duration-200
-                  hover:scale-105 hover:shadow-[0_8px_32px_rgba(0,0,0,.28)]
-                  active:scale-100
-                "
+                className="inline-flex items-center gap-2.5 px-5 py-3 sm:px-7 sm:py-3.5 rounded-xl bg-white/95 hover:bg-white text-blue-700 hover:text-blue-800 font-semibold text-sm sm:text-base shadow-[0_4px_24px_rgba(0,0,0,.22)] border border-white/80 backdrop-blur-sm transition-all duration-200 hover:scale-105 hover:shadow-[0_8px_32px_rgba(0,0,0,.28)] active:scale-100"
               >
                 <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
                 Ver tablero completo
               </a>
             </div>
           </div>
-          {/* Pie de card */}
           <div className="px-5 py-4 sm:px-7 sm:py-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-white/60 backdrop-blur-sm border-t border-blue-100/40">
             <p className="text-xs text-slate-400 font-medium tracking-wide">
               Actualizado manualmente · Power BI Desktop

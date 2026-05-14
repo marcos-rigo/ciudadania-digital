@@ -1,5 +1,21 @@
 @import "tailwindcss";
 
+/* Previene scroll horizontal en toda la app. El padding-right que
+   Radix UI agrega al body al abrir un Select/Dialog queda anulado. */
+html {
+  overflow-x: hidden;
+}
+body {
+  overflow-x: hidden;
+}
+/* Radix remove-scroll agrega padding-right para compensar scrollbar;
+   en mobile no hay scrollbar visible, así que lo forzamos a 0. */
+body[data-scroll-locked] {
+  --removed-body-scroll-bar-size: 0px !important;
+  padding-right: 0 !important;
+  margin-right: 0 !important;
+}
+
 @layer base {
   :root {
     /* ══════════════════════════════════════════════════════════ */

@@ -62,7 +62,7 @@ export function DashboardLayout({ nombre, rol, children }: Props) {
     )
 
   return (
-    <div className="min-h-screen flex flex-col bg-content-subtle">
+    <div className="min-h-screen flex flex-col bg-content-subtle overflow-x-hidden">
       {/* ── HEADER OSCURO ── */}
       <header className="sticky top-0 z-50 w-full bg-[#0a1428]/95 backdrop-blur-xl shadow-lg">
         {/* Accent bar */}
