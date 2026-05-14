@@ -6,7 +6,7 @@ import Image from "next/image"
 import { usePathname, useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { LogIn, LogOut, LayoutDashboard, BarChart2, Users, Menu, X } from "lucide-react"
+import { LogIn, LogOut, LayoutDashboard, BarChart2, Users, Menu, X, Sparkles } from "lucide-react"
 
 interface SpcAuth {
   nombre: string
@@ -19,7 +19,6 @@ function readSpcAuth(): SpcAuth | null {
   if (!match) return null
   try {
     const raw = decodeURIComponent(match.trim().slice("spc_auth=".length))
-    // soporta cookie vieja (="1") y nueva (=JSON)
     if (raw === "1") return { nombre: "", rol: "" }
     return JSON.parse(raw) as SpcAuth
   } catch {
@@ -28,9 +27,18 @@ function readSpcAuth(): SpcAuth | null {
 }
 
 const BADGE: Record<string, { cls: string; label: string }> = {
-  superadmin: { cls: "bg-violet-100 text-violet-700 border border-violet-200", label: "Superadmin" },
-  empleado:   { cls: "bg-blue-100 text-blue-700 border border-blue-200",       label: "Empleado"   },
-  lector:     { cls: "bg-slate-100 text-slate-600 border border-slate-200",     label: "Lector"     },
+  superadmin: { 
+    cls: "bg-gradient-to-r from-violet-500/20 to-violet-600/10 border-violet-500/30 text-violet-300", 
+    label: "Superadmin" 
+  },
+  empleado:   { 
+    cls: "bg-gradient-to-r from-cyan-500/20 to-cyan-600/10 border-cyan-500/30 text-cyan-300", 
+    label: "Empleado" 
+  },
+  lector:     { 
+    cls: "bg-gradient-to-r from-slate-500/20 to-slate-600/10 border-slate-500/30 text-slate-400", 
+    label: "Lector" 
+  },
 }
 
 
@@ -51,7 +59,6 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener('scroll', fn)
   }, [])
 
-  // Cerrar menú al cambiar ruta
   useEffect(() => { setMenuOpen(false) }, [pathname])
 
   async function handleLogout() {
@@ -67,35 +74,28 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
 
   const navLinkCls = (active: boolean) =>
     cn(
-      "px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200",
+      "px-4 py-2 text-sm font-medium rounded-lg transition-all duration-300 relative overflow-hidden group",
       active
-        ? "bg-blue-50 text-blue-700 shadow-sm border border-blue-200"
-        : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
-    )
-
-  const mobileNavLinkCls = (active: boolean) =>
-    cn(
-      "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 w-full",
-      active
-        ? "bg-blue-50 text-blue-700 border border-blue-200"
-        : "text-slate-600 hover:bg-slate-100"
+        ? "text-cyan-400"
+        : "text-slate-400 hover:text-cyan-400"
     )
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
       {/* ── HEADER ── */}
       <header className={cn(
-        "sticky top-0 z-50 w-full bg-white/92 backdrop-blur-xl transition-all duration-200",
-        scrolled ? "border-b border-slate-200/80 shadow-sm" : "border-b border-transparent"
+        "sticky top-0 z-50 w-full backdrop-blur-2xl transition-all duration-300",
+        scrolled 
+          ? "bg-[#0d1220]/95 border-b border-cyan-500/10 shadow-lg shadow-cyan-500/5" 
+          : "bg-[#050810]/80 border-b border-transparent"
       )}>
         {/* Accent bar */}
-        <div className="h-0.5 w-full bg-gradient-to-r from-blue-600 via-violet-600 to-blue-600" />
+        <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent" />
 
         <div className="flex h-16 items-center px-4 lg:px-8 gap-2">
-
-          {/* Hamburger — solo mobile */}
+          {/* Hamburger */}
           <button
-            className="lg:hidden flex-shrink-0 flex items-center justify-center w-9 h-9 rounded-lg text-slate-500 hover:bg-slate-100 transition-colors"
+            className="lg:hidden flex-shrink-0 flex items-center justify-center w-9 h-9 rounded-lg text-slate-400 hover:text-cyan-400 hover:bg-cyan-500/10 transition-all duration-200"
             onClick={() => setMenuOpen((v) => !v)}
             aria-label="Menú de navegación"
           >
@@ -103,38 +103,39 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
           </button>
 
           {/* Logo */}
-          <Link href="/inicio" className="flex items-center shrink-0">
+          <Link href="/inicio" className="flex items-center shrink-0 group">
             <div className="relative h-10 w-32 sm:h-14 sm:w-44">
               <Image
                 src="/logo1.png"
                 alt="Secretaría de Participación Ciudadana"
                 fill
-                className="object-contain"
+                className="object-contain transition-all duration-300 group-hover:scale-105"
               />
             </div>
           </Link>
 
-          {/* Nav centrado — desktop */}
+          {/* Nav centrado */}
           <div className="flex-1 flex items-center justify-center">
             {loggedIn && (
               <nav className="hidden lg:flex items-center gap-1">
                 {(user?.rol === 'superadmin' || user?.rol === 'empleado') && (
                   <Link href="/dashboard/admin" className={navLinkCls(false)}>
-                    <span className="flex items-center gap-1.5">
+                    <span className="flex items-center gap-1.5 relative z-10">
                       <LayoutDashboard className="w-4 h-4" />
                       Carga
                     </span>
+                    <span className="absolute inset-0 bg-cyan-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
                   </Link>
                 )}
                 <Link href="/dashboard/estadisticas" className={navLinkCls(false)}>
-                  <span className="flex items-center gap-1.5">
+                  <span className="flex items-center gap-1.5 relative z-10">
                     <BarChart2 className="w-4 h-4" />
                     Estadísticas
                   </span>
                 </Link>
                 {user?.rol === 'superadmin' && (
                   <Link href="/dashboard/admin/usuarios" className={navLinkCls(false)}>
-                    <span className="flex items-center gap-1.5">
+                    <span className="flex items-center gap-1.5 relative z-10">
                       <Users className="w-4 h-4" />
                       Usuarios
                     </span>
@@ -144,26 +145,24 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
             )}
           </div>
 
-          {/* Derecha: usuario + acciones */}
+          {/* Right: usuario + acciones */}
           <div className="flex items-center gap-2 shrink-0">
             {loggedIn ? (
               <>
-                {/* Badge de usuario — solo desktop */}
                 {user?.nombre && (
-                  <div className="hidden sm:flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-full pl-3 pr-2 py-1.5">
-                    <span className="text-sm font-medium text-slate-700 max-w-[140px] truncate">
+                  <div className="hidden sm:flex items-center gap-2 bg-slate-900/50 border border-slate-700/50 rounded-full pl-3 pr-2 py-1.5 hover:border-cyan-500/20 transition-all duration-300">
+                    <span className="text-sm font-medium text-slate-300 max-w-[140px] truncate">
                       {user.nombre}
                     </span>
                     {badge && (
-                      <span className={cn("text-[11px] font-bold px-2.5 py-0.5 rounded-full", badge.cls)}>
+                      <span className={cn("text-[11px] font-bold px-2.5 py-0.5 rounded-full border", badge.cls)}>
                         {badge.label}
                       </span>
                     )}
                   </div>
                 )}
-                {/* Solo badge en mobile cuando hay nombre */}
                 {badge && user?.nombre && (
-                  <span className={cn("sm:hidden text-[11px] font-bold px-2.5 py-1 rounded-full", badge.cls)}>
+                  <span className={cn("sm:hidden text-[11px] font-bold px-2.5 py-1 rounded-full border", badge.cls)}>
                     {badge.label}
                   </span>
                 )}
@@ -171,14 +170,14 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
                 <button
                   onClick={handleLogout}
                   title="Cerrar sesión"
-                  className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium bg-slate-50 hover:bg-red-50 border border-slate-200 hover:border-red-200 rounded-lg transition-all duration-200 text-slate-500 hover:text-red-600"
+                  className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium bg-slate-900/50 hover:bg-red-500/10 border border-slate-700/50 hover:border-red-500/30 rounded-lg transition-all duration-200 text-slate-400 hover:text-red-400"
                 >
                   <LogOut className="w-4 h-4" />
                   <span className="hidden sm:inline">Salir</span>
                 </button>
               </>
             ) : (
-              <Button asChild variant="default" size="sm">
+              <Button asChild variant="default" size="sm" className="bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-semibold border-0">
                 <Link href="/login">
                   <LogIn className="h-4 w-4 mr-2" />
                   Ingresar
@@ -190,13 +189,13 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
 
         {/* ── MOBILE NAV ── */}
         {menuOpen && (
-          <div className="lg:hidden border-t border-slate-100 bg-white/95 backdrop-blur-xl px-4 py-3 space-y-1 shadow-lg">
+          <div className="lg:hidden border-t border-slate-800/50 bg-[#0d1220]/98 backdrop-blur-xl px-4 py-3 space-y-1 shadow-2xl shadow-cyan-500/5">
             {loggedIn && user?.nombre && (
-              <div className="flex items-center gap-3 px-4 py-3 mb-1 bg-slate-50 rounded-xl">
+              <div className="flex items-center gap-3 px-4 py-3 mb-1 bg-slate-900/50 rounded-xl border border-slate-700/30">
                 <div className="min-w-0">
-                  <p className="text-sm font-semibold text-slate-800 truncate">{user.nombre}</p>
+                  <p className="text-sm font-semibold text-slate-200 truncate">{user.nombre}</p>
                   {badge && (
-                    <span className={cn("text-[11px] font-bold px-2 py-0.5 rounded-full", badge.cls)}>
+                    <span className={cn("text-[11px] font-bold px-2 py-0.5 rounded-full border", badge.cls)}>
                       {badge.label}
                     </span>
                   )}
@@ -207,25 +206,25 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
             {loggedIn ? (
               <>
                 {(user?.rol === 'superadmin' || user?.rol === 'empleado') && (
-                  <Link href="/dashboard/admin" onClick={() => setMenuOpen(false)} className={mobileNavLinkCls(false)}>
+                  <Link href="/dashboard/admin" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-400 hover:text-cyan-400 hover:bg-cyan-500/10 transition-all duration-200 w-full">
                     <LayoutDashboard className="w-4 h-4" />
                     Carga
                   </Link>
                 )}
-                <Link href="/dashboard/estadisticas" onClick={() => setMenuOpen(false)} className={mobileNavLinkCls(false)}>
+                <Link href="/dashboard/estadisticas" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-400 hover:text-cyan-400 hover:bg-cyan-500/10 transition-all duration-200 w-full">
                   <BarChart2 className="w-4 h-4" />
                   Estadísticas
                 </Link>
                 {user?.rol === 'superadmin' && (
-                  <Link href="/dashboard/admin/usuarios" onClick={() => setMenuOpen(false)} className={mobileNavLinkCls(false)}>
+                  <Link href="/dashboard/admin/usuarios" onClick={() => setMenuOpen(false)} className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-400 hover:text-cyan-400 hover:bg-cyan-500/10 transition-all duration-200 w-full">
                     <Users className="w-4 h-4" />
                     Usuarios
                   </Link>
                 )}
-                <div className="pt-2 border-t border-slate-100">
+                <div className="pt-2 border-t border-slate-800/50">
                   <button
                     onClick={handleLogout}
-                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 w-full transition-colors"
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-red-400 hover:bg-red-500/10 w-full transition-all duration-200"
                   >
                     <LogOut className="w-4 h-4" /> Cerrar sesión
                   </button>
@@ -235,7 +234,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
               <Link
                 href="/login"
                 onClick={() => setMenuOpen(false)}
-                className={mobileNavLinkCls(false)}
+                className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-cyan-400 bg-cyan-500/10 border border-cyan-500/20 w-full"
               >
                 <LogIn className="w-4 h-4" />
                 Ingresar
@@ -249,22 +248,22 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
       <main className="flex-1">{children}</main>
 
       {/* ── FOOTER ── */}
-      <footer className="border-t border-slate-200 bg-white">
-        <div className="h-0.5 w-full bg-gradient-to-r from-blue-600 via-violet-600 to-blue-600" />
+      <footer className="border-t border-slate-800/50 bg-[#0a1020]">
+        <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent" />
         <div className="container mx-auto px-4 py-12">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {/* Descripción */}
             <div className="lg:col-span-2">
               <div className="flex items-center gap-3 mb-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-violet-600 shadow-md">
-                  <span className="text-lg font-bold text-white">CD</span>
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-500 to-violet-500 shadow-lg shadow-cyan-500/20">
+                  <Sparkles className="h-5 w-5 text-white" />
                 </div>
                 <div>
-                  <p className="font-semibold text-slate-900">Ciudadanía Digital</p>
+                  <p className="font-semibold text-slate-200">Ciudadanía Digital</p>
                   <p className="text-sm text-slate-500">San Miguel de Tucumán</p>
                 </div>
               </div>
-              <p className="text-sm text-slate-600 max-w-md leading-relaxed">
+              <p className="text-sm text-slate-400 max-w-md leading-relaxed">
                 Plataforma de Gestión para una Ciudadanía Activa y Participativa.
                 Secretaría de Estado de Participación Ciudadana.
               </p>
@@ -273,23 +272,23 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
             {/* Enlaces rápidos */}
             {loggedIn && (
               <div>
-                <h3 className="font-semibold text-slate-900 mb-4">Dashboard</h3>
+                <h3 className="font-semibold text-slate-200 mb-4">Dashboard</h3>
                 <ul className="space-y-2">
                   {(user?.rol === 'superadmin' || user?.rol === 'empleado') && (
                     <li>
-                      <Link href="/dashboard/admin" className="text-sm text-slate-500 hover:text-blue-600 transition-colors duration-200">
+                      <Link href="/dashboard/admin" className="text-sm text-slate-400 hover:text-cyan-400 transition-colors duration-200">
                         Carga
                       </Link>
                     </li>
                   )}
                   <li>
-                    <Link href="/dashboard/estadisticas" className="text-sm text-slate-500 hover:text-blue-600 transition-colors duration-200">
+                    <Link href="/dashboard/estadisticas" className="text-sm text-slate-400 hover:text-cyan-400 transition-colors duration-200">
                       Estadísticas
                     </Link>
                   </li>
                   {user?.rol === 'superadmin' && (
                     <li>
-                      <Link href="/dashboard/admin/usuarios" className="text-sm text-slate-500 hover:text-blue-600 transition-colors duration-200">
+                      <Link href="/dashboard/admin/usuarios" className="text-sm text-slate-400 hover:text-cyan-400 transition-colors duration-200">
                         Usuarios
                       </Link>
                     </li>
@@ -300,7 +299,7 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
 
             {/* Contacto */}
             <div>
-              <h3 className="font-semibold text-slate-900 mb-4">Contacto</h3>
+              <h3 className="font-semibold text-slate-200 mb-4">Contacto</h3>
               <ul className="space-y-2 text-sm text-slate-500">
                 <li>25 de Mayo 90</li>
                 <li>San Miguel de Tucumán</li>
@@ -309,17 +308,17 @@ export function PublicLayout({ children }: { children: React.ReactNode }) {
             </div>
           </div>
 
-          <div className="mt-8 pt-8 border-t border-slate-200">
+          <div className="mt-8 pt-8 border-t border-slate-800/50">
             <div className="flex flex-col sm:flex-row justify-between items-center gap-6">
-              <p className="text-sm text-slate-400">
+              <p className="text-sm text-slate-500">
                 © {new Date().getFullYear()} José Farhat. Todos los derechos reservados.
               </p>
               <div className="flex items-center gap-4">
                 <div className="relative h-9 w-28 sm:h-12 sm:w-36">
-                  <Image src="/logo1.png" alt="SPC Tucumán" fill className="object-contain" />
+                  <Image src="/logo1.png" alt="SPC Tucumán" fill className="object-contain opacity-70" />
                 </div>
                 <div className="relative h-9 w-28 sm:h-12 sm:w-36">
-                  <Image src="/logo2.png" alt="Gobierno de Tucumán" fill className="object-contain" />
+                  <Image src="/logo2.png" alt="Gobierno de Tucumán" fill className="object-contain opacity-70" />
                 </div>
               </div>
             </div>

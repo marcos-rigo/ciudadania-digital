@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react"
-
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
@@ -20,6 +19,7 @@ import {
   Award,
   LogIn,
   ChevronDown,
+  Sparkles,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -51,26 +51,25 @@ const userNavItems = [
 export function CiudadaniaLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  // Mock: Check if user is logged in
   const isLoggedIn = true;
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
       {/* Header */}
-      <header className="sticky top-0 z-50 border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <header className="sticky top-0 z-50 border-b border-slate-800/50 bg-[#050810]/95 backdrop-blur-xl">
+        <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent" />
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-accent glow text-primary-foreground font-bold text-lg">
-                CD
+            <Link href="/" className="flex items-center gap-3 group">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-500 to-violet-500 shadow-lg shadow-cyan-500/20 text-white font-bold text-lg">
+                <Sparkles className="h-5 w-5" />
               </div>
               <div className="hidden sm:block">
-                <p className="font-semibold text-foreground leading-tight">
+                <p className="font-semibold text-slate-200 leading-tight group-hover:text-cyan-400 transition-colors">
                   Ciudadanía Digital
                 </p>
-                <p className="text-xs text-muted-foreground">José Farhat</p>
+                <p className="text-xs text-slate-500">José Farhat</p>
               </div>
             </Link>
 
@@ -82,20 +81,17 @@ export function CiudadaniaLayout({ children }: { children: React.ReactNode }) {
                     <DropdownMenuTrigger asChild>
                       <Button
                         variant="ghost"
-                        className="gap-1 text-muted-foreground hover:text-foreground"
+                        className="gap-1 text-slate-400 hover:text-cyan-400 hover:bg-cyan-500/10"
                       >
                         <item.icon className="h-4 w-4" />
                         {item.label}
                         <ChevronDown className="h-3 w-3" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="center" className="glass">
+                    <DropdownMenuContent align="center" className="bg-[#0d1220] border-slate-800">
                       {item.children.map((child) => (
-                        <DropdownMenuItem key={child.href} asChild className="cursor-pointer hover:bg-primary/10">
-                          <Link
-                            href={child.href}
-                            className="flex items-center gap-2"
-                          >
+                        <DropdownMenuItem key={child.href} asChild className="cursor-pointer hover:bg-cyan-500/10 text-slate-300">
+                          <Link href={child.href} className="flex items-center gap-2">
                             <child.icon className="h-4 w-4" />
                             {child.label}
                           </Link>
@@ -108,9 +104,9 @@ export function CiudadaniaLayout({ children }: { children: React.ReactNode }) {
                     <Button
                       variant="ghost"
                       className={cn(
-                        "gap-2 text-muted-foreground hover:text-foreground transition-all duration-200 rounded-lg",
+                        "gap-2 text-slate-400 hover:text-cyan-400 hover:bg-cyan-500/10 transition-all duration-200 rounded-lg",
                         pathname === item.href &&
-                          "bg-primary/10 text-primary glow shadow-glow-sm"
+                          "bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 shadow-lg shadow-cyan-500/10"
                       )}
                     >
                       <item.icon className="h-4 w-4" />
@@ -128,20 +124,17 @@ export function CiudadaniaLayout({ children }: { children: React.ReactNode }) {
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="outline"
-                      className="hidden sm:flex gap-2 border-border/40 hover:border-primary/40 hover:bg-primary/5 bg-transparent glow"
+                      className="hidden sm:flex gap-2 border-slate-700 bg-slate-900/50 text-slate-300 hover:border-cyan-500/30 hover:bg-cyan-500/10 hover:text-cyan-400"
                     >
                       <User className="h-4 w-4" />
                       Mi cuenta
                       <ChevronDown className="h-3 w-3" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="glass">
+                  <DropdownMenuContent align="end" className="bg-[#0d1220] border-slate-800">
                     {userNavItems.map((item) => (
-                      <DropdownMenuItem key={item.href} asChild className="cursor-pointer hover:bg-primary/10">
-                        <Link
-                          href={item.href}
-                          className="flex items-center gap-2"
-                        >
+                      <DropdownMenuItem key={item.href} asChild className="cursor-pointer hover:bg-cyan-500/10 text-slate-300">
+                        <Link href={item.href} className="flex items-center gap-2">
                           <item.icon className="h-4 w-4" />
                           {item.label}
                         </Link>
@@ -151,7 +144,7 @@ export function CiudadaniaLayout({ children }: { children: React.ReactNode }) {
                 </DropdownMenu>
               ) : (
                 <Link href="/ciudadania-digital/login">
-                  <Button className="hidden sm:flex gap-2 bg-gradient-to-r from-primary to-accent text-primary-foreground glow hover:shadow-glow-lg">
+                  <Button className="hidden sm:flex gap-2 bg-cyan-500 text-slate-900 hover:bg-cyan-400 font-semibold shadow-lg shadow-cyan-500/20">
                     <LogIn className="h-4 w-4" />
                     Ingresar
                   </Button>
@@ -162,7 +155,7 @@ export function CiudadaniaLayout({ children }: { children: React.ReactNode }) {
               <Button
                 variant="ghost"
                 size="icon"
-                className="lg:hidden"
+                className="lg:hidden text-slate-400 hover:text-cyan-400 hover:bg-cyan-500/10"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               >
                 {mobileMenuOpen ? (
@@ -177,12 +170,12 @@ export function CiudadaniaLayout({ children }: { children: React.ReactNode }) {
 
         {/* Mobile Navigation */}
         {mobileMenuOpen && (
-          <div className="lg:hidden border-t border-border/40 bg-card/50 backdrop-blur">
+          <div className="lg:hidden border-t border-slate-800/50 bg-[#0d1220]/98 backdrop-blur-xl">
             <div className="px-4 py-4 space-y-1">
               {navItems.map((item) =>
                 item.children ? (
                   <div key={item.label} className="space-y-1">
-                    <p className="px-3 py-2 text-sm font-medium text-muted-foreground">
+                    <p className="px-3 py-2 text-sm font-medium text-slate-500">
                       {item.label}
                     </p>
                     {item.children.map((child) => (
@@ -193,8 +186,8 @@ export function CiudadaniaLayout({ children }: { children: React.ReactNode }) {
                         className={cn(
                           "flex items-center gap-3 rounded-lg px-3 py-2 text-sm pl-6 transition-all duration-200",
                           pathname === child.href
-                            ? "bg-primary/10 text-primary glow"
-                            : "text-muted-foreground hover:bg-muted/50"
+                            ? "bg-cyan-500/10 text-cyan-400 border border-cyan-500/20"
+                            : "text-slate-400 hover:bg-slate-800/50"
                         )}
                       >
                         <child.icon className="h-4 w-4" />
@@ -210,8 +203,8 @@ export function CiudadaniaLayout({ children }: { children: React.ReactNode }) {
                     className={cn(
                       "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all duration-200",
                       pathname === item.href
-                        ? "bg-primary/10 text-primary glow"
-                        : "text-muted-foreground hover:bg-muted/50"
+                        ? "bg-cyan-500/10 text-cyan-400 border border-cyan-500/20"
+                        : "text-slate-400 hover:bg-slate-800/50"
                     )}
                   >
                     <item.icon className="h-4 w-4" />
@@ -219,7 +212,7 @@ export function CiudadaniaLayout({ children }: { children: React.ReactNode }) {
                   </Link>
                 )
               )}
-              <div className="border-t border-border/40 pt-2 mt-2">
+              <div className="border-t border-slate-800/50 pt-2 mt-2">
                 {isLoggedIn ? (
                   userNavItems.map((item) => (
                     <Link
@@ -229,8 +222,8 @@ export function CiudadaniaLayout({ children }: { children: React.ReactNode }) {
                       className={cn(
                         "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all duration-200",
                         pathname === item.href
-                          ? "bg-primary/10 text-primary glow"
-                          : "text-muted-foreground hover:bg-muted/50"
+                          ? "bg-cyan-500/10 text-cyan-400"
+                          : "text-slate-400 hover:bg-slate-800/50"
                       )}
                     >
                       <item.icon className="h-4 w-4" />
@@ -241,7 +234,7 @@ export function CiudadaniaLayout({ children }: { children: React.ReactNode }) {
                   <Link
                     href="/ciudadania-digital/login"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-primary font-medium"
+                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-cyan-400 font-medium"
                   >
                     <LogIn className="h-4 w-4" />
                     Ingresar
@@ -257,22 +250,22 @@ export function CiudadaniaLayout({ children }: { children: React.ReactNode }) {
       <main className="flex-1">{children}</main>
 
       {/* Footer */}
-      <footer className="border-t border-border/40 bg-card/30 mt-16">
+      <footer className="border-t border-slate-800/50 bg-[#0a1020] mt-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="md:col-span-2">
               <div className="flex items-center gap-3 mb-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-accent glow text-primary-foreground font-bold text-lg">
-                  CD
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-500 to-violet-500 shadow-lg shadow-cyan-500/20 text-white font-bold text-lg">
+                  <Sparkles className="h-5 w-5" />
                 </div>
                 <div>
-                  <p className="font-semibold text-foreground">
+                  <p className="font-semibold text-slate-200">
                     Ciudadanía Digital
                   </p>
-                  <p className="text-xs text-muted-foreground">José Farhat</p>
+                  <p className="text-xs text-slate-500">José Farhat</p>
                 </div>
               </div>
-              <p className="text-sm text-muted-foreground max-w-md">
+              <p className="text-sm text-slate-400 max-w-md">
                 La ciudadanía digital se aprende, se practica y se construye
                 colectivamente. Formate como ciudadano/a digital y contribuí a
                 una internet más segura y participativa.
@@ -280,37 +273,25 @@ export function CiudadaniaLayout({ children }: { children: React.ReactNode }) {
             </div>
 
             <div>
-              <h4 className="font-semibold text-foreground mb-4">Formación</h4>
+              <h4 className="font-semibold text-slate-200 mb-4">Formación</h4>
               <ul className="space-y-2">
                 <li>
-                  <Link
-                    href="/trayectos"
-                    className="text-sm text-muted-foreground hover:text-primary transition-colors duration-200"
-                  >
+                  <Link href="/trayectos" className="text-sm text-slate-400 hover:text-cyan-400 transition-colors duration-200">
                     Trayectos formativos
                   </Link>
                 </li>
                 <li>
-                  <Link
-                    href="/contenidos/videos"
-                    className="text-sm text-muted-foreground hover:text-primary transition-colors duration-200"
-                  >
+                  <Link href="/contenidos/videos" className="text-sm text-slate-400 hover:text-cyan-400 transition-colors duration-200">
                     Videos educativos
                   </Link>
                 </li>
                 <li>
-                  <Link
-                    href="/contenidos/podcast"
-                    className="text-sm text-muted-foreground hover:text-primary transition-colors duration-200"
-                  >
+                  <Link href="/contenidos/podcast" className="text-sm text-slate-400 hover:text-cyan-400 transition-colors duration-200">
                     Podcast
                   </Link>
                 </li>
                 <li>
-                  <Link
-                    href="/evaluaciones"
-                    className="text-sm text-muted-foreground hover:text-primary transition-colors duration-200"
-                  >
+                  <Link href="/evaluaciones" className="text-sm text-slate-400 hover:text-cyan-400 transition-colors duration-200">
                     Evaluaciones
                   </Link>
                 </li>
@@ -318,29 +299,20 @@ export function CiudadaniaLayout({ children }: { children: React.ReactNode }) {
             </div>
 
             <div>
-              <h4 className="font-semibold text-foreground mb-4">Institucional</h4>
+              <h4 className="font-semibold text-slate-200 mb-4">Institucional</h4>
               <ul className="space-y-2">
                 <li>
-                  <Link
-                    href="/"
-                    className="text-sm text-muted-foreground hover:text-primary transition-colors duration-200"
-                  >
+                  <Link href="/" className="text-sm text-slate-400 hover:text-cyan-400 transition-colors duration-200">
                     SPC Tucumán
                   </Link>
                 </li>
                 <li>
-                  <Link
-                    href="/contacto"
-                    className="text-sm text-muted-foreground hover:text-primary transition-colors duration-200"
-                  >
+                  <Link href="/contacto" className="text-sm text-slate-400 hover:text-cyan-400 transition-colors duration-200">
                     Contacto
                   </Link>
                 </li>
                 <li>
-                  <Link
-                    href="/transparencia"
-                    className="text-sm text-muted-foreground hover:text-primary transition-colors duration-200"
-                  >
+                  <Link href="/transparencia" className="text-sm text-slate-400 hover:text-cyan-400 transition-colors duration-200">
                     Transparencia
                   </Link>
                 </li>
@@ -348,8 +320,8 @@ export function CiudadaniaLayout({ children }: { children: React.ReactNode }) {
             </div>
           </div>
 
-          <div className="border-t border-border/40 mt-8 pt-8 text-center">
-            <p className="text-xs text-muted-foreground">
+          <div className="border-t border-slate-800/50 mt-8 pt-8 text-center">
+            <p className="text-xs text-slate-500">
               Secretaría de Estado de Participación Ciudadana - Ministerio de
               Seguridad - Tucumán
             </p>

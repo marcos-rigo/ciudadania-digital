@@ -11,12 +11,11 @@ const modules = [
     description: "Registro territorial",
     details:
       "Sistema centralizado de carga de actividades, capacitaciones y acciones territoriales. Integración directa con formularios operativos para un registro ágil y trazable.",
-    iconBg: "bg-blue-50",
-    iconColor: "text-blue-600",
-    borderHover: "hover:border-blue-300",
-    shadowHover: "hover:shadow-[0_8px_32px_rgba(37,99,235,0.12)]",
-    gradientHover: "from-blue-50/80 to-transparent",
-    accentColor: "text-blue-600",
+    iconBg: "bg-cyan-500/20",
+    iconColor: "text-cyan-400",
+    borderHover: "hover:border-cyan-500/30",
+    gradientHover: "from-cyan-500/10 to-transparent",
+    accentColor: "text-cyan-400",
   },
   {
     icon: Activity,
@@ -24,12 +23,11 @@ const modules = [
     description: "Seguimiento continuo",
     details:
       "Visualización actualizada del alcance territorial, cantidad de personas impactadas y localidades activas. Indicadores en vivo para el seguimiento de la gestión diaria.",
-    iconBg: "bg-emerald-50",
-    iconColor: "text-emerald-600",
-    borderHover: "hover:border-emerald-300",
-    shadowHover: "hover:shadow-[0_8px_32px_rgba(16,185,129,0.12)]",
-    gradientHover: "from-emerald-50/80 to-transparent",
-    accentColor: "text-emerald-600",
+    iconBg: "bg-emerald-500/20",
+    iconColor: "text-emerald-400",
+    borderHover: "hover:border-emerald-500/30",
+    gradientHover: "from-emerald-500/10 to-transparent",
+    accentColor: "text-emerald-400",
   },
   {
     icon: LayoutDashboard,
@@ -37,12 +35,11 @@ const modules = [
     description: "Decisiones basadas en datos",
     details:
       "Dashboards con indicadores clave de desempeño, consolidación de información por programa y territorio, y reportes automáticos para la toma de decisiones estratégicas.",
-    iconBg: "bg-violet-50",
-    iconColor: "text-violet-600",
-    borderHover: "hover:border-violet-300",
-    shadowHover: "hover:shadow-[0_8px_32px_rgba(109,40,217,0.12)]",
-    gradientHover: "from-violet-50/80 to-transparent",
-    accentColor: "text-violet-600",
+    iconBg: "bg-violet-500/20",
+    iconColor: "text-violet-400",
+    borderHover: "hover:border-violet-500/30",
+    gradientHover: "from-violet-500/10 to-transparent",
+    accentColor: "text-violet-400",
   },
 ]
 
@@ -64,9 +61,14 @@ const cardVariant = {
 
 export function EcosystemSection() {
   return (
-    <section className="py-24 md:py-32 relative overflow-hidden bg-hero-premium">
-      {/* Grain */}
+    <section className="py-24 md:py-32 relative overflow-hidden bg-[#0a1020]">
+      {/* Grain & Grid */}
       <div className="bg-noise" />
+      <div className="absolute inset-0 bg-grid opacity-20" />
+
+      {/* Ambient glow */}
+      <div className="absolute top-1/3 left-0 w-80 h-80 bg-cyan-500/10 rounded-full blur-[100px]" />
+      <div className="absolute bottom-1/3 right-0 w-80 h-80 bg-violet-500/10 rounded-full blur-[100px]" />
 
       <div className="container mx-auto px-4 relative z-10">
         {/* Header */}
@@ -83,12 +85,12 @@ export function EcosystemSection() {
             <span className="badge-accent">Sistema Integrado</span>
           </div>
 
-          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 mb-6 leading-tight">
+          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-100 mb-6 leading-tight">
             Soluciones Integradas
             <span className="block text-gradient">para la Gestión Interna</span>
           </h2>
 
-          <p className="text-lg text-slate-500 leading-relaxed max-w-2xl mx-auto">
+          <p className="text-lg text-slate-400 leading-relaxed max-w-2xl mx-auto">
             Módulos interconectados que centralizan el registro, el monitoreo y el análisis
             de resultados de la Secretaría de Participación Ciudadana.
           </p>
@@ -107,7 +109,7 @@ export function EcosystemSection() {
             return (
               <motion.div key={module.title} variants={cardVariant} className="group">
                 <Card
-                  className={`h-full overflow-hidden border border-slate-200/80 bg-white/95
+                  className={`h-full overflow-hidden border border-slate-800/50 bg-slate-900/50
                     card-glow transition-all duration-300 hover:-translate-y-1.5
                     ${module.borderHover}`}
                 >
@@ -121,14 +123,14 @@ export function EcosystemSection() {
 
                   <CardHeader className="pb-3 relative z-10">
                     <motion.div
-                      className={`inline-flex h-14 w-14 items-center justify-center rounded-xl ${module.iconBg} mb-4 border border-white shadow-sm transition-all group-hover:scale-110`}
-                      whileHover={{ rotate: 8 }}
+                      className={`inline-flex h-14 w-14 items-center justify-center rounded-xl ${module.iconBg} mb-4 border border-slate-700/50 shadow-lg transition-all group-hover:scale-110 group-hover:rotate-3`}
+                      whileHover={{ rotate: 5 }}
                       transition={{ type: "spring", stiffness: 300 }}
                     >
                       <Icon className={`h-7 w-7 ${module.iconColor}`} />
                     </motion.div>
 
-                    <CardTitle className="text-base font-bold text-slate-900">
+                    <CardTitle className="text-base font-bold text-slate-100">
                       {module.title}
                     </CardTitle>
                     <CardDescription className={`${module.accentColor} font-semibold text-xs uppercase tracking-wide`}>
@@ -137,13 +139,13 @@ export function EcosystemSection() {
                   </CardHeader>
 
                   <CardContent className="relative z-10">
-                    <p className="text-sm text-slate-500 leading-relaxed group-hover:text-slate-700 transition-colors">
+                    <p className="text-sm text-slate-400 leading-relaxed group-hover:text-slate-300 transition-colors">
                       {module.details}
                     </p>
                   </CardContent>
 
                   {/* Index number */}
-                  <div className="absolute bottom-4 right-4 text-5xl font-black text-slate-100 group-hover:text-slate-200 transition-colors pointer-events-none select-none">
+                  <div className="absolute bottom-4 right-4 text-5xl font-black text-slate-800 group-hover:text-slate-700 transition-colors pointer-events-none select-none">
                     {(index + 1).toString().padStart(2, '0')}
                   </div>
 
@@ -159,11 +161,11 @@ export function EcosystemSection() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
           viewport={{ once: true }}
-          className="mt-16 p-8 rounded-2xl border border-blue-200/60 bg-gradient-to-br from-blue-50/80 to-violet-50/60 text-center max-w-2xl mx-auto card-glow"
+          className="mt-16 p-8 rounded-2xl border border-cyan-500/20 bg-gradient-to-br from-cyan-500/5 to-violet-500/5 text-center max-w-2xl mx-auto card-glow"
         >
-          <p className="text-slate-700 font-medium">
+          <p className="text-slate-300 font-medium">
             Todos los módulos comparten la misma base de datos para garantizar{' '}
-            <span className="text-blue-700 font-bold">coherencia, trazabilidad y reportes en tiempo real</span>.
+            <span className="text-cyan-400 font-bold">coherencia, trazabilidad y reportes en tiempo real</span>.
           </p>
         </motion.div>
       </div>

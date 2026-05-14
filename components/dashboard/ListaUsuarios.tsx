@@ -35,12 +35,10 @@ export function ListaUsuarios({ refetch }: { refetch?: number }) {
   const [error, setError] = useState('')
   const [internalRefetch, setInternalRefetch] = useState(0)
 
-  // Modales
   const [mostrarCrear, setMostrarCrear] = useState(false)
   const [usuarioEditar, setUsuarioEditar] = useState<Usuario | null>(null)
   const [usuarioEliminar, setUsuarioEliminar] = useState<Usuario | null>(null)
 
-  // Estado del formulario de edición
   const [editNombre, setEditNombre] = useState('')
   const [editRol, setEditRol] = useState('')
   const [editEstado, setEditEstado] = useState('')
@@ -49,7 +47,6 @@ export function ListaUsuarios({ refetch }: { refetch?: number }) {
   const [editLoading, setEditLoading] = useState(false)
   const [editError, setEditError] = useState('')
 
-  // Estado de eliminación
   const [deleteLoading, setDeleteLoading] = useState(false)
   const [deleteError, setDeleteError] = useState('')
 
@@ -142,10 +139,8 @@ export function ListaUsuarios({ refetch }: { refetch?: number }) {
     }
   }
 
-  const inputCls =
-    'w-full py-2.5 px-3 pl-9 border border-slate-200 rounded-lg text-sm text-slate-800 bg-white outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/15 transition-all placeholder:text-slate-400'
-
-  const labelCls = 'block text-xs font-semibold text-slate-600 mb-1.5 uppercase tracking-wide'
+  const inputCls = 'w-full py-2.5 px-3 pl-9 border border-slate-700 rounded-lg text-sm text-slate-100 bg-slate-900/50 outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all placeholder:text-slate-500'
+  const labelCls = 'block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wide'
 
   return (
     <>
@@ -153,7 +148,7 @@ export function ListaUsuarios({ refetch }: { refetch?: number }) {
       <div className="flex justify-end mb-4">
         <button
           onClick={() => setMostrarCrear(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-[#4272bb] hover:bg-[#2d5a9e] text-white text-sm font-bold rounded-lg shadow-[0_4px_14px_rgba(66,114,187,.3)] transition-all"
+          className="flex items-center gap-2 px-4 py-2 bg-cyan-500 hover:bg-cyan-400 text-slate-900 text-sm font-bold rounded-lg shadow-lg shadow-cyan-500/20 transition-all"
         >
           <Plus className="w-4 h-4" />
           Agregar usuario
@@ -162,17 +157,17 @@ export function ListaUsuarios({ refetch }: { refetch?: number }) {
 
       {/* Tabla */}
       {loading && (
-        <div className="text-center text-[#64748b] py-8">Cargando usuarios...</div>
+        <div className="text-center text-slate-400 py-8">Cargando usuarios...</div>
       )}
 
       {!loading && error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3">
+        <div className="bg-red-500/10 border border-red-500/30 text-red-400 text-sm rounded-lg px-4 py-3">
           {error}
         </div>
       )}
 
       {!loading && !error && usuarios.length === 0 && (
-        <div className="bg-[#f8fafc] border border-[#e2e8f0] text-[#64748b] text-sm rounded-lg px-4 py-8 text-center">
+        <div className="bg-slate-900/50 border border-slate-800 text-slate-400 text-sm rounded-lg px-4 py-8 text-center">
           No hay usuarios creados aún.
         </div>
       )}
@@ -182,16 +177,16 @@ export function ListaUsuarios({ refetch }: { refetch?: number }) {
           {/* Mobile: cards */}
           <div className="sm:hidden space-y-3">
             {usuarios.map((u, i) => (
-              <div key={i} className="bg-white border border-[#e2e8f0] rounded-xl p-4 shadow-sm">
+              <div key={i} className="bg-slate-900/50 border border-slate-800 rounded-xl p-4 shadow-lg">
                 <div className="flex items-start justify-between gap-3 mb-3">
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 mb-0.5">
-                      <User className="w-4 h-4 text-[#94a3b8] flex-shrink-0" />
-                      <span className="text-[#1A2A36] font-semibold text-sm truncate">{u.nombre}</span>
+                      <User className="w-4 h-4 text-slate-500 flex-shrink-0" />
+                      <span className="text-slate-100 font-semibold text-sm truncate">{u.nombre}</span>
                     </div>
                     <div className="flex items-center gap-1.5 ml-6">
-                      <Mail className="w-3.5 h-3.5 text-[#94a3b8] flex-shrink-0" />
-                      <span className="text-[#64748b] text-xs truncate">{u.email}</span>
+                      <Mail className="w-3.5 h-3.5 text-slate-500 flex-shrink-0" />
+                      <span className="text-slate-400 text-xs truncate">{u.email}</span>
                     </div>
                   </div>
                   <div className="flex gap-1.5 flex-shrink-0">
@@ -200,14 +195,14 @@ export function ListaUsuarios({ refetch }: { refetch?: number }) {
                         <button
                           onClick={() => abrirEditar(u)}
                           title="Editar usuario"
-                          className="p-2 rounded-lg text-[#4272bb] hover:bg-[#4272bb]/10 transition-colors"
+                          className="p-2 rounded-lg text-cyan-400 hover:bg-cyan-500/10 transition-colors"
                         >
                           <Edit className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => { setUsuarioEliminar(u); setDeleteError('') }}
                           title="Eliminar usuario"
-                          className="p-2 rounded-lg text-red-500 hover:bg-red-50 transition-colors"
+                          className="p-2 rounded-lg text-red-400 hover:bg-red-500/10 transition-colors"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -216,38 +211,38 @@ export function ListaUsuarios({ refetch }: { refetch?: number }) {
                   </div>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <Shield className="w-3.5 h-3.5 text-[#4272bb]" />
-                  <span className="text-[#4272bb] text-xs font-semibold capitalize">{u.rol}</span>
+                  <Shield className="w-3.5 h-3.5 text-cyan-400" />
+                  <span className="text-cyan-400 text-xs font-semibold capitalize">{u.rol}</span>
                 </div>
               </div>
             ))}
           </div>
 
           {/* Desktop: table */}
-          <div className="hidden sm:block rounded-2xl overflow-hidden border border-slate-200/80 shadow-sm">
+          <div className="hidden sm:block rounded-2xl overflow-hidden border border-slate-800/50 bg-slate-900/30 shadow-lg">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-slate-50/80">
+                <thead className="bg-slate-900/80">
                   <tr>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-200/70">Nombre</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-200/70">Email</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-200/70">Rol</th>
-                    <th className="px-4 py-3 text-center text-xs font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-200/70">Acciones</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-800">Nombre</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-800">Email</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-800">Rol</th>
+                    <th className="px-4 py-3 text-center text-xs font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-800">Acciones</th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-slate-100">
+                <tbody className="divide-y divide-slate-800/50">
                   {usuarios.map((u, i) => (
-                    <tr key={i} className="hover:bg-blue-50/20 transition-colors">
+                    <tr key={i} className="hover:bg-cyan-500/5 transition-colors">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
-                          <User className="w-4 h-4 text-slate-300 flex-shrink-0" />
-                          <span className="text-slate-800 font-medium">{u.nombre}</span>
+                          <User className="w-4 h-4 text-slate-500 flex-shrink-0" />
+                          <span className="text-slate-200 font-medium">{u.nombre}</span>
                         </div>
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
-                          <Mail className="w-4 h-4 text-slate-300 flex-shrink-0" />
-                          <span className="text-slate-500 text-xs">{u.email}</span>
+                          <Mail className="w-4 h-4 text-slate-500 flex-shrink-0" />
+                          <span className="text-slate-400 text-xs">{u.email}</span>
                         </div>
                       </td>
                       <td className="px-4 py-3">
@@ -266,20 +261,20 @@ export function ListaUsuarios({ refetch }: { refetch?: number }) {
                               <button
                                 onClick={() => abrirEditar(u)}
                                 title="Editar usuario"
-                                className="p-1.5 rounded-lg text-blue-500 hover:bg-blue-50 hover:text-blue-700 transition-colors"
+                                className="p-1.5 rounded-lg text-cyan-400 hover:bg-cyan-500/10 hover:text-cyan-300 transition-colors"
                               >
                                 <Edit className="w-4 h-4" />
                               </button>
                               <button
                                 onClick={() => { setUsuarioEliminar(u); setDeleteError('') }}
                                 title="Eliminar usuario"
-                                className="p-1.5 rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-600 transition-colors"
+                                className="p-1.5 rounded-lg text-slate-500 hover:bg-red-500/10 hover:text-red-400 transition-colors"
                               >
                                 <Trash2 className="w-4 h-4" />
                               </button>
                             </>
                           ) : (
-                            <span className="text-xs text-slate-300 italic px-2">—</span>
+                            <span className="text-xs text-slate-600 italic px-2">—</span>
                           )}
                         </div>
                       </td>
@@ -292,16 +287,15 @@ export function ListaUsuarios({ refetch }: { refetch?: number }) {
         </>
       )}
 
-      {/* ── Modal: Agregar usuario ── */}
+      {/* Modal: Agregar usuario */}
       <Dialog open={mostrarCrear} onOpenChange={setMostrarCrear}>
-        <DialogContent className="bg-white border border-slate-200 shadow-xl sm:max-w-md p-0 gap-0 overflow-hidden">
-          {/* Header del modal */}
-          <div className="flex items-center gap-3 px-6 py-5 border-b border-slate-100">
-            <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center flex-shrink-0">
+        <DialogContent className="bg-[#0d1220] border border-slate-800 shadow-2xl sm:max-w-md p-0 gap-0 overflow-hidden">
+          <div className="flex items-center gap-3 px-6 py-5 border-b border-slate-800">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-500 to-violet-500 flex items-center justify-center flex-shrink-0">
               <Plus className="w-4 h-4 text-white" />
             </div>
             <div>
-              <DialogTitle className="text-base font-bold text-slate-900">Nuevo usuario</DialogTitle>
+              <DialogTitle className="text-base font-bold text-slate-100">Nuevo usuario</DialogTitle>
               <p className="text-xs text-slate-500 mt-0.5">Completá los datos para crear la cuenta</p>
             </div>
           </div>
@@ -316,16 +310,15 @@ export function ListaUsuarios({ refetch }: { refetch?: number }) {
         </DialogContent>
       </Dialog>
 
-      {/* ── Modal: Editar usuario ── */}
+      {/* Modal: Editar usuario */}
       <Dialog open={!!usuarioEditar} onOpenChange={open => { if (!open) cerrarEditar() }}>
-        <DialogContent className="bg-white border border-slate-200 shadow-xl sm:max-w-md p-0 gap-0 overflow-hidden">
-          {/* Header */}
-          <div className="flex items-center gap-3 px-6 py-5 border-b border-slate-100">
-            <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center flex-shrink-0">
+        <DialogContent className="bg-[#0d1220] border border-slate-800 shadow-2xl sm:max-w-md p-0 gap-0 overflow-hidden">
+          <div className="flex items-center gap-3 px-6 py-5 border-b border-slate-800">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-500 to-violet-500 flex items-center justify-center flex-shrink-0">
               <Edit className="w-4 h-4 text-white" />
             </div>
             <div>
-              <DialogTitle className="text-base font-bold text-slate-900">Editar usuario</DialogTitle>
+              <DialogTitle className="text-base font-bold text-slate-100">Editar usuario</DialogTitle>
               {usuarioEditar && (
                 <p className="text-xs text-slate-500 mt-0.5 truncate max-w-[260px]">{usuarioEditar.email}</p>
               )}
@@ -334,11 +327,10 @@ export function ListaUsuarios({ refetch }: { refetch?: number }) {
 
           {usuarioEditar && (
             <div className="px-6 py-5 space-y-4">
-              {/* Nombre */}
               <div>
                 <label className={labelCls}>Nombre completo</label>
                 <div className="relative">
-                  <User className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <User className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
                   <input
                     type="text"
                     value={editNombre}
@@ -349,31 +341,29 @@ export function ListaUsuarios({ refetch }: { refetch?: number }) {
                 </div>
               </div>
 
-              {/* Rol */}
               <div>
                 <label className={labelCls}>Rol</label>
                 <div className="relative">
-                  <Shield className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <Shield className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
                   <select
                     value={editRol}
                     onChange={e => setEditRol(e.target.value)}
                     className={`${inputCls} appearance-none cursor-pointer`}
                   >
                     {ROLES.map(r => (
-                      <option key={r} value={r}>{r.charAt(0).toUpperCase() + r.slice(1)}</option>
+                      <option key={r} value={r} className="bg-slate-900">{r.charAt(0).toUpperCase() + r.slice(1)}</option>
                     ))}
                   </select>
                 </div>
               </div>
 
-              {/* Nueva contraseña */}
               <div>
                 <label className={labelCls}>
                   Nueva contraseña
-                  <span className="ml-1.5 normal-case font-normal text-slate-400">(dejar vacío para no cambiar)</span>
+                  <span className="ml-1.5 normal-case font-normal text-slate-500">(dejar vacío para no cambiar)</span>
                 </label>
                 <div className="relative">
-                  <Lock className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <Lock className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
                   <input
                     type={showEditPwd ? 'text' : 'password'}
                     value={editPassword}
@@ -384,7 +374,7 @@ export function ListaUsuarios({ refetch }: { refetch?: number }) {
                   <button
                     type="button"
                     onClick={() => setShowEditPwd(v => !v)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-600 transition-colors"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-cyan-400 transition-colors"
                     tabIndex={-1}
                   >
                     {showEditPwd ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -393,24 +383,23 @@ export function ListaUsuarios({ refetch }: { refetch?: number }) {
               </div>
 
               {editError && (
-                <div className="flex items-start gap-2.5 bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3">
+                <div className="flex items-start gap-2.5 bg-red-500/10 border border-red-500/30 text-red-400 text-sm rounded-lg px-4 py-3">
                   <span className="flex-shrink-0 mt-0.5">⚠</span>
                   {editError}
                 </div>
               )}
 
-              {/* Acciones */}
               <div className="flex gap-3 pt-1">
                 <button
                   onClick={cerrarEditar}
-                  className="flex-1 py-2.5 border border-slate-200 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all"
+                  className="flex-1 py-2.5 border border-slate-700 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 transition-all"
                 >
                   Cancelar
                 </button>
                 <button
                   onClick={guardarEdicion}
                   disabled={editLoading}
-                  className="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg flex items-center justify-center gap-2 transition-all disabled:opacity-60 disabled:cursor-not-allowed shadow-sm"
+                  className="flex-1 py-2.5 bg-cyan-500 hover:bg-cyan-400 text-slate-900 text-sm font-semibold rounded-lg flex items-center justify-center gap-2 transition-all disabled:opacity-60 disabled:cursor-not-allowed shadow-lg shadow-cyan-500/20"
                 >
                   {editLoading
                     ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -424,34 +413,32 @@ export function ListaUsuarios({ refetch }: { refetch?: number }) {
         </DialogContent>
       </Dialog>
 
-      {/* ── Modal: Confirmar eliminación ── */}
+      {/* Modal: Confirmar eliminación */}
       <AlertDialog open={!!usuarioEliminar} onOpenChange={open => { if (!open) setUsuarioEliminar(null) }}>
-        <AlertDialogContent className="bg-white border border-slate-200 shadow-xl sm:max-w-sm p-0 gap-0 overflow-hidden">
-          {/* Header rojo */}
-          <div className="flex items-center gap-3 px-6 py-5 border-b border-slate-100">
-            <div className="w-9 h-9 rounded-xl bg-red-100 flex items-center justify-center flex-shrink-0">
-              <AlertTriangle className="w-4 h-4 text-red-600" />
+        <AlertDialogContent className="bg-[#0d1220] border border-slate-800 shadow-2xl sm:max-w-sm p-0 gap-0 overflow-hidden">
+          <div className="flex items-center gap-3 px-6 py-5 border-b border-slate-800">
+            <div className="w-9 h-9 rounded-xl bg-red-500/20 flex items-center justify-center flex-shrink-0">
+              <AlertTriangle className="w-4 h-4 text-red-400" />
             </div>
-            <AlertDialogTitle className="text-base font-bold text-slate-900">
+            <AlertDialogTitle className="text-base font-bold text-slate-100">
               ¿Eliminar usuario?
             </AlertDialogTitle>
           </div>
 
           <div className="px-6 py-5 space-y-4">
-            <AlertDialogDescription className="text-sm text-slate-600 leading-relaxed">
+            <AlertDialogDescription className="text-sm text-slate-300 leading-relaxed">
               Estás por eliminar a{' '}
-              <span className="font-semibold text-slate-900">{usuarioEliminar?.nombre}</span>.
+              <span className="font-semibold text-slate-100">{usuarioEliminar?.nombre}</span>.
               Esta acción no se puede deshacer.
             </AlertDialogDescription>
 
-            {/* Dato del usuario */}
-            <div className="flex items-center gap-2.5 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5">
-              <Mail className="w-4 h-4 text-slate-400 flex-shrink-0" />
-              <span className="text-sm text-slate-600 truncate">{usuarioEliminar?.email}</span>
+            <div className="flex items-center gap-2.5 bg-slate-900/50 border border-slate-800 rounded-lg px-3 py-2.5">
+              <Mail className="w-4 h-4 text-slate-500 flex-shrink-0" />
+              <span className="text-sm text-slate-300 truncate">{usuarioEliminar?.email}</span>
             </div>
 
             {deleteError && (
-              <div className="flex items-start gap-2.5 bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3">
+              <div className="flex items-start gap-2.5 bg-red-500/10 border border-red-500/30 text-red-400 text-sm rounded-lg px-4 py-3">
                 <span className="flex-shrink-0 mt-0.5">⚠</span>
                 {deleteError}
               </div>
@@ -460,14 +447,14 @@ export function ListaUsuarios({ refetch }: { refetch?: number }) {
             <div className="flex gap-3 pt-1">
               <AlertDialogCancel
                 disabled={deleteLoading}
-                className="flex-1 py-2.5 border border-slate-200 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all bg-white"
+                className="flex-1 py-2.5 border border-slate-700 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 transition-all bg-transparent"
               >
                 Cancelar
               </AlertDialogCancel>
               <AlertDialogAction
                 onClick={e => { e.preventDefault(); confirmarEliminar() }}
                 disabled={deleteLoading}
-                className="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-lg flex items-center justify-center gap-2 transition-all disabled:opacity-60 disabled:cursor-not-allowed shadow-sm"
+                className="flex-1 py-2.5 bg-red-500 hover:bg-red-400 text-white text-sm font-semibold rounded-lg flex items-center justify-center gap-2 transition-all disabled:opacity-60 disabled:cursor-not-allowed shadow-lg"
               >
                 {deleteLoading
                   ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />

@@ -1,27 +1,27 @@
 import React from "react"
 import type { Metadata, Viewport } from 'next'
-import { Poppins, Lora } from "next/font/google";
+import { Outfit, JetBrains_Mono } from "next/font/google"
 import { Analytics } from '@vercel/analytics/next'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/components/ui/sonner'
 import './globals.css'
 
-const poppins = Poppins({
+const outfit = Outfit({
   subsets: ["latin"],
-  variable: "--font-poppins",
+  variable: "--font-outfit",
   weight: ['300', '400', '500', '600', '700', '800', '900'],
   display: 'swap',
-});
+})
 
-const lora = Lora({
+const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
-  variable: '--font-lora',
-  weight: ['400', '500', '600', '700'],
+  variable: "--font-jetbrains",
+  weight: ['400', '500', '600'],
   display: 'swap',
-});
+})
 
 export const metadata: Metadata = {
-  title: 'Sistema Integral de Información y Comunicación Estratégica | SPC Tucumán',
+  title: 'SPC Tucumán | Sistema Integral de Información y Comunicación Estratégica',
   description: 'Hacia una Gestión Inteligente: Datos, Territorio y Participación Ciudadana. Secretaría de Estado de Participación Ciudadana - Ministerio de Seguridad - Tucumán.',
   generator: 'v0.app',
   icons: {
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: '#2563eb',
+  themeColor: '#050810',
   width: 'device-width',
   initialScale: 1,
 }
@@ -46,12 +46,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" suppressHydrationWarning>
-      <body className={`${poppins.variable} ${lora.variable} font-sans antialiased bg-background text-foreground relative`}>
+      <body className={`${outfit.variable} ${jetbrainsMono.variable} font-sans antialiased bg-background text-foreground relative selection:bg-cyan-500/20 selection:text-cyan-300`}>
         <div className="bg-noise" />
+        <div className="bg-grid fixed inset-0 pointer-events-none opacity-30" />
         <ThemeProvider
           attribute="class"
-          defaultTheme="light"
-          forcedTheme="light"
+          defaultTheme="dark"
+          forcedTheme="dark"
           disableTransitionOnChange
         >
           {children}

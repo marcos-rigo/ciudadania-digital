@@ -9,15 +9,15 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: 'bg-primary text-primary-foreground btn-magnetic hover:bg-primary/90 active:scale-95',
+        default: 'bg-cyan-500 text-slate-900 btn-magnetic hover:bg-cyan-400 active:scale-95 shadow-lg shadow-cyan-500/20',
         destructive:
-          'bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60 btn-magnetic',
+          'bg-red-500/90 text-white hover:bg-red-500 focus-visible:ring-red-500/30 btn-magnetic shadow-lg shadow-red-500/10',
         outline:
-          'border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 transition-all duration-300 btn-magnetic',
+          'border border-slate-700 bg-slate-900/50 shadow-xs hover:bg-cyan-500/10 hover:border-cyan-500/30 hover:text-cyan-400 transition-all duration-300 btn-magnetic',
         secondary:
-          'bg-secondary text-secondary-foreground hover:bg-secondary/80 btn-magnetic',
+          'bg-slate-800 text-slate-300 hover:bg-slate-700 btn-magnetic',
         ghost:
-          'hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 transition-all duration-300',
+          'hover:bg-cyan-500/10 hover:text-cyan-400 transition-all duration-300',
         link: 'text-primary underline-offset-4 hover:underline',
       },
       size: {

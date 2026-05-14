@@ -7,6 +7,7 @@
 - **Package manager is `npm`**. Ignore `pnpm-lock.yaml` — it's present but not used.
 - **No test suite** — `npm run dev` is the only meaningful verification step.
 - **`typescript.ignoreBuildErrors: true`** — TypeScript errors won't break the build.
+- **Dark mode único** — El diseño es ahora Tech Noir oscuro. ForcedTheme en `app/layout.tsx` es "dark". Los colores del Design System están optimizados para fondo oscuro.
 
 ## Supabase: no SDK
 
