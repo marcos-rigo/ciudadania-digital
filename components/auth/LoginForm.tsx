@@ -76,6 +76,7 @@ export function LoginForm() {
       if (data.pendiente) { router.push('/pendiente'); return }
       if (data.verificar) { router.push(`/verificar?email=${encodeURIComponent(email.trim().toLowerCase())}`); return }
       if (!data.ok) { setApiError(data.error || 'Email o contraseña incorrectos.'); return }
+      router.refresh()
       if (data.rol === 'superadmin') router.push('/dashboard/admin/usuarios')
       else if (data.rol === 'empleado') router.push('/dashboard/admin')
       else router.push('/dashboard/estadisticas')
