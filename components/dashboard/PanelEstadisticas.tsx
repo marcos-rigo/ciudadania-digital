@@ -9,7 +9,7 @@ import {
 } from '@/lib/estadisticas-utils'
 import { motion } from 'framer-motion'
 import {
-  BarChart2, Search, X, RefreshCw, Calendar, Users, MapPin, TrendingUp, ExternalLink,
+  BarChart2, Search, X, RefreshCw, Calendar, Users, MapPin, TrendingUp, ExternalLink, Database,
 } from 'lucide-react'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { Input } from '@/components/ui/input'
@@ -62,14 +62,14 @@ const POR_PAGINA = 10
 
 const MESES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic']
 const CHART_COLORS = [
-  '#2563eb', // azul
-  '#16a34a', // verde
-  '#ea580c', // naranja
-  '#9333ea', // violeta
-  '#0891b2', // cyan
-  '#dc2626', // rojo
-  '#ca8a04', // amarillo
-  '#db2777', // rosa
+  '#2563eb',
+  '#16a34a',
+  '#ea580c',
+  '#9333ea',
+  '#0891b2',
+  '#dc2626',
+  '#ca8a04',
+  '#db2777',
 ]
 
 const tooltipStyle = {
@@ -163,6 +163,54 @@ function ChartCard({
   )
 }
 
+function Paginacion({
+  pagina, totalPaginas, setPagina,
+}: {
+  pagina: number
+  totalPaginas: number
+  setPagina: (fn: (p: number) => number) => void
+}) {
+  if (totalPaginas <= 1) return null
+  return (
+    <div className="flex items-center justify-between px-5 py-3 border-t border-slate-200/70 bg-slate-50/80">
+      <span className="text-xs text-slate-500">
+        Página <span className="font-semibold text-slate-700">{pagina}</span> de{' '}
+        <span className="font-semibold text-slate-700">{totalPaginas}</span>
+      </span>
+      <div className="flex items-center gap-1">
+        <Button variant="outline" size="sm" onClick={() => setPagina(() => 1)} disabled={pagina === 1}
+          className="h-8 w-8 p-0 border-slate-200 text-slate-600 disabled:opacity-40">«</Button>
+        <Button variant="outline" size="sm" onClick={() => setPagina((p) => Math.max(1, p - 1))} disabled={pagina === 1}
+          className="h-8 px-3 border-slate-200 text-slate-600 disabled:opacity-40">Anterior</Button>
+        <div className="flex items-center gap-1">
+          {Array.from({ length: totalPaginas }, (_, i) => i + 1)
+            .filter((n) => n === 1 || n === totalPaginas || Math.abs(n - pagina) <= 1)
+            .reduce<(number | '…')[]>((acc, n, idx, arr) => {
+              if (idx > 0 && n - (arr[idx - 1] as number) > 1) acc.push('…')
+              acc.push(n)
+              return acc
+            }, [])
+            .map((n, idx) =>
+              n === '…' ? (
+                <span key={`e${idx}`} className="px-1 text-slate-400 text-sm">…</span>
+              ) : (
+                <Button key={n} variant={pagina === n ? 'default' : 'outline'} size="sm"
+                  onClick={() => setPagina(() => n as number)}
+                  className={`h-8 w-8 p-0 text-sm ${pagina === n ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700' : 'border-slate-200 text-slate-600 hover:border-blue-300'}`}>
+                  {n}
+                </Button>
+              )
+            )}
+        </div>
+        <Button variant="outline" size="sm" onClick={() => setPagina((p) => Math.min(totalPaginas, p + 1))} disabled={pagina === totalPaginas}
+          className="h-8 px-3 border-slate-200 text-slate-600 disabled:opacity-40">Siguiente</Button>
+        <Button variant="outline" size="sm" onClick={() => setPagina(() => totalPaginas)} disabled={pagina === totalPaginas}
+          className="h-8 w-8 p-0 border-slate-200 text-slate-600 disabled:opacity-40">»</Button>
+      </div>
+    </div>
+  )
+}
+
 export function PanelEstadisticas({ rol }: { rol: string }) {
   const router       = useRouter()
   const pathname     = usePathname()
@@ -239,11 +287,13 @@ export function PanelEstadisticas({ rol }: { rol: string }) {
   const hasFilters = !!(search || filPrograma !== 'all' || filLocalidad !== 'all')
   const clearFilters = () => { setSearch(''); setFilPrograma('all'); setFilLocalidad('all'); setPagina(1) }
 
-  // ── Stats 2025 (sobre filtered) ───────────────────────────
-  const totalActividades = filtered.length
-  const totalPersonas    = filtered.reduce((s, r) => s + (parseInt(String(r.cantidad_personas)) || 0), 0)
-  const municipiosUnicos = new Set(filtered.map((a) => a.localidad).filter(Boolean)).size
-  const promedio         = totalActividades > 0 ? Math.round(totalPersonas / totalActividades) : 0
+  // ── Stats 2025 globales (para KPIs) y filtradas (para tabla) ──
+  const totalActividadesAll = data.length
+  const totalPersonasAll    = data.reduce((s, r) => s + (parseInt(String(r.cantidad_personas)) || 0), 0)
+  const municipiosUnicosAll = new Set(data.map((a) => a.localidad).filter(Boolean)).size
+  const promedioAll         = totalActividadesAll > 0 ? Math.round(totalPersonasAll / totalActividadesAll) : 0
+
+  const totalPersonasFiltradas = filtered.reduce((s, r) => s + (parseInt(String(r.cantidad_personas)) || 0), 0)
 
   // ── Paginación 2025 ───────────────────────────────────────
   const totalPaginas = Math.ceil(filtered.length / POR_PAGINA)
@@ -321,8 +371,9 @@ export function PanelEstadisticas({ rol }: { rol: string }) {
   const totalPaginas2026 = Math.ceil(filtered2026.length / POR_PAGINA)
   const paginated2026    = filtered2026.slice((pagina2026 - 1) * POR_PAGINA, pagina2026 * POR_PAGINA)
 
-  // ── KPIs 2026 (sobre filtered, igual que 2025) ────────────
-  const kpis2026 = useMemo(() => calcularKPIs(filtered2026), [filtered2026])
+  // ── KPIs 2026 globales (KPI cards) y filtradas (tabla header) ──
+  const kpisAll2026 = useMemo(() => calcularKPIs(data2026), [data2026])
+  const kpis2026    = useMemo(() => calcularKPIs(filtered2026), [filtered2026])
 
   // ── Gráficos 2026 (sobre data completa) ───────────────────
   const evolMes2026      = useMemo(() => agruparPorMes(data2026), [data2026])
@@ -352,7 +403,7 @@ export function PanelEstadisticas({ rol }: { rol: string }) {
       {/* ── Tab 2025 ── */}
       <TabsContent value="2025" className="mt-4 animate-in fade-in-0 duration-200 space-y-6">
 
-        {/* Heading */}
+        {/* 1. Header + KPIs */}
         <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-4 sm:p-8 space-y-6">
           <h2 className="text-slate-800 font-black text-xl flex items-center gap-2">
             <span className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm shadow-blue-500/20">
@@ -374,179 +425,16 @@ export function PanelEstadisticas({ rol }: { rol: string }) {
           )}
 
           {!loading && !error && (
-            <>
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                <StatCard value={totalActividades.toLocaleString('es-AR')} label="Actividades" />
-                <StatCard value={totalPersonas.toLocaleString('es-AR')}    label="Personas alcanzadas" />
-                <StatCard value={municipiosUnicos.toLocaleString('es-AR')} label="Municipios alcanzados" />
-                <StatCard value={promedio.toLocaleString('es-AR')}         label="Promedio por actividad" />
-              </div>
-
-              <div className="divider-fade" />
-
-              {/* Filtros */}
-              <div className="flex flex-col gap-3">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                  <Input
-                    placeholder="Buscar por programa o localidad..."
-                    value={search}
-                    onChange={(e) => applySearch(e.target.value)}
-                    className="pl-9 bg-white border-slate-200 text-slate-900 placeholder:text-slate-400"
-                  />
-                </div>
-                <div className="grid grid-cols-2 sm:grid-cols-[1fr_1fr_auto] gap-2">
-                  <div className="min-w-0">
-                    <Select value={filPrograma} onValueChange={applyPrograma}>
-                      <SelectTrigger className="w-full border-slate-200 shadow-sm">
-                        <SelectValue placeholder="Programas" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">Todos los programas</SelectItem>
-                        {programasUnicos.map((p) => (
-                          <SelectItem key={p} value={p}>{p}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="min-w-0">
-                    <Select value={filLocalidad} onValueChange={applyLocalidad}>
-                      <SelectTrigger className="w-full border-slate-200 shadow-sm">
-                        <SelectValue placeholder="Municipios" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">Todos los municipios</SelectItem>
-                        {localidadesUnicas.map((l) => (
-                          <SelectItem key={l} value={l}>{l}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {hasFilters && (
-                    <Button variant="ghost" size="sm" onClick={clearFilters}
-                      className="h-9 text-slate-500 hover:text-slate-900 col-span-2 sm:col-span-1">
-                      <X className="h-4 w-4 mr-1" />
-                      Limpiar
-                    </Button>
-                  )}
-                </div>
-              </div>
-
-              {filtered.length === 0 ? (
-                <p className="text-center text-slate-400 italic py-8 text-sm">
-                  {hasFilters
-                    ? 'No hay actividades que coincidan con los filtros.'
-                    : 'Aún no hay actividades registradas para 2025.'}
-                </p>
-              ) : (
-                <div className="rounded-2xl overflow-hidden border border-slate-200/80 shadow-sm">
-                  <div className="flex items-center justify-between px-5 py-3 bg-slate-50/80 border-b border-slate-200/70">
-                    <span className="text-xs text-slate-500">
-                      <span className="font-semibold text-slate-700">{filtered.length}</span> actividades
-                    </span>
-                    <span className="text-xs text-slate-500">
-                      <span className="font-semibold text-blue-700">{totalPersonas.toLocaleString('es-AR')}</span>{' '}
-                      personas alcanzadas
-                    </span>
-                  </div>
-
-                  {/* Desktop */}
-                  <div className="hidden sm:block overflow-x-auto">
-                    <table className="w-full text-sm">
-                      <thead>
-                        <tr className="bg-slate-50/60">
-                          {['Fecha', 'Municipio / Comuna', 'Programa', 'Personas', 'Cargado por'].map((h) => (
-                            <th key={h} className="text-left px-5 py-3 text-slate-400 font-semibold text-xs uppercase tracking-wider border-b border-slate-200/70">
-                              {h}
-                            </th>
-                          ))}
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {paginated.map((a, i) => (
-                          <tr key={i} className="hover:bg-blue-50/25 border-b border-slate-100 last:border-0 transition-colors">
-                            <td className="px-5 py-3 text-slate-600 tabular-nums whitespace-nowrap">{formatFecha(a.fecha)}</td>
-                            <td className="px-5 py-3 font-medium text-slate-800">{a.localidad || '-'}</td>
-                            <td className="px-5 py-3 text-slate-700">{a.programa || '-'}</td>
-                            <td className="px-5 py-3 text-center">
-                              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-100">
-                                {(parseInt(String(a.cantidad_personas)) || 0).toLocaleString('es-AR')}
-                              </span>
-                            </td>
-                            <td className="px-5 py-3 text-slate-400 text-xs">{a.usuario_nombre || '-'}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-
-                  {/* Mobile */}
-                  <div className="sm:hidden divide-y divide-slate-100">
-                    {paginated.map((a, i) => (
-                      <div key={i} className="px-4 py-4 hover:bg-blue-50/20 transition-colors">
-                        <div className="flex items-center justify-between mb-1.5">
-                          <span className="text-slate-600 text-sm font-medium tabular-nums">{formatFecha(a.fecha)}</span>
-                          <span className="bg-blue-50 text-blue-700 font-bold text-xs px-2.5 py-0.5 rounded-full border border-blue-100">
-                            {(parseInt(String(a.cantidad_personas)) || 0).toLocaleString('es-AR')} personas
-                          </span>
-                        </div>
-                        <p className="text-slate-800 text-sm font-semibold truncate">{a.programa || '-'}</p>
-                        <div className="flex items-center justify-between mt-1">
-                          <span className="text-slate-500 text-xs">{a.localidad || '-'}</span>
-                          <span className="text-slate-400 text-xs truncate max-w-[150px]">{a.usuario_nombre || '-'}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Paginación */}
-                  {totalPaginas > 1 && (
-                    <div className="flex items-center justify-between px-5 py-3 border-t border-slate-200/70 bg-slate-50/80">
-                      <span className="text-xs text-slate-500">
-                        Página <span className="font-semibold text-slate-700">{pagina}</span> de{' '}
-                        <span className="font-semibold text-slate-700">{totalPaginas}</span>
-                      </span>
-                      <div className="flex items-center gap-1">
-                        <Button variant="outline" size="sm" onClick={() => setPagina(1)} disabled={pagina === 1}
-                          className="h-8 w-8 p-0 border-slate-200 text-slate-600 disabled:opacity-40">«</Button>
-                        <Button variant="outline" size="sm" onClick={() => setPagina((p) => Math.max(1, p - 1))} disabled={pagina === 1}
-                          className="h-8 px-3 border-slate-200 text-slate-600 disabled:opacity-40">Anterior</Button>
-                        <div className="flex items-center gap-1">
-                          {Array.from({ length: totalPaginas }, (_, i) => i + 1)
-                            .filter((n) => n === 1 || n === totalPaginas || Math.abs(n - pagina) <= 1)
-                            .reduce<(number | '…')[]>((acc, n, idx, arr) => {
-                              if (idx > 0 && n - (arr[idx - 1] as number) > 1) acc.push('…')
-                              acc.push(n)
-                              return acc
-                            }, [])
-                            .map((n, idx) =>
-                              n === '…' ? (
-                                <span key={`e${idx}`} className="px-1 text-slate-400 text-sm">…</span>
-                              ) : (
-                                <Button key={n} variant={pagina === n ? 'default' : 'outline'} size="sm"
-                                  onClick={() => setPagina(n as number)}
-                                  className={`h-8 w-8 p-0 text-sm ${pagina === n ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700' : 'border-slate-200 text-slate-600 hover:border-blue-300'}`}>
-                                  {n}
-                                </Button>
-                              )
-                            )}
-                        </div>
-                        <Button variant="outline" size="sm" onClick={() => setPagina((p) => Math.min(totalPaginas, p + 1))} disabled={pagina === totalPaginas}
-                          className="h-8 px-3 border-slate-200 text-slate-600 disabled:opacity-40">Siguiente</Button>
-                        <Button variant="outline" size="sm" onClick={() => setPagina(totalPaginas)} disabled={pagina === totalPaginas}
-                          className="h-8 w-8 p-0 border-slate-200 text-slate-600 disabled:opacity-40">»</Button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-            </>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <StatCard value={totalActividadesAll.toLocaleString('es-AR')} label="Actividades" />
+              <StatCard value={totalPersonasAll.toLocaleString('es-AR')}    label="Personas alcanzadas" />
+              <StatCard value={municipiosUnicosAll.toLocaleString('es-AR')} label="Municipios alcanzados" />
+              <StatCard value={promedioAll.toLocaleString('es-AR')}         label="Promedio por actividad" />
+            </div>
           )}
         </div>
 
-        {/* Gráficos 2025 */}
+        {/* 2. Gráficos 2025 — arriba en grilla */}
         {!loading && !error && data.length > 0 && (
           <div className="grid lg:grid-cols-2 gap-6">
             <ChartCard
@@ -673,7 +561,7 @@ export function PanelEstadisticas({ rol }: { rol: string }) {
                       </Pie>
                       <Tooltip
                         contentStyle={tooltipStyle}
-                        formatter={(v: number, name: string) => [
+                        formatter={(v: number) => [
                           `${v} actividades · ${((v / totalCobertura) * 100).toFixed(1)}%`,
                           'Municipio',
                         ]}
@@ -687,15 +575,144 @@ export function PanelEstadisticas({ rol }: { rol: string }) {
           </div>
         )}
 
+        {/* 3. Filtros + Listado — abajo */}
+        {!loading && !error && (
+          <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-4 sm:p-8 space-y-6">
+            <h3 className="text-slate-700 font-bold text-base flex items-center gap-2">
+              <Search className="w-4 h-4 text-slate-400" />
+              Listado de actividades
+            </h3>
+
+            <div className="flex flex-col gap-3">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                <Input
+                  placeholder="Buscar por programa o localidad..."
+                  value={search}
+                  onChange={(e) => applySearch(e.target.value)}
+                  className="pl-9 bg-white border-slate-200 text-slate-900 placeholder:text-slate-400"
+                />
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-[1fr_1fr_auto] gap-2">
+                <div className="min-w-0">
+                  <Select value={filPrograma} onValueChange={applyPrograma}>
+                    <SelectTrigger className="w-full border-slate-200 shadow-sm">
+                      <SelectValue placeholder="Programas" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todos los programas</SelectItem>
+                      {programasUnicos.map((p) => (
+                        <SelectItem key={p} value={p}>{p}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="min-w-0">
+                  <Select value={filLocalidad} onValueChange={applyLocalidad}>
+                    <SelectTrigger className="w-full border-slate-200 shadow-sm">
+                      <SelectValue placeholder="Municipios" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todos los municipios</SelectItem>
+                      {localidadesUnicas.map((l) => (
+                        <SelectItem key={l} value={l}>{l}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {hasFilters && (
+                  <Button variant="ghost" size="sm" onClick={clearFilters}
+                    className="h-9 text-slate-500 hover:text-slate-900 col-span-2 sm:col-span-1">
+                    <X className="h-4 w-4 mr-1" />
+                    Limpiar
+                  </Button>
+                )}
+              </div>
+            </div>
+
+            {filtered.length === 0 ? (
+              <p className="text-center text-slate-400 italic py-8 text-sm">
+                {hasFilters
+                  ? 'No hay actividades que coincidan con los filtros.'
+                  : 'Aún no hay actividades registradas para 2025.'}
+              </p>
+            ) : (
+              <div className="rounded-2xl overflow-hidden border border-slate-200/80 shadow-sm">
+                <div className="flex items-center justify-between px-5 py-3 bg-slate-50/80 border-b border-slate-200/70">
+                  <span className="text-xs text-slate-500">
+                    <span className="font-semibold text-slate-700">{filtered.length}</span> actividades
+                    {hasFilters && <span className="text-slate-400"> (filtradas)</span>}
+                  </span>
+                  <span className="text-xs text-slate-500">
+                    <span className="font-semibold text-blue-700">{totalPersonasFiltradas.toLocaleString('es-AR')}</span>{' '}
+                    personas alcanzadas
+                  </span>
+                </div>
+
+                {/* Desktop */}
+                <div className="hidden sm:block overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="bg-slate-50/60">
+                        {['Fecha', 'Municipio / Comuna', 'Programa', 'Personas', 'Cargado por'].map((h) => (
+                          <th key={h} className="text-left px-5 py-3 text-slate-400 font-semibold text-xs uppercase tracking-wider border-b border-slate-200/70">
+                            {h}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {paginated.map((a, i) => (
+                        <tr key={i} className="hover:bg-blue-50/25 border-b border-slate-100 last:border-0 transition-colors">
+                          <td className="px-5 py-3 text-slate-600 tabular-nums whitespace-nowrap">{formatFecha(a.fecha)}</td>
+                          <td className="px-5 py-3 font-medium text-slate-800">{a.localidad || '-'}</td>
+                          <td className="px-5 py-3 text-slate-700">{a.programa || '-'}</td>
+                          <td className="px-5 py-3 text-center">
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-100">
+                              {(parseInt(String(a.cantidad_personas)) || 0).toLocaleString('es-AR')}
+                            </span>
+                          </td>
+                          <td className="px-5 py-3 text-slate-400 text-xs">{a.usuario_nombre || '-'}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Mobile */}
+                <div className="sm:hidden divide-y divide-slate-100">
+                  {paginated.map((a, i) => (
+                    <div key={i} className="px-4 py-4 hover:bg-blue-50/20 transition-colors">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="text-slate-600 text-sm font-medium tabular-nums">{formatFecha(a.fecha)}</span>
+                        <span className="bg-blue-50 text-blue-700 font-bold text-xs px-2.5 py-0.5 rounded-full border border-blue-100">
+                          {(parseInt(String(a.cantidad_personas)) || 0).toLocaleString('es-AR')} personas
+                        </span>
+                      </div>
+                      <p className="text-slate-800 text-sm font-semibold truncate">{a.programa || '-'}</p>
+                      <div className="flex items-center justify-between mt-1">
+                        <span className="text-slate-500 text-xs">{a.localidad || '-'}</span>
+                        <span className="text-slate-400 text-xs truncate max-w-[150px]">{a.usuario_nombre || '-'}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <Paginacion pagina={pagina} totalPaginas={totalPaginas} setPagina={setPagina} />
+              </div>
+            )}
+          </div>
+        )}
+
       </TabsContent>
 
       {/* ── Tab 2026 ── */}
       <TabsContent value="2026" className="mt-4 animate-in fade-in-0 duration-200 space-y-6">
 
-        {/* Bloque principal — mismo estilo que 2025 */}
+        {/* 1. Header + KPIs */}
         <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-4 sm:p-8 space-y-6">
-
-          {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <h2 className="text-slate-800 font-black text-xl flex flex-wrap items-center gap-2">
               <span className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm shadow-blue-500/20">
@@ -719,224 +736,60 @@ export function PanelEstadisticas({ rol }: { rol: string }) {
             </Button>
           </div>
 
-          {/* Cargando */}
           {(loading2026 || !hasFetched2026) && !error2026 && (
             <div className="text-center py-16">
               <span className="w-8 h-8 border-2 border-slate-200 border-t-blue-600 rounded-full animate-spin inline-block" />
             </div>
           )}
 
-          {/* Error */}
           {error2026 && !loading2026 && (
             <div className="text-center py-8 text-red-600 text-sm">
               Error al cargar los datos. Intentá de nuevo más tarde.
             </div>
           )}
 
-          {/* Contenido */}
-          {hasFetched2026 && !loading2026 && !error2026 && (
-            <>
-              {data2026.length === 0 ? (
-                <div className="text-center py-12">
-                  <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-slate-100">
-                    <Calendar className="w-7 h-7 text-slate-300" />
-                  </div>
-                  <p className="text-slate-700 font-semibold text-base mb-2">
-                    Todavía no hay actividades registradas para 2026
-                  </p>
-                  <p className="text-slate-400 text-sm max-w-sm mx-auto leading-relaxed">
-                    Los datos aparecerán aquí automáticamente una vez que se registren actividades mediante el formulario.
-                  </p>
-                </div>
-              ) : (
-                <>
-                  {/* KPI Cards */}
-                  <motion.div
-                    variants={staggerCards}
-                    initial="hidden"
-                    animate="show"
-                    className="grid grid-cols-2 lg:grid-cols-4 gap-4"
-                  >
-                    <motion.div variants={fadeUpCard}>
-                      <KPICard icon={<Calendar className="w-5 h-5 text-blue-600" />}
-                        value={kpis2026.total.toLocaleString('es-AR')} label="Actividades registradas" />
-                    </motion.div>
-                    <motion.div variants={fadeUpCard}>
-                      <KPICard icon={<Users className="w-5 h-5 text-emerald-600" />}
-                        value={kpis2026.personas.toLocaleString('es-AR')} label="Personas alcanzadas" />
-                    </motion.div>
-                    <motion.div variants={fadeUpCard}>
-                      <KPICard icon={<MapPin className="w-5 h-5 text-violet-600" />}
-                        value={kpis2026.localidades.toLocaleString('es-AR')} label="Municipios cubiertos" />
-                    </motion.div>
-                    <motion.div variants={fadeUpCard}>
-                      <KPICard icon={<TrendingUp className="w-5 h-5 text-amber-600" />}
-                        value={kpis2026.promedio.toLocaleString('es-AR')} label="Promedio por actividad" />
-                    </motion.div>
-                  </motion.div>
+          {hasFetched2026 && !loading2026 && !error2026 && data2026.length === 0 && (
+            <div className="text-center py-12">
+              <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-slate-100">
+                <Calendar className="w-7 h-7 text-slate-300" />
+              </div>
+              <p className="text-slate-700 font-semibold text-base mb-2">
+                Todavía no hay actividades registradas para 2026
+              </p>
+              <p className="text-slate-400 text-sm max-w-sm mx-auto leading-relaxed">
+                Los datos aparecerán aquí automáticamente una vez que se registren actividades mediante el formulario.
+              </p>
+            </div>
+          )}
 
-                  <div className="divider-fade" />
-
-                  {/* Filtros */}
-                  <div className="flex flex-col gap-3">
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                      <Input
-                        placeholder="Buscar por programa o localidad..."
-                        value={search2026}
-                        onChange={(e) => applySearch2026(e.target.value)}
-                        className="pl-9 bg-white border-slate-200 text-slate-900 placeholder:text-slate-400"
-                      />
-                    </div>
-                    <div className="grid grid-cols-2 sm:grid-cols-[1fr_1fr_auto] gap-2">
-                      <div className="min-w-0">
-                        <Select value={filPrograma2026} onValueChange={applyPrograma2026}>
-                          <SelectTrigger className="w-full border-slate-200 shadow-sm">
-                            <SelectValue placeholder="Programas" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="all">Todos los programas</SelectItem>
-                            {programasUnicos2026.map((p) => (
-                              <SelectItem key={p} value={p}>{p}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="min-w-0">
-                        <Select value={filLocalidad2026} onValueChange={applyLocalidad2026}>
-                          <SelectTrigger className="w-full border-slate-200 shadow-sm">
-                            <SelectValue placeholder="Municipios" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="all">Todos los municipios</SelectItem>
-                            {localidadesUnicas2026.map((l) => (
-                              <SelectItem key={l} value={l}>{l}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      {hasFilters2026 && (
-                        <Button variant="ghost" size="sm" onClick={clearFilters2026}
-                          className="h-9 text-slate-500 hover:text-slate-900 col-span-2 sm:col-span-1">
-                          <X className="h-4 w-4 mr-1" />Limpiar
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Tabla */}
-                  {filtered2026.length === 0 ? (
-                    <p className="text-center text-slate-400 italic py-8 text-sm">
-                      No hay actividades que coincidan con los filtros.
-                    </p>
-                  ) : (
-                    <div className="rounded-2xl overflow-hidden border border-slate-200/80 shadow-sm">
-                      <div className="flex items-center justify-between px-5 py-3 bg-slate-50/80 border-b border-slate-200/70">
-                        <span className="text-xs text-slate-500">
-                          <span className="font-semibold text-slate-700">{filtered2026.length}</span> actividades
-                        </span>
-                        <span className="text-xs text-slate-500">
-                          <span className="font-semibold text-blue-700">{kpis2026.personas.toLocaleString('es-AR')}</span>{' '}
-                          personas alcanzadas
-                        </span>
-                      </div>
-
-                      {/* Desktop */}
-                      <div className="hidden sm:block overflow-x-auto">
-                        <table className="w-full text-sm">
-                          <thead>
-                            <tr className="bg-slate-50/60">
-                              {['Fecha', 'Municipio / Comuna', 'Programa', 'Temática', 'Personas', 'Cargado por'].map((h) => (
-                                <th key={h} className="text-left px-5 py-3 text-slate-400 font-semibold text-xs uppercase tracking-wider border-b border-slate-200/70">{h}</th>
-                              ))}
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {paginated2026.map((a, i) => (
-                              <tr key={i} className="hover:bg-blue-50/25 border-b border-slate-100 last:border-0 transition-colors">
-                                <td className="px-5 py-3 text-slate-600 tabular-nums whitespace-nowrap">{formatFecha(a.fecha)}</td>
-                                <td className="px-5 py-3 font-medium text-slate-800">{a.localidad || '-'}</td>
-                                <td className="px-5 py-3 text-slate-700">{a.programa || '-'}</td>
-                                <td className="px-5 py-3 text-slate-500 text-xs max-w-[160px] truncate">{a.tematica || '-'}</td>
-                                <td className="px-5 py-3 text-center">
-                                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-100">
-                                    {(parseInt(String(a.cantidad_personas)) || 0).toLocaleString('es-AR')}
-                                  </span>
-                                </td>
-                                <td className="px-5 py-3 text-slate-400 text-xs">{a.usuario_nombre || '-'}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-
-                      {/* Mobile */}
-                      <div className="sm:hidden divide-y divide-slate-100">
-                        {paginated2026.map((a, i) => (
-                          <div key={i} className="px-4 py-4 hover:bg-blue-50/20 transition-colors">
-                            <div className="flex items-center justify-between mb-1.5">
-                              <span className="text-slate-600 text-sm font-medium tabular-nums">{formatFecha(a.fecha)}</span>
-                              <span className="bg-blue-50 text-blue-700 font-bold text-xs px-2.5 py-0.5 rounded-full border border-blue-100">
-                                {(parseInt(String(a.cantidad_personas)) || 0).toLocaleString('es-AR')} personas
-                              </span>
-                            </div>
-                            <p className="text-slate-800 text-sm font-semibold truncate">{a.programa || '-'}</p>
-                            {a.tematica && <p className="text-slate-400 text-xs truncate mt-0.5">{a.tematica}</p>}
-                            <div className="flex items-center justify-between mt-1">
-                              <span className="text-slate-500 text-xs">{a.localidad || '-'}</span>
-                              <span className="text-slate-400 text-xs truncate max-w-[150px]">{a.usuario_nombre || '-'}</span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-
-                      {/* Paginación */}
-                      {totalPaginas2026 > 1 && (
-                        <div className="flex items-center justify-between px-5 py-3 border-t border-slate-200/70 bg-slate-50/80">
-                          <span className="text-xs text-slate-500">
-                            Página <span className="font-semibold text-slate-700">{pagina2026}</span> de{' '}
-                            <span className="font-semibold text-slate-700">{totalPaginas2026}</span>
-                          </span>
-                          <div className="flex items-center gap-1">
-                            <Button variant="outline" size="sm" onClick={() => setPagina2026(1)} disabled={pagina2026 === 1}
-                              className="h-8 w-8 p-0 border-slate-200 text-slate-600 disabled:opacity-40">«</Button>
-                            <Button variant="outline" size="sm" onClick={() => setPagina2026((p) => Math.max(1, p - 1))} disabled={pagina2026 === 1}
-                              className="h-8 px-3 border-slate-200 text-slate-600 disabled:opacity-40">Anterior</Button>
-                            <div className="flex items-center gap-1">
-                              {Array.from({ length: totalPaginas2026 }, (_, i) => i + 1)
-                                .filter((n) => n === 1 || n === totalPaginas2026 || Math.abs(n - pagina2026) <= 1)
-                                .reduce<(number | '…')[]>((acc, n, idx, arr) => {
-                                  if (idx > 0 && n - (arr[idx - 1] as number) > 1) acc.push('…')
-                                  acc.push(n); return acc
-                                }, [])
-                                .map((n, idx) =>
-                                  n === '…' ? (
-                                    <span key={`e${idx}`} className="px-1 text-slate-400 text-sm">…</span>
-                                  ) : (
-                                    <Button key={n} variant={pagina2026 === n ? 'default' : 'outline'} size="sm"
-                                      onClick={() => setPagina2026(n as number)}
-                                      className={`h-8 w-8 p-0 text-sm ${pagina2026 === n ? 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700' : 'border-slate-200 text-slate-600 hover:border-blue-300'}`}>
-                                      {n}
-                                    </Button>
-                                  )
-                                )}
-                            </div>
-                            <Button variant="outline" size="sm" onClick={() => setPagina2026((p) => Math.min(totalPaginas2026, p + 1))} disabled={pagina2026 === totalPaginas2026}
-                              className="h-8 px-3 border-slate-200 text-slate-600 disabled:opacity-40">Siguiente</Button>
-                            <Button variant="outline" size="sm" onClick={() => setPagina2026(totalPaginas2026)} disabled={pagina2026 === totalPaginas2026}
-                              className="h-8 w-8 p-0 border-slate-200 text-slate-600 disabled:opacity-40">»</Button>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </>
-              )}
-            </>
+          {hasFetched2026 && !loading2026 && !error2026 && data2026.length > 0 && (
+            <motion.div
+              variants={staggerCards}
+              initial="hidden"
+              animate="show"
+              className="grid grid-cols-2 lg:grid-cols-4 gap-4"
+            >
+              <motion.div variants={fadeUpCard}>
+                <KPICard icon={<Calendar className="w-5 h-5 text-blue-600" />}
+                  value={kpisAll2026.total.toLocaleString('es-AR')} label="Actividades registradas" />
+              </motion.div>
+              <motion.div variants={fadeUpCard}>
+                <KPICard icon={<Users className="w-5 h-5 text-emerald-600" />}
+                  value={kpisAll2026.personas.toLocaleString('es-AR')} label="Personas alcanzadas" />
+              </motion.div>
+              <motion.div variants={fadeUpCard}>
+                <KPICard icon={<MapPin className="w-5 h-5 text-violet-600" />}
+                  value={kpisAll2026.localidades.toLocaleString('es-AR')} label="Municipios cubiertos" />
+              </motion.div>
+              <motion.div variants={fadeUpCard}>
+                <KPICard icon={<TrendingUp className="w-5 h-5 text-amber-600" />}
+                  value={kpisAll2026.promedio.toLocaleString('es-AR')} label="Promedio por actividad" />
+              </motion.div>
+            </motion.div>
           )}
         </div>
 
-        {/* Gráficos 2026 — mismo grid que 2025 */}
+        {/* 2. Gráficos 2026 — arriba en grilla */}
         {hasFetched2026 && !loading2026 && !error2026 && data2026.length > 0 && (
           <div className="grid lg:grid-cols-2 gap-6">
 
@@ -1068,6 +921,132 @@ export function PanelEstadisticas({ rol }: { rol: string }) {
           </div>
         )}
 
+        {/* 3. Filtros + Listado 2026 — abajo */}
+        {hasFetched2026 && !loading2026 && !error2026 && data2026.length > 0 && (
+          <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-4 sm:p-8 space-y-6">
+            <h3 className="text-slate-700 font-bold text-base flex items-center gap-2">
+              <Search className="w-4 h-4 text-slate-400" />
+              Listado de actividades
+            </h3>
+
+            <div className="flex flex-col gap-3">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                <Input
+                  placeholder="Buscar por programa o localidad..."
+                  value={search2026}
+                  onChange={(e) => applySearch2026(e.target.value)}
+                  className="pl-9 bg-white border-slate-200 text-slate-900 placeholder:text-slate-400"
+                />
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-[1fr_1fr_auto] gap-2">
+                <div className="min-w-0">
+                  <Select value={filPrograma2026} onValueChange={applyPrograma2026}>
+                    <SelectTrigger className="w-full border-slate-200 shadow-sm">
+                      <SelectValue placeholder="Programas" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todos los programas</SelectItem>
+                      {programasUnicos2026.map((p) => (
+                        <SelectItem key={p} value={p}>{p}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="min-w-0">
+                  <Select value={filLocalidad2026} onValueChange={applyLocalidad2026}>
+                    <SelectTrigger className="w-full border-slate-200 shadow-sm">
+                      <SelectValue placeholder="Municipios" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todos los municipios</SelectItem>
+                      {localidadesUnicas2026.map((l) => (
+                        <SelectItem key={l} value={l}>{l}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                {hasFilters2026 && (
+                  <Button variant="ghost" size="sm" onClick={clearFilters2026}
+                    className="h-9 text-slate-500 hover:text-slate-900 col-span-2 sm:col-span-1">
+                    <X className="h-4 w-4 mr-1" />Limpiar
+                  </Button>
+                )}
+              </div>
+            </div>
+
+            {filtered2026.length === 0 ? (
+              <p className="text-center text-slate-400 italic py-8 text-sm">
+                No hay actividades que coincidan con los filtros.
+              </p>
+            ) : (
+              <div className="rounded-2xl overflow-hidden border border-slate-200/80 shadow-sm">
+                <div className="flex items-center justify-between px-5 py-3 bg-slate-50/80 border-b border-slate-200/70">
+                  <span className="text-xs text-slate-500">
+                    <span className="font-semibold text-slate-700">{filtered2026.length}</span> actividades
+                    {hasFilters2026 && <span className="text-slate-400"> (filtradas)</span>}
+                  </span>
+                  <span className="text-xs text-slate-500">
+                    <span className="font-semibold text-blue-700">{kpis2026.personas.toLocaleString('es-AR')}</span>{' '}
+                    personas alcanzadas
+                  </span>
+                </div>
+
+                {/* Desktop */}
+                <div className="hidden sm:block overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="bg-slate-50/60">
+                        {['Fecha', 'Municipio / Comuna', 'Programa', 'Temática', 'Personas', 'Cargado por'].map((h) => (
+                          <th key={h} className="text-left px-5 py-3 text-slate-400 font-semibold text-xs uppercase tracking-wider border-b border-slate-200/70">{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {paginated2026.map((a, i) => (
+                        <tr key={i} className="hover:bg-blue-50/25 border-b border-slate-100 last:border-0 transition-colors">
+                          <td className="px-5 py-3 text-slate-600 tabular-nums whitespace-nowrap">{formatFecha(a.fecha)}</td>
+                          <td className="px-5 py-3 font-medium text-slate-800">{a.localidad || '-'}</td>
+                          <td className="px-5 py-3 text-slate-700">{a.programa || '-'}</td>
+                          <td className="px-5 py-3 text-slate-500 text-xs max-w-[160px] truncate">{a.tematica || '-'}</td>
+                          <td className="px-5 py-3 text-center">
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-100">
+                              {(parseInt(String(a.cantidad_personas)) || 0).toLocaleString('es-AR')}
+                            </span>
+                          </td>
+                          <td className="px-5 py-3 text-slate-400 text-xs">{a.usuario_nombre || '-'}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Mobile */}
+                <div className="sm:hidden divide-y divide-slate-100">
+                  {paginated2026.map((a, i) => (
+                    <div key={i} className="px-4 py-4 hover:bg-blue-50/20 transition-colors">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="text-slate-600 text-sm font-medium tabular-nums">{formatFecha(a.fecha)}</span>
+                        <span className="bg-blue-50 text-blue-700 font-bold text-xs px-2.5 py-0.5 rounded-full border border-blue-100">
+                          {(parseInt(String(a.cantidad_personas)) || 0).toLocaleString('es-AR')} personas
+                        </span>
+                      </div>
+                      <p className="text-slate-800 text-sm font-semibold truncate">{a.programa || '-'}</p>
+                      {a.tematica && <p className="text-slate-400 text-xs truncate mt-0.5">{a.tematica}</p>}
+                      <div className="flex items-center justify-between mt-1">
+                        <span className="text-slate-500 text-xs">{a.localidad || '-'}</span>
+                        <span className="text-slate-400 text-xs truncate max-w-[150px]">{a.usuario_nombre || '-'}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <Paginacion pagina={pagina2026} totalPaginas={totalPaginas2026} setPagina={setPagina2026} />
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Tablero Power BI estático */}
         <div className="relative flex items-center gap-4 py-2">
           <div className="flex-1 h-px bg-gradient-to-r from-transparent via-slate-200 to-slate-200" />
@@ -1115,6 +1094,63 @@ export function PanelEstadisticas({ rol }: { rol: string }) {
             </a>
           </div>
         </div>
+
+        {/* Tabla de datos fuente */}
+        {hasFetched2026 && !loading2026 && !error2026 && data2026.length > 0 && (
+          <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+            <div className="px-5 py-4 sm:px-6 sm:py-5 border-b border-slate-100 flex items-center gap-3">
+              <div className="w-8 h-8 bg-slate-50 rounded-lg flex items-center justify-center border border-slate-100 shrink-0">
+                <Database className="w-4 h-4 text-slate-400" />
+              </div>
+              <div>
+                <h3 className="font-bold text-slate-800 text-sm">Datos fuente · actividades_2026</h3>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Registros tal como llegan desde MS Forms · {data2026.length} entradas · ordenadas por fecha
+                  {data2026.length > 20 && <span> · mostrando últimas 20</span>}
+                </p>
+              </div>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs min-w-[960px]">
+                <thead>
+                  <tr className="bg-slate-50/60">
+                    {['Fecha', 'Programa', 'Estrategia', 'Institución', 'Municipio', 'Dirección', 'Personas', 'Grupo etario', 'Temática', 'Descripción', 'Cargado por'].map((h) => (
+                      <th key={h} className="text-left px-4 py-2.5 text-slate-400 font-semibold text-xs uppercase tracking-wide border-b border-slate-200/70 whitespace-nowrap">
+                        {h}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {data2026.slice(0, 20).map((a, i) => (
+                    <tr key={i} className="hover:bg-slate-50/60 border-b border-slate-100 last:border-0 transition-colors">
+                      <td className="px-4 py-2.5 text-slate-500 tabular-nums whitespace-nowrap">{formatFecha(a.fecha)}</td>
+                      <td className="px-4 py-2.5 text-slate-700 max-w-[140px] truncate">{a.programa || '-'}</td>
+                      <td className="px-4 py-2.5 text-slate-500 max-w-[120px] truncate">{a.estrategia || '-'}</td>
+                      <td className="px-4 py-2.5 text-slate-500 max-w-[130px] truncate">{a.institucion || '-'}</td>
+                      <td className="px-4 py-2.5 text-slate-700 whitespace-nowrap">{a.localidad || '-'}</td>
+                      <td className="px-4 py-2.5 text-slate-400 max-w-[130px] truncate">{a.direccion || '-'}</td>
+                      <td className="px-4 py-2.5 text-center">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-100">
+                          {(parseInt(String(a.cantidad_personas)) || 0).toLocaleString('es-AR')}
+                        </span>
+                      </td>
+                      <td className="px-4 py-2.5 text-slate-400 max-w-[110px] truncate">{a.grupo_etario || '-'}</td>
+                      <td className="px-4 py-2.5 text-slate-500 max-w-[130px] truncate">{a.tematica || '-'}</td>
+                      <td className="px-4 py-2.5 text-slate-400 max-w-[180px] truncate">{a.descripcion || '-'}</td>
+                      <td className="px-4 py-2.5 text-slate-400 whitespace-nowrap">{a.usuario_nombre || '-'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            {data2026.length > 20 && (
+              <div className="px-5 py-3 bg-slate-50/80 border-t border-slate-100 text-xs text-slate-400 text-center">
+                Mostrando los últimos 20 de {data2026.length} registros · Para ver el conjunto completo accedé al tablero en SharePoint
+              </div>
+            )}
+          </div>
+        )}
 
       </TabsContent>
     </Tabs>
